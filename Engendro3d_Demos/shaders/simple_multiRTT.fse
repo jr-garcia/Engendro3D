@@ -1,0 +1,79 @@
+effect
+{
+    description='Simple multi RTT.';
+    texturetype = 2d ;
+}
+
+texture2d
+{
+file = 'mask.bmp';
+name = mask;
+}
+
+target
+{
+name=diffuse;
+size = [1];
+}
+
+target
+{
+name=normals;
+// if 'size' is omited, size = size of the window.
+}
+target
+{
+name=depth;
+}
+
+target
+{
+name=positions;
+size = [1]; // this means size = 100% of screen in both width and height.
+}
+
+technique
+{
+    name = simple;
+    pass
+        {
+        vertex = vertex1;
+        fragment = fragment1;
+        in = _raw;
+        out = diffuse, normals, positions, depth;
+        clear = [.5, .5, .5];
+        }
+    pass
+        {
+            vertex = sqv;
+            fragment = sqf;
+            in = diffuse, normals, positions, depth;
+            out = _scene;
+            // clear = [.1, .1, .1]; // not used since background is not visible in last pass
+        }
+}
+
+shader
+{
+    name=vertex1;
+    file='multiVS.glsl';
+}
+
+shader
+{
+    name=fragment1;
+    file='multiFS.glsl';
+}
+
+shader
+{
+    name=sqf;
+    file='default_sq_FS.fs';
+}
+
+shader
+{
+    name=sqv;
+    file='default_sq_VS.vs';
+}
+

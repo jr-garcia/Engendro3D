@@ -1,0 +1,30 @@
+effect
+{
+    description='Simple scene renderer override.';
+    texturetype = 2d ;
+}
+
+technique
+{
+    name = simple;
+    pass
+    {
+        vertex = vertex1;
+        fragment = fragment1;
+        in = _raw;
+        out = _raw;
+        clear = [.5, .5, .5];
+    }
+}
+
+shader
+{
+    name=vertex1;
+    file='normalsVS.glsl';
+}
+
+shader
+{
+    name=fragment1;
+    file='normalsFS.glsl';
+}
