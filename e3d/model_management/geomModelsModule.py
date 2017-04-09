@@ -1,9 +1,9 @@
 from ..commonValues import radian
 from cycgkit.cgtypes import mat4, vec3
-from cycgkit.trimeshgeom import TriMeshGeom
-from cgkit.spheregeom import SphereGeom
-from cgkit.boxgeom import BoxGeom
-from cgkit.plane import PlaneGeom
+# from cycgkit.trimeshgeom import TriMeshGeom
+# from cgkit.spheregeom import SphereGeom
+# from cgkit.boxgeom import BoxGeom
+# from cgkit.plane import PlaneGeom
 
 
 class geomTypeEnum(object):

@@ -29,9 +29,6 @@ class game:
         self.lastspeed = 0
         nsize = [640, 480]
 
-        # Initialize the Engine
-        # self.engine = Engine(loglevel=logLevelsEnum.debug, multisampleLevel=16, restrictContextTo=[2, 1])
-
         self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1])
         self.engine.initialize()
 
@@ -51,7 +48,6 @@ class game:
 
         self.window.FPS_UpdatedCallback = self.updateTitle
 
-        # self.buildGui()
         self._started()
 
     def keydown(self, e):
@@ -194,7 +190,7 @@ class game:
             # mat.textureRepeat = 60
 
         except Exception as ex:
-            print('error in main._loadModels: ' + str(ex))
+            print('error in main.prepareScene: ' + str(ex))
             self.close()
             self.engine.terminate()
             raise

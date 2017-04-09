@@ -188,7 +188,7 @@ class game:
             # mat.textureRepeat = 60
 
         except Exception as ex:
-            print('error in main._loadModels: ' + str(ex))
+            print('error in main.prepareScene: ' + str(ex))
             self.close()
             self.engine.terminate()
             raise
