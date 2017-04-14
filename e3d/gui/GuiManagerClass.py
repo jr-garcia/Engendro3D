@@ -185,7 +185,11 @@ class GuiManager:
                 dump(fontRangeInfo, dest, protocol=2)
         else:
             with open(INFOFORMATSTRING.format(fontPath=infoPath), 'rb') as dest:
-                fontRangeInfo = load(dest, encoding='bytes')
+                try:
+                    fontRangeInfo = load(dest, encoding='bytes')
+                except TypeError:
+                    fontRangeInfo = load(dest)
+
         fontTextureName = FONTTEXTUREIDSTRING.format(ID)
         self.engine.textures.loadTexture(finalPath, fontTextureName, repeat=False, force=True)
         self.fontInfos[ID] = fontRangeInfo

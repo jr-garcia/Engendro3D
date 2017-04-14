@@ -1,3 +1,4 @@
+# coding=utf-8
 from collections import OrderedDict
 from os import makedirs, path
 
@@ -28,7 +29,7 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
 
     charRangeName, charRangeRange = charRange
 
-    if isinstance(charRangeRange, range):
+    if isinstance(charRangeRange, type(range)):
         finalRange = [chr(i) for i in charRangeRange]
     elif isinstance(charRangeRange, list):
         if isinstance(charRangeRange[0], str):
@@ -47,7 +48,12 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
     print('Rendering {} {}...'.format(fontName, charRange[0]))
     chars = []
     for c in finalRange:
-        if not c.isprintable():
+        if hasattr(c, 'isprintable'):
+            isPrintableTest = c.isprintable()
+        else:
+            from string import printable
+            isPrintableTest = c in printable
+        if not isPrintableTest:
             continue
 
         face.load_char(c)

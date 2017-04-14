@@ -21,8 +21,8 @@ class Demo(game):
 
     def loadModels(self):
         engine = self.engine
-        # engine.models.loadSphere("mainspheremodel", 32)
-        # self.sphere1 = self.scene1.addModel('mainspheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
+        engine.models.loadSphere("mainspheremodel", 32)
+        self.sphere1 = self.scene1.addModel('mainspheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
         # self.sphere1.physicsBody.isDynamic = True
         # mats = self.sphere1.getMaterialByIndex(0)
         # mats.specularPower = 50
