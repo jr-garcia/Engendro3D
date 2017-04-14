@@ -214,7 +214,10 @@ class FSEManager(object):
                 rt.createDepthAttachment(ssize)
             self._builtRenderTargets[effect.ID] = rt
         except Exception as ex:
-            raise Exception(es.format(str(ex)))
+            ex.message = es.format(str(ex))
+            if hasattr(ex, 'args'):
+                ex.args = tuple([ex.message])
+            raise
 
             # def terminate(self):
             #     try:

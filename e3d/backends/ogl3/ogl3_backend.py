@@ -466,6 +466,7 @@ class OGL3Backend(BaseBackend):
             rTarget._act(attachmentTypes, colorIndexes)
         except:
             self.unsetRenderTarget()
+            raise
 
     def unsetRenderTarget(self, rTarget=None):
         """
