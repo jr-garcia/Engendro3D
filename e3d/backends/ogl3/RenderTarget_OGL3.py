@@ -1,4 +1,5 @@
-from OpenGL.GL import *
+from glaze.GL import *
+from glaze import GL
 import numpy as np
 
 from ..RenderTargetBase import *
@@ -18,7 +19,8 @@ class RenderTarget(RTBase):
         # ftype = GL_BYTE # GL_FLOAT
         comp = GL_DEPTH_COMPONENT
         ftype = GL_FLOAT
-        texture = glGenTextures(1)
+        texture = np.empty((1,), np.uint32)
+        glGenTextures(1, texture)
         if '_depth' not in self._textures._textureCache:
             self._textures._textureCache['_depth'] = texture
         #  GL_DEPTH_ATTACHMENT                                               GL_DEPTH_STENCIL_ATTACHMENT
@@ -41,10 +43,11 @@ class RenderTarget(RTBase):
         @type engine: ManagersReferenceHolder
         @rtype : RenderTargetBaseClass
         """
-        super(RenderTarget, self).__init__(engine, textureType, hasDepth)
+        RTBase.__init__(self, engine, textureType, hasDepth)
         self._backend = backend
 
-        self._fbo = glGenFramebuffers(1)
+        self._fbo = np.empty((1,), np.uint32)
+        glGenFramebuffers(1, self._fbo)
 
         # if hasStencil:
         #     comp = GL_DEPTH_COMPONENT
@@ -121,10 +124,10 @@ class RenderTarget(RTBase):
         #     attachments.append(GL_DEPTH_ATTACHMENT)
 
         for unit in colorIndexes:
-            attachments.append(getattr(OpenGL.GL, 'GL_COLOR_ATTACHMENT' + str(unit)))
+            attachments.append(getattr(GL, 'GL_COLOR_ATTACHMENT' + str(unit)))
 
-        size = np.array(len(attachments), dtype=np.int32)
-        att = np.array(attachments, dtype=np.int32)
+        size = len(attachments)
+        att = np.array(attachments, dtype=np.uint32)
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, self._fbo)
         glDrawBuffers(size, att)
 
@@ -147,7 +150,7 @@ class RenderTarget(RTBase):
         @type atachmentType: attachmentTypeEnum
         """
         if atachmentType == attachmentTypeEnum.color:
-            atachType = getattr(OpenGL.GL, 'GL_COLOR_ATTACHMENT' + str(colorIndex))
+            atachType = getattr(GL, 'GL_COLOR_ATTACHMENT' + str(colorIndex))
         elif atachmentType == attachmentTypeEnum.depth:
             atachType = GL_DEPTH_ATTACHMENT
         elif atachmentType == attachmentTypeEnum.stencil:
@@ -181,14 +184,15 @@ class RenderTarget(RTBase):
         # if texturesSize == 0:
         #     raise AttributeError('Error in createColorAttachments: All specified colorIndexes exist already.')
 
-        textures = glGenTextures(texturesSize)
+        textures = np.empty((texturesSize,), np.uint32)
+        glGenTextures(texturesSize, textures)
 
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, self._fbo)
 
         tIDs = []
 
         for unit, size, ID in finals:
-            attachType = getattr(OpenGL.GL, 'GL_COLOR_ATTACHMENT' + str(unit))
+            attachType = getattr(GL, 'GL_COLOR_ATTACHMENT' + str(unit))
             comp = GL_RGBA
             ttype = GL_UNSIGNED_BYTE
             if texturesSize == 1:
