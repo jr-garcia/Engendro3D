@@ -1,53 +1,36 @@
 # TODO: find where I got these to give credit here.
 
-from OpenGL.raw.GL.VERSION.GL_2_0 import glGetActiveUniform as glGetActiveUniformRaw, glGetUniformLocation as \
-    glGetUniformLocationRaw, glGetActiveAttrib as glGetActiveAttribRaw, glGetAttribLocation as glGetAttribLocationRaw
-from OpenGL.GL import *
-from ctypes import create_string_buffer
+from glaze.GL import *
+import numpy as np
 
 
-def print_uniforms(program):
-    _count = GLint()
-    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, _count)
-    lenght = GLint()
-    glGetProgramiv(program, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH, lenght)
-
-    name = create_string_buffer(lenght.value)
-
-    for i in range(_count.value):
-        size = GLint()
-        type = GLenum()
-
-        glGetActiveUniformRaw(program, i, 255, None, size, type, name)
-
-        location = glGetUniformLocationRaw(program, name)
-
-        type_name = type_set[type.value]
-
-        print("Uniform {} (loc={}):\t{} {} <Size: {}>".format(
-              i, location, type_name, name.value, size.value))
-
-
-def getActiveUniforms(program):
+def getShaderActives(program, what1, what2):
     actives = []
-    _count = GLint()
-    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, _count)
-    lenght = GLint()
-    glGetProgramiv(program, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH, lenght)
+    _count = np.empty(1, np.int32)
+    glGetProgramiv(program, what1, _count)
+    maxLenght = np.empty(1, np.int32)
+    glGetProgramiv(program, what2, maxLenght)
 
-    name = create_string_buffer(lenght.value)
+    name = np.empty(maxLenght, np.uint8)
 
-    size = GLint()
-    type = GLenum()
+    size = np.empty(1, np.int32)
+    type = np.empty(1, np.uint32)
+    lenght = np.empty(1, np.int32)
 
-    for i in range(_count.value):
-        glGetActiveUniformRaw(program, i, 255, None, size, type, name)
+    for i in range(int(_count)):
+        if what1 == GL_ACTIVE_UNIFORMS:
+            func1 = glGetActiveUniform
+            func2 = glGetUniformLocation
+        else:
+            func1 = glGetActiveAttrib
+            func2 = glGetAttribLocation
 
-        location = glGetUniformLocationRaw(program, name)
+        func1(program, i, maxLenght, lenght, size, type, name)
+        location = func2(program, name)
 
-        type_name = type_set[type.value]
+        type_name = type_set[int(type)]
 
-        nname = name.value
+        nname = ''.join([chr(c) for c in name[:int(lenght)]])
         try:
             nname = nname.decode()
         except AttributeError:
@@ -58,31 +41,13 @@ def getActiveUniforms(program):
     return actives
 
 
+def getActiveUniforms(program):
+    actives = getShaderActives(program, GL_ACTIVE_UNIFORMS, GL_ACTIVE_UNIFORM_MAX_LENGTH)
+    return actives
+
+
 def getActiveAttribs(program):
-    actives = []
-    _count = GLint()
-    glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, _count)
-    lenght = GLint()
-    glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, lenght)
-
-    name = create_string_buffer(lenght.value)
-    size = GLint()
-    type = GLenum()
-
-    for i in range(_count.value):
-        glGetActiveAttribRaw(program, i, 255, None, size, type, name)
-
-        location = glGetAttribLocationRaw(program, name)
-
-        type_name = type_set[type.value]
-        nname = name.value
-        try:
-            nname = nname.decode()
-        except AttributeError:
-            pass
-
-        actives.append((location, type_name, nname))
-
+    actives = getShaderActives(program, GL_ACTIVE_ATTRIBUTES, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH)
     return actives
 
 
