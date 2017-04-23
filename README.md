@@ -13,7 +13,7 @@ Python + OpenGL - 3D Game Engine
     > `pip install git+https://github.com/jr-garcia/Glaze.git`
 * **[Numpy](http://www.numpy.org/)**
     > `pip install numpy`
-* **[cyCGkit](https://github.com/jr-garcia/cyCGkit_minimal)** 
+* **[CyCGkit](https://github.com/jr-garcia/cyCGkit_minimal)** 
     > `pip install git+https://github.com/jr-garcia/cyCGkit_minimal.git`    
 * **[Pillow (Pil fork)](https://python-pillow.org/)**
     > `pip install pillow`
