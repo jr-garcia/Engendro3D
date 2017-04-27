@@ -1,5 +1,8 @@
 from cgkit.cgtypes import vec3
 
+from _do_import import resolve_import
+resolve_import()
+
 from e3d import Engine, __version__
 from e3d.LoggerClass import logLevelsEnum, logger
 from e3d.backends import OGL3Backend
