@@ -391,12 +391,13 @@ class Mesh:
             snormals.append(vec3(0))
 
         for i in range(len(inds)):
-            ind = inds[i]
+            a, b, c = inds[i]
+            ind = int(a), int(b), int(c)
             triang = [verts[ind[0]], verts[ind[1]], verts[ind[2]]]
             normal = Mesh.calculateSurfaceNormal(triang)
-            snormals[ind[0]] += normal
-            snormals[ind[1]] += normal
-            snormals[ind[2]] += normal
+            snormals[ind[0]] += vec3(normal)
+            snormals[ind[1]] += vec3(normal)
+            snormals[ind[2]] += vec3(normal)
 
         return snormals
 
@@ -544,6 +545,7 @@ class Mesh:
         polarF1 = sharesdict[polars[1]]
         for f in polarF0:
             face = faces[f]
+            face = int(face[0]), int(face[1]), int(face[2])
             for v in range(3):
                 if face[v] == polars[0]:
                     newuv = list(uvs[face[v]])
@@ -571,6 +573,7 @@ class Mesh:
 
         for f in polarF1:
             face = faces[f]
+            face = int(face[0]), int(face[1]), int(face[2])
             for v in range(3):
                 if face[v] == polars[1]:
                     newuv = list(uvs[face[v]])
@@ -632,6 +635,7 @@ class Mesh:
         # place = 1
         for i in range(faces.__len__()):
             face = faces[i]
+            face = int(face[0]), int(face[1]), int(face[2])
             uv0 = uvs[face[0]]
             uv1 = uvs[face[1]]
             uv2 = uvs[face[2]]
@@ -659,6 +663,7 @@ class Mesh:
         bitangents = [list([0, 0, 0])] * len(vertices)
 
         for face in faces:
+            face = int(face[0]), int(face[1]), int(face[2])
             v0 = vertices[face[0]]
             v1 = vertices[face[1]]
             v2 = vertices[face[2]]
@@ -732,7 +737,7 @@ class Mesh:
         for face in faces:
             nface = [0, 0, 0]
             for i in range(3):
-                cFaceVert = face[i]
+                cFaceVert = int(face[i])
                 v = vertices[cFaceVert]
                 u = uvs[cFaceVert]
                 n = normals[cFaceVert]
