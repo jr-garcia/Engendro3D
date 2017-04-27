@@ -341,13 +341,13 @@ class Mesh:
         normals = []
 
         for i in range(len(faces)):
-            face = faces[i]
+            face = int(faces[i][0]), int(faces[i][1]), int(faces[i][2])
             triang = [verts[face[0]], verts[face[1]], verts[face[2]]]
             normal = Mesh.calculateSurfaceNormal(triang)
             normals.append(normal)
 
         for i in range(len(faces)):
-            face = faces[i]
+            face = int(faces[i][0]), int(faces[i][1]), int(faces[i][2])
             triang = list([verts[face[0]], verts[face[1]], verts[face[2]]])
             normal = list(normals[i])
             newVertices.extend(triang)
@@ -436,11 +436,11 @@ class Mesh:
 
     @staticmethod
     def calculateBoxUVS(vertices, faces, normals):
-        uvs = [None] * vertices.__len__()
+        uvs = [None] * len(vertices)
         quads = {}
-        for i in range(normals.__len__()):
+        for i in range(len(normals)):
             isinQuads = False
-            norm = str(normals[i])
+            norm = vec3(normals[i])
             for qnorm in quads.keys():
                 if qnorm == norm:
                     isinQuads = True
@@ -448,9 +448,9 @@ class Mesh:
             if not isinQuads:
                 quads[norm] = []
 
-        for i in range(faces.__len__()):
+        for i in range(len(faces)):
             verta = faces[i][0]
-            norm = str(normals[verta])
+            norm = vec3(normals[verta])
             for qnorm in quads.keys():
                 if qnorm == norm:
                     quads[qnorm].append(faces[i])
