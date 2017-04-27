@@ -10,7 +10,7 @@ from e3d.gui import *
 from cycgkit.cgtypes import *
 from random import randint as ri, random as rf
 
-import model_paths
+import _model_paths
 import os
 
 
@@ -129,7 +129,7 @@ class game:
             self.scene1.currentCamera = self.camera
             # self.scene1.beforeUpdateCallback = self.scene1Update
 
-            engine.models.loadModel(model_paths.triangleMODEL, "duckmodel", forceStatic=True)
+            engine.models.loadModel(_model_paths.triangleMODEL, "duckmodel", forceStatic=True)
             self.duck = self.scene1.addModel('duckmodel', 'duck1', vec3(0, 5, 5), vec3(0), 1.5)
             mat = self.duck.getMaterialByIndex(0)
             # mat.shaderID = 'normals'

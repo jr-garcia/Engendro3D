@@ -11,7 +11,7 @@ from _BaseDemo import game, runDemo
 
 class Demo(game):
     def __init__(self):
-        super(Demo, self).__init__()
+        game.__init__(self)
         self.texturesToLoad = [
             # ['e3dlogo.png', 'logo'],
             # ['Grass.jpg', 'grass'],
@@ -24,15 +24,15 @@ class Demo(game):
         engine.models.loadSphere("mainspheremodel", 32)
         self.sphere1 = self.scene1.addModel('mainspheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
         # self.sphere1.physicsBody.isDynamic = True
-        # mats = self.sphere1.getMaterialByIndex(0)
-        # mats.specularPower = 50
-        # mats.useDiffuseTexture = True
-        # mats.useNormalMapTexture = True
-        # mats.normalMapTextureID = 'defND'
-        # mats.textureRepeat = 4
-        # self.sphereMat = mats
-        # self.bumpymats.append(mats)
-        # self.texmats.append(mats)
+        mats = self.sphere1.getMaterialByIndex(0)
+        mats.specularPower = 50
+        mats.useDiffuseTexture = True
+        mats.useNormalMapTexture = True
+        mats.normalMapTextureID = 'defND'
+        mats.textureRepeat = 4
+        self.sphereMat = mats
+        self.bumpymats.append(mats)
+        self.texmats.append(mats)
 
         # engine.models.loadSphere("spheremodel", 12)
 
@@ -118,13 +118,12 @@ class Demo(game):
 
     def addLights(self):
         print('Adding Lights')
-        self.dlight = self.scene1.addLight(0, vec3(1.0, 1.0, 1.0), vec3(45, 45, 0))
-        self.dlight.color = vec3(.9, .9, 0.7)
-        self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
-        self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
-        self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
-        self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
-        self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
+        game.addLights(self)
+        # self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
+        # self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
+        # self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
+        # self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
+        # self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
 
     def dropBox(self):
         try:
@@ -173,9 +172,8 @@ class Demo(game):
                 #     print ev
 
     def keydown(self, e):
-        if e.name == 'keyUp':
+        if e.eventName == 'keyUp':
             return
-        # print "Key pressed=", e.keyName
         if e.keyName.__contains__('shift'):
             self.window.mouseLock = not self.window.mouseLock
         if e.keyName == 'escape':  # ESC

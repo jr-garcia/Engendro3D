@@ -10,15 +10,12 @@ from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
 from e3d.gui import Panel
 
+from _model_paths import *
+
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
 
 class game:
-    maindir = os.path.dirname(__file__)
-    planepath = os.path.join(maindir, "Engendro3D", "defaults", "primitives", "plane.x")
-    duckMODEL = os.path.join(maindir, "models", "duck", "duck.3DS")
-    dwarfMODEL = os.path.join(maindir, "models", 'dwarf', "dwarf.x")
-    tubeMODEL = os.path.join(maindir, "models", 'first_bone.x')
 
     camera = None
 
@@ -83,6 +80,11 @@ class game:
     def mouseMove(self, ev):
         pass
 
+    def addLights(self):
+        print('Adding Lights')
+        self.dlight = self.scene1.addLight(0, vec3(1.0, 1.0, 1.0), vec3(45, 45, 0))
+        self.dlight.color = vec3(.9, .9, 0.7)
+
     def scene1Update(self, ev):
         ft = ev[0] + .01
         movespeed = ft / 10.0
@@ -127,9 +129,10 @@ class game:
 
     def loadTextures(self):
         def loadTexture(*args):
+            args = args[0]
             if len(args) == 2:
                 args.append(False)
-            print('<< Loading texture:', args[1])
+            print('<< Loading texture:' + args[1])
             # self.pendingTex += 1
             # self.isWaitingTex = True
             self.engine.textures.loadTexture(args[0], args[1], args[2])
@@ -157,7 +160,7 @@ class game:
         # self.window.renderingMan.showAsWireframe = True
         print('Switch scene 0 >> 1')
         engine.scenes.setCurrentSceneID('scene1')
-
+        self.addLights()
         self.loadModels()
 
     def loadModels(self):
