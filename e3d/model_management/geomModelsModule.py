@@ -1,7 +1,8 @@
 from ..commonValues import radian
 from cycgkit.cgtypes import mat4, vec3
+from cycgkit.boundingbox import BoundingBox
 # from cycgkit.trimeshgeom import TriMeshGeom
-# from cgkit.spheregeom import SphereGeom
+from pygeom.spheregeom import SphereGeometry
 # from cgkit.boxgeom import BoxGeom
 # from cgkit.plane import PlaneGeom
 
@@ -13,47 +14,21 @@ class geomTypeEnum(object):
     plane = 'plane'
 
 
-def _convertExtractVert(geom):
-    tm = TriMeshGeom()
-    geom.convert(tm)
-    vert = []
-    ind = []
-    # norm = []
-    # uvs = []
-
-    # for var in tm.iterVariables():
-    #     for it in tm.slot(var[0]):
-    #         print(var[0], it)
-    if isinstance(geom, SphereGeom):
-        rot = mat4.rotation(90 * radian, vec3(1, 0, 0))
-        for v in tm.verts:
-            vert.append(list(rot * v))
-    else:
-        for v in tm.verts:
-            vert.append(list(v))
-
-    # if uvSlot:
-    #     for uv in uvSlot:
-    #         uvs.append(vec3(uv[0], uv[1], 0))
-    #
-    # if normalsSlot:
-    #     for n in normalsSlot:
-    #         norm.append(rot * n)
-
-    for f in tm.faces:
-        ind.append(list(f))
-
-    return vert, ind
-
-
 def _getObjVertIndBBox(geomObj):
-    vert, ind = _convertExtractVert(geomObj)
-    bbox = geomObj.boundingBox()
+    vert = geomObj.vertices
+    ind = []
+
+    for f in geomObj.faces:
+        ind.append(f.abcVec3())
+
+    bbox = geomObj.boundingBox = BoundingBox()
+    for v in vert:
+        bbox.addPoint(v)
     return vert, ind, bbox
 
 
 def _getSphereVertIndBBox(radius, segmentsU, segmentsV):
-    sp = SphereGeom(radius, segmentsU, segmentsV)
+    sp = SphereGeometry(radius, segmentsU, segmentsV)
     return _getObjVertIndBBox(sp)
 
 
