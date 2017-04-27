@@ -1,11 +1,9 @@
 from ..commonValues import radian
 from cycgkit.cgtypes import mat4, vec3
 from cycgkit.boundingbox import BoundingBox
-# from cycgkit.trimeshgeom import TriMeshGeom
-from pygeom.spheregeom import SphereGeometry
-# from cgkit.boxgeom import BoxGeom
-# from cgkit.plane import PlaneGeom
 
+from pygeom.spheregeom import SphereGeometry
+from pygeom.boxgeom import BoxGeometry
 
 class geomTypeEnum(object):
     sphere = 'sphere'
@@ -33,7 +31,7 @@ def _getSphereVertIndBBox(radius, segmentsU, segmentsV):
 
 
 def _getBoxVertIndBBox(sx, sy, sz, segmentsX, segmentsY, segmentsZ):
-    sp = BoxGeom(sx, sy, sz, segmentsX, segmentsY, segmentsZ)
+    sp = BoxGeometry(sx, sy, sz, segmentsX, segmentsY, segmentsZ)
     return _getObjVertIndBBox(sp)
 
 

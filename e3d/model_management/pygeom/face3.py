@@ -2,7 +2,9 @@ from cycgkit.cgtypes import vec3
 
 
 class Face3:
-    def __init__(self, a, b, c, normals):
+    def __init__(self, a, b, c, normals=None):
+        if normals is None:
+            normals = []
         self.a = a
         self.b = b
         self.c = c
