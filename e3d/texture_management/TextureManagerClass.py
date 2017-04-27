@@ -28,6 +28,7 @@ class TexturesManager():
         self._context = None
         self._window = None
         self._defaultTexture = None
+        self._defaultNormalMap = None
         self._engine = None
 
     def initialize(self, engine, window_context):
@@ -35,20 +36,18 @@ class TexturesManager():
         self._engine = engine
         self.remotequeue = Queue()
         self.localqueue = Queue()
-        self.paralellProcess = Process(target=serve, args=[self.remotequeue, self.localqueue])
-        # self.paralellProcess.start()
+        # self.parallelProcess = Process(target=serve, args=[self.remotequeue, self.localqueue])
+        # self.parallelProcess.start()
 
-        di = os.path.join(self._engine.path, 'defaults', 'textures', "default.png")
+        dt = os.path.join(self._engine.path.defaults.textures, "default.png")
+        dtnm = os.path.join(self._engine.path.defaults.textures, "default_nm.png")
         try:
-            self.loadTexture(di, "default", serial=True, raiseOnError=True)
+            self.loadTexture(dt, "default", serial=True, raiseOnError=True)
             self._defaultTexture = self._textureCache.get('default')
-        except Exception as ex:
-            # try:
-            #     ex.message = "Fatal error while retrieving default texture:\n{0}".format(ex.message)
-            # except:
-            #     ex.args[0] = "Fatal error while retrieving default texture:\n{0}".format(ex.args[0])
+            self.loadTexture(dtnm, "_defaultNM", serial=True, raiseOnError=True)
+            self._defaultNormalMap = self._textureCache.get('_defaultNM')
+        except:
             raise
-        # self.start()
 
     def run(self):
         # if SDL_GL_MakeCurrent(self._window, self._context):
@@ -56,6 +55,9 @@ class TexturesManager():
         while self._running:
             sleep(1.5)
             self.checkQueue()
+
+    def getDefaultNormalMap(self):
+        return self._defaultNormalMap
 
     def checkQueue(self):
         # return
@@ -147,7 +149,7 @@ class TexturesManager():
         @rtype : None
         @param ID:
         """
-        # TODO: turn into paralell
+        # TODO: turn into parallel
         cube = self._cubeTexCache.get(ID)
         if not cube:
             if not os.path.exists(folderPath):
@@ -189,7 +191,7 @@ class TexturesManager():
         except BrokenPipeError:
             pass
 
-        # self.paralellProcess.terminate()
+        # self.parallelProcess.terminate()
 
         # TODO: Move following code to backend
         # glBindTexture(GL_TEXTURE_2D, 0)

@@ -28,6 +28,10 @@ class Material(object):
 
         self._shaderProps = ShaderPropertiesList()
 
+    def setDefaultNormalMap(self):
+        self.normalMapTextureID = '_defaultNM'
+        self.useNormalMapTexture = True
+
     def _getShaderProps(self):
         return self._shaderProps
 

@@ -1,3 +1,5 @@
+from math import sin
+
 from _do_import import resolve_import
 
 from cgkit.cgtypes import vec3
@@ -13,11 +15,12 @@ class Demo(game):
     def __init__(self):
         game.__init__(self)
         self.texturesToLoad = [
-            # ['e3dlogo.png', 'logo'],
+            ['e3dlogo.png', 'logo'],
             # ['Grass.jpg', 'grass'],
-            ['defaults/default_n.png', 'defN'], ['./textures/n_deep.png', 'defND', True],
-            ['./textures/n_irr.png', 'defNI', True], ['./textures/nmap_test.png', 'testN', True],
-            ['./textures/earth_nasa_brighter.jpg', 'earth']]
+            ['./textures/n_deep.png', 'defND', True],
+            ['./textures/n_irr.png', 'defNI', True],
+            ['./textures/nmap_test.png', 'testN', True],
+            ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
 
     def loadModels(self):
         engine = self.engine
@@ -114,7 +117,6 @@ class Demo(game):
         # self.boxcount = 1
         # self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
         # self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
-        # self.addLights()
 
     def addLights(self):
         print('Adding Lights')
@@ -215,6 +217,42 @@ class Demo(game):
         if e.keyName == 't':
             for mat in self.texmats:
                 mat.useDiffuseTexture = not mat.useDiffuseTexture
+
+    def scene1Update(self, ev):
+        ft = ev[0] + .01
+        movespeed = ft / 10.0
+        # npos = list(self.camera._position)
+        # npos[1] -= 100000000
+        npos = self.camera.forward
+        npos[2] *= 100000000
+        # res = self.scene1.physics.castRay(self.camera._position, npos)
+        # if res:
+        #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
+        self.lastspeed = movespeed
+
+        ran1 = 45 * sin(ev[1] / 1000.0)
+        ran2 = 45 * sin(ev[1] / 500.0)
+        for s in self.spots:
+            s.rotation = vec3(ran2, 0, ran1)
+        # if self.dorot:
+            # if self.pushbox1:
+            #     self.pushbox1.rotateY(-.07 * ft)
+            #     self.pushbox2.rotateY(-.07 * ft)
+                # self.box1.rotateY(-.07 * ft)
+        if self.window.events.isKeyPressed('w'):
+            self.camera.moveForward(movespeed)
+        elif self.window.events.isKeyPressed('s'):
+            self.camera.moveBackward(movespeed)
+
+        if self.window.events.isKeyPressed('a'):
+            self.camera.moveLeft(movespeed)
+        elif self.window.events.isKeyPressed('d'):
+            self.camera.moveRight(movespeed)
+
+        if self.window.events.isKeyPressed('up'):
+            self.camera.moveUp(movespeed)
+        elif self.window.events.isKeyPressed('down'):
+            self.camera.moveDown(movespeed)
 
 
 if __name__ == '__main__':

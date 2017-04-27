@@ -1,6 +1,3 @@
-import os
-from math import sin
-
 from cgkit.cgtypes import vec3
 
 from e3d import Engine, __version__
@@ -9,8 +6,6 @@ from e3d.backends import OGL3Backend
 from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
 from e3d.gui import Panel
-
-from _model_paths import *
 
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
@@ -55,7 +50,6 @@ class game:
         self.engine.updateLoop()
 
     def onFirstRun(self, e):
-        print('First Run')
         listener = EventsListener()
         listener.onCustomEvent = self.customEvent
         self.window.events.addListener('main', listener)
@@ -81,45 +75,8 @@ class game:
         pass
 
     def addLights(self):
-        print('Adding Lights')
         self.dlight = self.scene1.addLight(0, vec3(1.0, 1.0, 1.0), vec3(45, 45, 0))
         self.dlight.color = vec3(.9, .9, 0.7)
-
-    def scene1Update(self, ev):
-        ft = ev[0] + .01
-        movespeed = ft / 10.0
-        # npos = list(self.camera._position)
-        # npos[1] -= 100000000
-        npos = self.camera.forward
-        npos[2] *= 100000000
-        # res = self.scene1.physics.castRay(self.camera._position, npos)
-        # if res:
-        #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
-        self.lastspeed = movespeed
-
-        ran1 = 45 * sin(ev[1] / 1000.0)
-        ran2 = 45 * sin(ev[1] / 500.0)
-        for s in self.spots:
-            s.rotation = vec3(ran2, 0, ran1)
-        # if self.dorot:
-            # if self.pushbox1:
-            #     self.pushbox1.rotateY(-.07 * ft)
-            #     self.pushbox2.rotateY(-.07 * ft)
-                # self.box1.rotateY(-.07 * ft)
-        if self.window.events.isKeyPressed('w'):
-            self.camera.moveForward(movespeed)
-        elif self.window.events.isKeyPressed('s'):
-            self.camera.moveBackward(movespeed)
-
-        if self.window.events.isKeyPressed('a'):
-            self.camera.moveLeft(movespeed)
-        elif self.window.events.isKeyPressed('d'):
-            self.camera.moveRight(movespeed)
-
-        if self.window.events.isKeyPressed('up'):
-            self.camera.moveUp(movespeed)
-        elif self.window.events.isKeyPressed('down'):
-            self.camera.moveDown(movespeed)
 
     def updateTitle(self, ev):
         self.window.title = "FPS: {0} | Frame: {1} | {2}".format(ev[0], ev[1], self.gameName)
@@ -181,7 +138,13 @@ class game:
         if ltype == 2:
             self.spots.append(nlight)
 
+    def scene1Update(self, ev):
+        pass
+
     def buildGui(self):
+        self._addCornerLogos()
+
+    def _addCornerLogos(self):
         self.onelayer = self.window.gui.addLayer('one')
         logos = []
         pSize = [0.1, 0.1]
