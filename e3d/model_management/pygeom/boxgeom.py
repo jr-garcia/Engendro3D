@@ -12,6 +12,10 @@ class BoxGeometry(Geometry):
 
         self.type = 'BoxGeometry'
 
+        width = float(width)
+        height = float(height)
+        depth = float(depth)
+
         self.parameters = {'width'         : width, 'height': height, 'depth': depth, 'widthSegments': widthSegments,
                            'heightSegments': heightSegments, 'depthSegments': depthSegments}
 
@@ -22,9 +26,9 @@ class BoxGeometry(Geometry):
         def buildPlane(u, v, udir, vdir, width, height, depth, materialIndex):
             gridX = widthSegments
             gridY = heightSegments
-            width_half = width / 2
-            height_half = height / 2
-            offset = len(self.vertices)
+            width_half = width / 2.0
+            height_half = height / 2.0
+            offset = float(len(self.vertices))
 
             indDict = {'x': 0, 'y': 1, 'z': 2}
 
@@ -90,4 +94,4 @@ class BoxGeometry(Geometry):
         buildPlane('x', 'y', 1, - 1, width, height, depth_half, 4)  # pz
         buildPlane('x', 'y', - 1, - 1, width, height, - depth_half, 5)  # nz
 
-        # self.mergeVertices()
+        self.mergeVertices()

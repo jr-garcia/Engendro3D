@@ -19,13 +19,12 @@ class Demo(game):
     def loadModels(self):
         engine = self.engine
         
-        engine.models.loadSphere("spheremodel", 32)
-        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
+        engine.models.loadSphere("spheremodel", segmentsU=32)
+        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 0, 0], [0, 0, 0], 4)
         mats = self.sphere1.getMaterialByIndex(0)
         mats.specularPower = 50
         mats.useDiffuseTexture = True
-        mats.useNormalMapTexture = True
-        mats.normalMapTextureID = 'defND'
+        mats.setDefaultNormalMap()
         mats.textureRepeat = 4
 
         engine.models.loadBox("boxmodel", [6], 1)
@@ -33,27 +32,23 @@ class Demo(game):
         mt = self.box1._materials[0]
         mt.specularPower = 40
         mt.useDiffuseTexture = True
-        mt.useNormalMapTexture = True
-        mt.normalMapTextureID = 'defNI'
+        mt.setDefaultNormalMap()
 
-        # engine.models.loadBox("pushboxmodel", [55, 3, 3], 2)
-        # self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
-        # self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
-        #
-        # engine.models.loadPlane("planemodelbig", 1, 15)
-        # engine.models.loadPlane("planemodel1", 1, 5)
+        engine.models.loadBox("pushboxmodel", [55, 3, 3], 2)
+        self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
+        self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
+
+        engine.models.loadPlane("planemodelbig", 1, 15)
+        engine.models.loadPlane("planemodel1", 1, 5)
         # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
         # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
         # 2. Poor Tessellation Hurts Lighting
-        # self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [-90, 0, 0], 1200)
-        # mt = self.plane1._materials[0]
-        # mt.specularPower = 50
-        # mt.useDiffuseTexture = True
-        # mt.useNormalMapTexture = True
-        # mt.normalMapTextureID = 'defNI'
-        # mt.textureRepeat = 40
-        # self.bumpymats.append(mt)
-        # self.texmats.append(mt)
+        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [-90, 0, 0], 1200)
+        mt = self.plane1._materials[0]
+        mt.specularPower = 50
+        mt.useDiffuseTexture = True
+        mt.setDefaultNormalMap()
+        mt.textureRepeat = 40
 
         # self.planer = self.scene1.addModel('planemodel1', 'planer', [300, 0, 0], [0, -80, 0], 280)
         # mt = self.planer._materials[0]

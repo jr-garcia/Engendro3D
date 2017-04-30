@@ -84,16 +84,18 @@ class ModelsManager(object):
                 except Exception:
                     raise
 
-    def loadSphere(self, ID, segmentsU=16, segmentsV=None):
+    def loadSphere(self, ID, segmentsU=16, segmentsV=None, radius=4.0):
         try:
             if ID in self._modelsCache.keys():
                 raise KeyError('The ID already exist.')
-            dictInfo = {'segmentsU': segmentsU, 'segmentsV': segmentsV}
+            if segmentsV is None:
+                segmentsV = segmentsU
+            dictInfo = {'radius': radius, 'segmentsU': segmentsU, 'segmentsV': segmentsV}
             mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.sphere, dictInfo)
             self._modelsCache[ID] = mod
             self._lastUVs = []
             self._lastChannel = -1
-        except Exception as ex:
+        except:
             raise
 
     def loadBox(self, ID, size, segmentsX=1, segmentsY=None, segmentsZ=None):
@@ -101,19 +103,25 @@ class ModelsManager(object):
             ssize = None
             if ID in self._modelsCache.keys():
                 raise KeyError('The ID already exist.')
-            if isinstance(size, int):
+            if isinstance(size, (int, float)):
                 ssize = [size] * 3
-            elif isinstance(size, list):
+            elif isinstance(size, list) and len(size) in [1, 3]:
                 if len(size) == 3:
                     ssize = size
+                elif len(size) == 1:
+                    ssize = [size[0], size[0], size[0]]
                 else:
-                    ssize = [size[0]] * 3
+                    raise TypeError('Size should be a 3 element list of numbers, or a single number.')
+
+            segmentsY = segmentsY or segmentsX
+            segmentsZ = segmentsZ or segmentsX
+
             dictInfo = {'size': ssize, 'segmentsX': segmentsX, 'segmentsY': segmentsY, 'segmentsZ': segmentsZ}
             mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.box, dictInfo)
             self._modelsCache[ID] = mod
             self._lastUVs = []
             self._lastChannel = -1
-        except Exception as ex:
+        except:
             raise
 
     def loadPlane(self, ID, size, segmentsX=1, segmentsY=None):

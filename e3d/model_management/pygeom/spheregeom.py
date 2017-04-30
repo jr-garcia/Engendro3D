@@ -13,6 +13,8 @@ class SphereGeometry(Geometry):
 
         Geometry.__init__(self)
 
+        radius = float(radius)
+
         widthSegments = int(max(3, math.floor(widthSegments or 8)))
         heightSegments = int(max(2, math.floor(heightSegments or 6)))
 

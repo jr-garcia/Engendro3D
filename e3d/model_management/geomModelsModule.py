@@ -46,29 +46,15 @@ def getObjectInfo(gtype, attDict):
     @type gtype: geomTypeEnum
     """
     if gtype == geomTypeEnum.sphere:
-        rad = attDict.get('radius', 4.0)
-        segU = attDict.get('segmentsU', 16)
+        rad = attDict.get('radius')
+        segU = attDict.get('segmentsU')
         segV = attDict.get('segmentsV')
-        if segV is None:
-            segV = segU
         obTup = _getSphereVertIndBBox(rad, segU, segV)
     elif gtype == geomTypeEnum.box:
-        size = attDict.get('size', [1.0, 1.0, 1.0])
-        if type(size) in [int, float]:
-            size = [size] * 3
-        elif isinstance(size, list) and len(size) in [1, 3]:
-            if len(size) == 1:
-                size = [size[0], size[0], size[0]]
-        else:
-            raise TypeError('Size should be a 3 element list of numbers, or a single number.')
-        sx, sy, sz = size
-        segX = attDict.get('segmentsX', 1)
+        sx, sy, sz = attDict.get('size')
+        segX = attDict.get('segmentsX')
         segY = attDict.get('segmentsY')
         segZ = attDict.get('segmentsZ')
-        if segY is None:
-            segY = segX
-        if segZ is None:
-            segZ = segX
         obTup = _getBoxVertIndBBox(sx, sy, sz, segX, segY, segZ)
     elif gtype == geomTypeEnum.plane:
         sx, sy = attDict.get('size', [1.0, 1.0])

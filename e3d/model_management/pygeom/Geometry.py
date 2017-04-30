@@ -208,8 +208,8 @@ class Geometry:
             #                 faceNormal = vec3()
             #                 vertexNormals = { a: vec3(), b: vec3(), c: vec3() }
             #
-            #                 dstNormalsFace.push( faceNormal )
-            #                 dstNormalsVertex.push( vertexNormals )
+            #                 dstNormalsFace.append( faceNormal )
+            #                 dstNormalsVertex.append( vertexNormals )
             #
             #             }
             #
@@ -336,7 +336,7 @@ class Geometry:
             #
             #         face =  self.faces[ f ]
             #
-            #         for ( i = 0 i < Math.min( face.vertexNormals.length, 3 ) i ++ ):
+            #         for ( i = 0 i < math.min( face.vertexNormals.length, 3 ) i ++ ):
             #
             #             n.copy( face.vertexNormals[ i ] )
             #
@@ -407,78 +407,61 @@ class Geometry:
             #      self.boundingSphere.setFromPoints(  self.vertices )
             #
             #
-            
-     # def mergeVertices(self):
-     #    verticesMap = {} # Hashmap for looking up vertice by position coordinates (and making sure they are unique)
-     #    unique = []
-     #    changes = []
-     #
-     #    precisionPoints = 4 # number of decimal points, eg. 4 for epsilon of 0.0001
-     #    precision = math.pow( 10, precisionPoints )
-     #
-     #    for ( i = 0, il = this.vertices.length i < il i ++ ):
-     #
-     #        v = this.vertices[ i ]
-     #        key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision )
-     #
-     #        if ( verticesMap[ key ] == undefined ):
-     #
-     #            verticesMap[ key ] = i
-     #            unique.push( this.vertices[ i ] )
-     #            changes[ i ] = unique.length - 1
-     #
-     #        else:
-     #
-     #            #console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key])
-     #            changes[ i ] = changes[ verticesMap[ key ] ]
-     #
-     #
-     #    # if faces are completely degenerate after merging vertices, we
-     #    # have to remove them from the geometry.
-     #    faceIndicesToRemove = []
-     #
-     #    for ( i = 0, il = this.faces.length i < il i ++ ):
-     #
-     #        face = this.faces[ i ]
-     #
-     #        face.a = changes[ face.a ]
-     #        face.b = changes[ face.b ]
-     #        face.c = changes[ face.c ]
-     #
-     #        indices = [ face.a, face.b, face.c ]
-     #
-     #        dupIndex = - 1
-     #
-     #        # if any duplicate vertices are found in a Face3
-     #        # we have to remove the face as nothing can be saved
-     #        for ( n = 0 n < 3 n ++ ):
-     #            if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ):
-     #
-     #                dupIndex = n
-     #                faceIndicesToRemove.push( i )
-     #                break
-     #
-     #            }
-     #        }
-     #
-     #    }
-     #
-     #    for ( i = faceIndicesToRemove.length - 1 i >= 0 i -- ):
-     #        idx = faceIndicesToRemove[ i ]
-     #
-     #        this.faces.splice( idx, 1 )
-     #
-     #        for ( j = 0, jl = this.faceVertexUvs.length j < jl j ++ ):
-     #
-     #            this.faceVertexUvs[ j ].splice( idx, 1 )
-     #
-     #        }
-     #
-     #    }
-     #
-     #    # Use unique set of vertices
-     #
-     #    diff = this.vertices.length - unique.length
-     #    this.vertices = unique
-     #    return diff
 
+    def mergeVertices(self):
+        verticesMap = {}  # Hashmap for looking up vertice by position coordinates (and making sure they are unique)
+        unique = []
+        changes = {}
+
+        precisionPoints = 4  # number of decimal points, eg. 4 for epsilon of 0.0001
+        precision = math.pow(10, precisionPoints)
+
+        for i in range(len(self.vertices)):
+            v = self.vertices[i]
+            key = '{}_{}_{}'.format(round(v.x * precision), round(v.y * precision), round(v.z * precision))
+
+            if verticesMap.get(key) is None:
+                verticesMap[key] = i
+                unique.append(self.vertices[i])
+                changes[i] = len(unique) - 1
+            else:
+                # console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key])
+                changes[i] = changes[verticesMap[key]]
+
+        # if faces are completely degenerate after merging vertices, we
+        # have to remove them from the geometry.
+        faceIndicesToRemove = []
+
+        for i in range(len(self.faces)):
+
+            face = self.faces[i]
+
+            face.a = changes[face.a]
+            face.b = changes[face.b]
+            face.c = changes[face.c]
+
+            indices = [face.a, face.b, face.c]
+
+            dupIndex = - 1
+
+            # if any duplicate vertices are found in a Face3
+            # we have to remove the face as nothing can be saved
+            for n in range(3):
+                if indices[n] == indices[(n + 1) % 3]:
+                    dupIndex = n
+                    faceIndicesToRemove.append(i)
+                    break
+        for i in range(len(faceIndicesToRemove) - 1, 0, -1):
+            # for ( i = faceIndicesToRemove.length - 1 i >= 0 i -- ):
+            idx = faceIndicesToRemove[i]
+
+            self.faces.splice(idx, 1)
+
+            for j in range(len(self.faceVertexUvs)):
+                self.faceVertexUvs[j].splice(idx, 1)
+
+        # Use unique set of vertices
+
+        diff = len(self.vertices) - len(unique)
+        self.vertices = unique
+        return diff
