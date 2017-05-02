@@ -20,35 +20,36 @@ class Demo(game):
         engine = self.engine
         
         engine.models.loadSphere("spheremodel", segmentsU=32)
-        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 0, 0], [0, 0, 0], 4)
+        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 20, 0], [0, 0, 0], 4)
         mats = self.sphere1.getMaterialByIndex(0)
         mats.specularPower = 50
         mats.useDiffuseTexture = True
         mats.setDefaultNormalMap()
         mats.textureRepeat = 4
 
-        engine.models.loadBox("boxmodel", [6], 1)
-        self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 90, 0], [0, 90, 0], 5, mass=7)
+        engine.models.loadBox("boxmodel", [20], 2)
+        self.box1 = self.scene1.addModel('boxmodel', 'box1', [-20, 10, 0], [0, 0, 0], 1)
         mt = self.box1._materials[0]
         mt.specularPower = 40
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()
 
-        engine.models.loadBox("pushboxmodel", [55, 3, 3], 2)
-        self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
-        self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
+        # engine.models.loadBox("pushboxmodel", [55, 3, 3], 2)
+        # self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
+        # self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
 
-        engine.models.loadPlane("planemodelbig", 1, 15)
-        engine.models.loadPlane("planemodel1", 1, 5)
+        engine.models.loadPlane("planemodelbig", 500, 500, 6)
+        # engine.models.loadPlane("planemodel1", 1, 5)
         # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
         # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
         # 2. Poor Tessellation Hurts Lighting
-        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [-90, 0, 0], 1200)
+        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
         mt = self.plane1._materials[0]
+        # self.plane1._materials[0]  =mt
         mt.specularPower = 50
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()
-        mt.textureRepeat = 40
+        mt.textureRepeat = 80
 
         # self.planer = self.scene1.addModel('planemodel1', 'planer', [300, 0, 0], [0, -80, 0], 280)
         # mt = self.planer._materials[0]

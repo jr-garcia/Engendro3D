@@ -2,8 +2,9 @@ from ..commonValues import radian
 from cycgkit.cgtypes import mat4, vec3
 from cycgkit.boundingbox import BoundingBox
 
-from pygeom.spheregeom import SphereGeometry
-from pygeom.boxgeom import BoxGeometry
+from .pygeom.spheregeom import SphereGeometry
+from .pygeom.boxgeom import BoxGeometry
+from .pygeom.planegeom import PlaneGeometry
 
 class geomTypeEnum(object):
     sphere = 'sphere'
@@ -36,7 +37,7 @@ def _getBoxVertIndBBox(sx, sy, sz, segmentsX, segmentsY, segmentsZ):
 
 
 def _getPlaneVertIndBBox(sx, sy, segmentsX, segmentsY):
-    sp = PlaneGeom(sx, sy, segmentsX, segmentsY)
+    sp = PlaneGeometry(sx, 1, sy, segmentsX, segmentsY, segmentsY)
     return _getObjVertIndBBox(sp)
 
 
@@ -44,6 +45,8 @@ def getObjectInfo(gtype, attDict):
     """
 
     @type gtype: geomTypeEnum
+    @param attDict: 
+    @type attDict: dict
     """
     if gtype == geomTypeEnum.sphere:
         rad = attDict.get('radius')
@@ -57,11 +60,10 @@ def getObjectInfo(gtype, attDict):
         segZ = attDict.get('segmentsZ')
         obTup = _getBoxVertIndBBox(sx, sy, sz, segX, segY, segZ)
     elif gtype == geomTypeEnum.plane:
-        sx, sy = attDict.get('size', [1.0, 1.0])
-        segX = attDict.get('segmentsX', 1)
+        sx = attDict.get('sizeX')
+        sy = attDict.get('sizeY')
+        segX = attDict.get('segmentsX')
         segY = attDict.get('segmentsY')
-        if segY is None:
-            segY = segX
         obTup = _getPlaneVertIndBBox(sx, sy, segX, segY)
     else:
         raise NotImplementedError('oops :(', gtype, attDict)

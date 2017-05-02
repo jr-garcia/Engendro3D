@@ -78,7 +78,7 @@ class game:
         pass
 
     def addLights(self):
-        self.dlight = self.scene1.addLight(0, vec3(1.0, 1.0, 1.0), vec3(45, 45, 0))
+        self.dlight = self.scene1.addLight(0, vec3(100000.0, 10000.0, 100000.0), vec3(45, 45, 0))
         self.dlight.color = vec3(.9, .9, 0.7)
 
     def updateTitle(self, ev):
@@ -108,8 +108,7 @@ class game:
             self.scene1 = engine.scenes.addScene('scene1')
             self.scene1.currentCamera = self.camera
             self.scene1.beforeUpdateCallback = self.scene1Update
-            # self.scene1.ambientColor = vec3(.05, .08, .1)
-            self.scene1.ambientColor = vec3(.0, .0, .0)
+            self.scene1.ambientColor = vec3(.03, .06, .09)
 
         except Exception as ex:
             print('error in main.prepareScene: {}'.format(str(ex)))
@@ -117,7 +116,6 @@ class game:
 
         self.camera.position = [0, 10, 230]
 
-        # self.window.renderingMan.showAsWireframe = True
         print('Switch scene 0 >> 1')
         engine.scenes.setCurrentSceneID('scene1')
         self.addLights()

@@ -100,7 +100,6 @@ class ModelsManager(object):
 
     def loadBox(self, ID, size, segmentsX=1, segmentsY=None, segmentsZ=None):
         try:
-            ssize = None
             if ID in self._modelsCache.keys():
                 raise KeyError('The ID already exist.')
             if isinstance(size, (int, float)):
@@ -124,24 +123,16 @@ class ModelsManager(object):
         except:
             raise
 
-    def loadPlane(self, ID, size, segmentsX=1, segmentsY=None):
+    def loadPlane(self, ID, sizeX=10, sizeY=None, segmentsX=4, segmentsY=None):
         try:
-            ssize = None
-            if ID in self._modelsCache.keys():
-                raise KeyError('The ID already exist.')
-            if type(size) in [int, float]:
-                ssize = [size] * 2
-            elif isinstance(size, list):
-                if len(size) == 2:
-                    ssize = size
-                else:
-                    ssize = [size[0]] * 2
-            dictInfo = {'size': ssize, 'segmentsX': segmentsX, 'segmentsY': segmentsY}
+            sizeY = sizeY or sizeX
+            segmentsY = segmentsY or segmentsX
+            dictInfo = {'sizeX': sizeX, 'sizeY': sizeY, 'segmentsX': segmentsX, 'segmentsY': segmentsY}
             mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.plane, dictInfo)
             self._modelsCache[ID] = mod
             self._lastUVs = []
             self._lastChannel = -1
-        except Exception as ex:
+        except:
             raise
 
     def loadCapsule(self, ID, radius, height):

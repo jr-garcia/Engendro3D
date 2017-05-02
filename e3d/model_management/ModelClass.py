@@ -385,8 +385,14 @@ class Model:
 
         @type constructInfoDict: dict
         """
+
         verts, inds, bbox = getObjectInfo(gtype, constructInfoDict)
         model = Model(engine)
+        model.rootNode = Node(ID)
+        model.boundingBox = bbox
+        model.materials.append(Material())
+        minmax = bbox.getBounds()
+
         if gtype == geomTypeEnum.sphere:
             model._preShape = bodyShapesEnum.sphere
             uvct = UVCalculationTypeEnum.spherical
@@ -402,10 +408,7 @@ class Model:
         else:
             uvct = UVCalculationTypeEnum.spherical
             nct = NormalsCalculationTypeEnum.smooth
-        model.rootNode = Node(ID)
-        model.boundingBox = bbox
-        model.materials.append(Material())
-        minmax = bbox.getBounds()
+
         try:
             mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvct, nct)
         except Exception as ex:
