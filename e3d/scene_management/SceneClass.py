@@ -86,8 +86,8 @@ class Scene(object):
             return modelIns
         else:
             raise KeyError(
-                "Error adding model. The specified ID (" + modelID + ") does not exist.\nTry loading the model before "
-                                                                     "calling addModel.")
+                "Error adding model. The specified ID ('" + modelID +
+                "') does not exist.\nTry loading the model before calling addModel.")
 
     def addLight(self, ltype=lightTypesEnum.directional, position=None, rotation=None, ID=''):
         """
