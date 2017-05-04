@@ -68,24 +68,19 @@ class SphereGeometry(Geometry):
                 uv4 = vec3(uvs[y + 1][x + 1])
 
                 if math.fabs(self.vertices[v1].y) == radius:
-
-                    uv1.x = (uv1.x + uv2.x) / 2
-                    self.faces.append(Face3(v1, v3, v4, [n1, n3, n4]))
+                    uv1.x = (uv1.x + uv2.x) / 2.0
+                    self.faces.append(Face3(v1, v3, v4, [vec3(n1), vec3(n3), vec3(n4)]))
                     self.faceVertexUvs[0].append([uv1, uv3, uv4])
-
                 elif math.fabs(self.vertices[v3].y) == radius:
-
-                    uv3.x = (uv3.x + uv4.x) / 2
-                    self.faces.append(Face3(v1, v2, v3, [n1, n2, n3]))
+                    uv3.x = (uv3.x + uv4.x) / 2.0
+                    self.faces.append(Face3(v1, v2, v3, [vec3(n1), vec3(n2), vec3(n3)]))
                     self.faceVertexUvs[0].append([uv1, uv2, uv3])
-
                 else:
-
-                    self.faces.append(Face3(v1, v2, v4, [n1, n2, n4]))
+                    self.faces.append(Face3(v1, v2, v4, [vec3(n1), vec3(n2), vec3(n4)]))
                     self.faceVertexUvs[0].append([uv1, uv2, uv4])
 
-                    self.faces.append(Face3(v2, v3, v4, [vec3(n2), n3, vec3(n4)]))
+                    self.faces.append(Face3(v2, v3, v4, [vec3(n2), vec3(n3), vec3(n4)]))
                     self.faceVertexUvs[0].append([vec3(uv2), uv3, vec3(uv4)])
 
-        self.computeFaceNormals()
+        # self.computeFaceNormals()
 
