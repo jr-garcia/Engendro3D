@@ -43,7 +43,7 @@ class EventsListener(object):
         elif etype in [SDL_FINGERDOWN, SDL_FINGERUP, SDL_FINGERMOTION]:
             myEvent = FingerEvent(event)
         elif etype in [SDL_TEXTEDITING, SDL_TEXTINPUT]:
-            print('text input/edit', etype, event.text.text)
+            # print('text input/edit', etype, event.text.text)
             SDL_PumpEvents()
             return True
         else:
@@ -51,6 +51,6 @@ class EventsListener(object):
                 self.onCustomEvent(event)
                 return event.discarded
             else:
-                print('Unhandled event etype: ' + str(etype))
+                # print('Unhandled event etype: ' + str(etype))
                 return False
         return myEvent.discarded
