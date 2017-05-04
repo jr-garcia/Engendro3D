@@ -44,7 +44,6 @@ class Window(object):
             @type parent: long
             """
         self.engine = engine
-        self.renderingMan = None
         self.firstRunCallback = None
         self.renderBeginCallback = None
         self.renderEndCallback = None

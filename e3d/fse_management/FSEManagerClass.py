@@ -1,7 +1,7 @@
 from .FullScreenEffectClass import FullScreenEffect
 from ..backends.RenderTargetBase import attachmentTypeEnum, renderTextureTypeEnum
 from ..LoggerClass import logger, logLevelsEnum
-from ..backends.base_backend import CompilationError
+from ..backends.base_backend import CompilationError, BaseBackend
 
 from glaze.GL import glDetachShader
 
@@ -16,7 +16,7 @@ class FSEManager(object):
 
 
 
-        @type renderMan: RenderingManager
+        @type backend: BaseBackend
         @rtype : FSEManager
         @type engine: ManagersReferenceHolder
         """

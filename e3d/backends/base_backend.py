@@ -16,6 +16,7 @@ class BaseBackend:
     def __init__(self):
         self.shaders = None
         self.textures = None
+        self._poliCount = 0
         # self._defaultCamera = SimpleCamera([0, 0, 0], [0, 0, 0])
         # self._currentCamera = self._defaultCamera
 
@@ -44,6 +45,11 @@ class BaseBackend:
     @staticmethod
     def getRenderTarget():
         pass
+
+    def _getPoliCount(self):
+        return self._poliCount
+
+    poligonsDrawnThisUpdate = property(_getPoliCount)
 
 
 class ShaderStruct(OrderedDict):

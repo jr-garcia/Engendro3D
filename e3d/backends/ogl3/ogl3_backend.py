@@ -22,7 +22,7 @@ class OGL3Backend(BaseBackend):
         self._setClearColor(self._defaultClearColor)
         self.shaders = engine.shaders
         self.textures = self._engine.textures
-        self._policount = 0
+        self._poliCount = 0
         self.drawingData = None
         self._window = window
         self._shaderOverride = None
@@ -363,7 +363,7 @@ class OGL3Backend(BaseBackend):
         self._engine.shaders._setShaderState(self._engine.shaders._currentShader, 0)
 
     def renderMesh(self, mesh, currentShader):
-        self._policount += mesh.primitiveCount
+        self._poliCount += mesh.primitiveCount
 
         stride = mesh._stride
         used_attribs = []
@@ -371,7 +371,6 @@ class OGL3Backend(BaseBackend):
             u = self._enableAttribute(currentShader, dd._name, stride, dd._offset)
             used_attribs.extend(u)
 
-        # glDrawArrays(GL_TRIANGLES, 0,  mesh.vertexCount)  # No indexing
         glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0)  # Using indexing
 
         for att in used_attribs:

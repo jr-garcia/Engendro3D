@@ -176,6 +176,10 @@ class Engine:
 
     def createWindow(self, title='', gameName='', size=None, FullScreenSize=None, parent=None, fullscreen=False,
                      vSynch=True, iconPath=None):
+        """
+
+        :rtype: Window
+        """
         win = Window(self, title, gameName, size, FullScreenSize, parent, fullscreen, vSynch, iconPath)
         self._windows[id(win)] = win
         return win
