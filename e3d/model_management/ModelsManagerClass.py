@@ -135,6 +135,18 @@ class ModelsManager(object):
         except:
             raise
 
+    def loadTorusKnot(self, ID, radius=100, tube=40, radialSegments=64, tubularSegments=8, p=2, q=3, heightScale=1):
+        if p <= 0:
+            raise RuntimeError("'p' value must be > 0")
+        try:
+            dictInfo = radius, tube, radialSegments, tubularSegments, p, q, heightScale
+            mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.torusKnot, dictInfo)
+            self._modelsCache[ID] = mod
+            self._lastUVs = []
+            self._lastChannel = -1
+        except:
+            raise
+
     def loadCapsule(self, ID, radius, height):
         raise NotImplementedError('Please report.')
 

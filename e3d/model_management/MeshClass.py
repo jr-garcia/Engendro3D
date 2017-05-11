@@ -167,8 +167,11 @@ class Mesh:
         uvsTypes = [list, ndarray]
         hasAnyTex = False
         if type(UVsOrCalculationType) in uvsTypes:
+            if len(UVsOrCalculationType) != 8:
+                raise ValueError("'UVsOrCalculationType should be of len=7. It is len={}".format(len(UVsOrCalculationType)))
             for i in range(len(UVsOrCalculationType)):
-                if type(UVsOrCalculationType[i]) in uvsTypes and len(UVsOrCalculationType[i]) == len(vertices):
+                if type(UVsOrCalculationType[i]) in uvsTypes and (len(UVsOrCalculationType[i]) == len(vertices)
+                                                                  or len(UVsOrCalculationType[i]) == len(faces)):
                     newMesh._hasTexCoords[i] = True
                     hasAnyTex = True
                     texCoords.append(UVsOrCalculationType[i])
@@ -449,7 +452,7 @@ class Mesh:
                 quads[norm] = []
 
         for i in range(len(faces)):
-            verta = faces[i][0]
+            verta = int(faces[i][0])
             norm = vec3(normals[verta])
             for qnorm in quads.keys():
                 if qnorm == norm:
@@ -459,9 +462,9 @@ class Mesh:
         for q in quads.items():
             vertlist = []
             for face in q[1]:
-                ver0 = vertices[face[0]]
-                ver1 = vertices[face[1]]
-                ver2 = vertices[face[2]]
+                ver0 = vertices[int(face[0])]
+                ver1 = vertices[int(face[1])]
+                ver2 = vertices[int(face[2])]
                 vertlist.append([ver0, ver1, ver2])
             res = Mesh.calculatePlanarUVS(vertlist, q[0])
             quadUVS.append(res)
@@ -471,9 +474,9 @@ class Mesh:
             lastface = 0
             facesUvs = quadUVS[counter]
             for face in q[1]:
-                uvs[face[0]] = facesUvs[lastface]
-                uvs[face[1]] = facesUvs[lastface + 1]
-                uvs[face[2]] = facesUvs[lastface + 2]
+                uvs[int(face[0])] = facesUvs[lastface]
+                uvs[int(face[1])] = facesUvs[lastface + 1]
+                uvs[int(face[2])] = facesUvs[lastface + 2]
                 lastface += 3
             counter += 1
 
@@ -511,7 +514,7 @@ class Mesh:
             for ver in v:
                 U = scaleNumber(ver.x, srcU, [0.0, 1.0])
                 V = scaleNumber(ver.y, srcV, [0.0, 1.0])
-                uvs.append([U, V, 0])
+                uvs.append([U, V, 1.0])
 
         return uvs
 
@@ -659,8 +662,8 @@ class Mesh:
     @staticmethod
     def calculateTanBitan(vertices, faces, uvs, normals):
         # http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
-        tangents = [list([0, 0, 0])] * len(vertices)
-        bitangents = [list([0, 0, 0])] * len(vertices)
+        tangents = [list([0.0, 0.0, 0.0])] * len(vertices)
+        bitangents = [list([0.0, 0.0, 0.0])] * len(vertices)
 
         for face in faces:
             face = int(face[0]), int(face[1]), int(face[2])

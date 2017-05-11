@@ -111,8 +111,8 @@ class Skeleton(object):
                                              transformationInfo.rotation.y, transformationInfo.rotation.z])
 
                         rotationMatrix = quat(transformationInfo.rotation).toMat4()
-                        positionMatrix = mat4.translation(transformationInfo.position)
-                        scaleMatrix = mat4.scaling(transformationInfo.scale)
+                        positionMatrix = mat4.translation(vec3(transformationInfo.position))
+                        scaleMatrix = mat4.scaling(vec3(transformationInfo.scale))
                         nodeTransformation = positionMatrix * rotationMatrix * scaleMatrix
 
                     nodeTransformation = nodeTransformation.transpose()
@@ -386,31 +386,35 @@ class Model:
         @type constructInfoDict: dict
         """
 
-        verts, inds, bbox = getObjectInfo(gtype, constructInfoDict)
+        verts, inds, bbox, uvs = getObjectInfo(gtype, constructInfoDict)
         model = Model(engine)
         model.rootNode = Node(ID)
         model.boundingBox = bbox
         model.materials.append(Material())
         minmax = bbox.getBounds()
+        uvsList = [[]] * 8
+        uvsList[0] = uvs
 
-        if gtype == geomTypeEnum.sphere:
+        if gtype in [geomTypeEnum.sphere, geomTypeEnum.torusKnot]:
             model._preShape = bodyShapesEnum.sphere
-            uvct = UVCalculationTypeEnum.spherical
+            nct = NormalsCalculationTypeEnum.smooth
+        elif gtype == geomTypeEnum.icosphere:
+            model._preShape = bodyShapesEnum.sphere
+            uvsList = UVCalculationTypeEnum.spherical
             nct = NormalsCalculationTypeEnum.smooth
         elif gtype == geomTypeEnum.box:
             model._preShape = bodyShapesEnum.box
-            uvct = UVCalculationTypeEnum.box
+            uvsList = UVCalculationTypeEnum.box
             nct = NormalsCalculationTypeEnum.hard
         elif gtype == geomTypeEnum.plane:
             model._preShape = bodyShapesEnum.box
-            uvct = UVCalculationTypeEnum.planar
             nct = NormalsCalculationTypeEnum.hard
         else:
-            uvct = UVCalculationTypeEnum.spherical
+            uvsList = UVCalculationTypeEnum.spherical
             nct = NormalsCalculationTypeEnum.smooth
 
         try:
-            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvct, nct)
+            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvsList, nct)
         except Exception as ex:
             ex.message = 'Error creating mesh from info: ' + ex.message
             raise

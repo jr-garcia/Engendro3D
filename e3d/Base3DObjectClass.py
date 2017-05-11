@@ -93,7 +93,7 @@ class Base3DObject(Attachable):
         elif isinstance(size, int) or isinstance(size, float):
             size = [size] * 3
 
-        self.__size = vec3(size)
+        self._size = vec3(size)
 
         if uniformScale != 1:
             fs = [s * float(uniformScale) for s in size]
@@ -113,7 +113,7 @@ class Base3DObject(Attachable):
         return '\'{}\''.format(self.ID)
 
     def getSize(self):
-        return self._scale[0] * self.__size
+        return self._scale[0] * self._size
 
     def _getAbsolutePosition(self):
         """
