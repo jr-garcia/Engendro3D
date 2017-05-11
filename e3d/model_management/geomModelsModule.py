@@ -5,40 +5,35 @@ from cycgkit.boundingbox import BoundingBox
 from .pygeom.spheregeom import SphereGeometry
 from .pygeom.boxgeom import BoxGeometry
 from .pygeom.planegeom import PlaneGeometry
+from .pygeom.torusknotgeom import TorusKnotGeometry
+
 
 class geomTypeEnum(object):
     sphere = 'sphere'
     box = 'box'
     capsule = 'capsule'
     plane = 'plane'
+    torusKnot = 'torusKnot'
+    icosphere = 'icosphere'
 
 
-def _getObjVertIndBBox(geomObj):
+def _getObjData(geomObj):
     vert = geomObj.vertices
     ind = []
+    uvs = [vec3(0, 0, 0)] * len(vert)
 
-    for f in geomObj.faces:
+    for i in range(len(geomObj.faces)):
+        f = geomObj.faces[i]
         ind.append(f.abcVec3())
+        uvs[f.a] = geomObj.faceVertexUvs[i][0]
+        uvs[f.b] = geomObj.faceVertexUvs[i][1]
+        uvs[f.c] = geomObj.faceVertexUvs[i][2]
 
     bbox = geomObj.boundingBox = BoundingBox()
     for v in vert:
         bbox.addPoint(v)
-    return vert, ind, bbox
 
-
-def _getSphereVertIndBBox(radius, segmentsU, segmentsV):
-    sp = SphereGeometry(radius, segmentsU, segmentsV)
-    return _getObjVertIndBBox(sp)
-
-
-def _getBoxVertIndBBox(sx, sy, sz, segmentsX, segmentsY, segmentsZ):
-    sp = BoxGeometry(sx, sy, sz, segmentsX, segmentsY, segmentsZ)
-    return _getObjVertIndBBox(sp)
-
-
-def _getPlaneVertIndBBox(sx, sy, segmentsX, segmentsY):
-    sp = PlaneGeometry(sx, 1, sy, segmentsX, segmentsY, segmentsY)
-    return _getObjVertIndBBox(sp)
+    return vert, ind, bbox, uvs
 
 
 def getObjectInfo(gtype, attDict):
@@ -52,20 +47,23 @@ def getObjectInfo(gtype, attDict):
         rad = attDict.get('radius')
         segU = attDict.get('segmentsU')
         segV = attDict.get('segmentsV')
-        obTup = _getSphereVertIndBBox(rad, segU, segV)
+        geomObj = SphereGeometry(rad, segU, segV)
     elif gtype == geomTypeEnum.box:
         sx, sy, sz = attDict.get('size')
         segX = attDict.get('segmentsX')
         segY = attDict.get('segmentsY')
         segZ = attDict.get('segmentsZ')
-        obTup = _getBoxVertIndBBox(sx, sy, sz, segX, segY, segZ)
+        geomObj = BoxGeometry(sx, sy, sz, segX, segY, segZ)
     elif gtype == geomTypeEnum.plane:
         sx = attDict.get('sizeX')
         sy = attDict.get('sizeY')
         segX = attDict.get('segmentsX')
         segY = attDict.get('segmentsY')
-        obTup = _getPlaneVertIndBBox(sx, sy, segX, segY)
+        geomObj = PlaneGeometry(sx, 1, sy, segX, segY, segY)
+    elif gtype == geomTypeEnum.torusKnot:
+        # radius, tube, radialSegments, tubularSegments, p, q, heightScale = attDict
+        geomObj = TorusKnotGeometry(*attDict)
     else:
-        raise NotImplementedError('oops :(', gtype, attDict)
+        raise NotImplementedError('geometryType not found :(', gtype, attDict)
 
-    return obTup
+    return _getObjData(geomObj)

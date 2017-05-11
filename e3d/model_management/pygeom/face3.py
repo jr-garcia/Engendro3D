@@ -13,3 +13,6 @@ class Face3:
 
     def abcVec3(self):
         return vec3(self.a, self.b, self.c)
+
+    def __repr__(self):
+        return '{},{},{}'.format(self.a, self.b, self.c)

@@ -70,17 +70,14 @@ class SphereGeometry(Geometry):
                 if math.fabs(self.vertices[v1].y) == radius:
                     uv1.x = (uv1.x + uv2.x) / 2.0
                     self.faces.append(Face3(v1, v3, v4, [vec3(n1), vec3(n3), vec3(n4)]))
-                    self.faceVertexUvs[0].append([uv1, uv3, uv4])
+                    self.faceVertexUvs.append([uv1, uv3, uv4])
                 elif math.fabs(self.vertices[v3].y) == radius:
                     uv3.x = (uv3.x + uv4.x) / 2.0
                     self.faces.append(Face3(v1, v2, v3, [vec3(n1), vec3(n2), vec3(n3)]))
-                    self.faceVertexUvs[0].append([uv1, uv2, uv3])
+                    self.faceVertexUvs.append([uv1, uv2, uv3])
                 else:
                     self.faces.append(Face3(v1, v2, v4, [vec3(n1), vec3(n2), vec3(n4)]))
-                    self.faceVertexUvs[0].append([uv1, uv2, uv4])
+                    self.faceVertexUvs.append([uv1, uv2, uv4])
 
                     self.faces.append(Face3(v2, v3, v4, [vec3(n2), vec3(n3), vec3(n4)]))
-                    self.faceVertexUvs[0].append([vec3(uv2), uv3, vec3(uv4)])
-
-        # self.computeFaceNormals()
-
+                    self.faceVertexUvs.append([vec3(uv2), uv3, vec3(uv4)])

@@ -78,14 +78,14 @@ class BoxGeometry(Geometry):
                     face.vertexNormals.append(vec3(normal))
 
                     self.faces.append(face)
-                    self.faceVertexUvs[0].append([uva, uvb, uvd])
+                    self.faceVertexUvs.append([uva, uvb, uvd])
 
                     face = Face3(b + offset, c + offset, d + offset)
                     face.normal = vec3(normal)
                     face.vertexNormals.append(vec3(normal))
 
                     self.faces.append(face)
-                    self.faceVertexUvs[0].append([vec3(uvb), vec3(uvc), vec3(uvd)])
+                    self.faceVertexUvs.append([vec3(uvb), vec3(uvc), vec3(uvd)])
 
         buildPlane('z', 'y', - 1, - 1, depth, height, width_half, 0)  # px
         buildPlane('z', 'y', 1, - 1, depth, height, - width_half, 1)  # nx

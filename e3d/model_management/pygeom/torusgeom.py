@@ -48,11 +48,11 @@ class TorusGeometry(Geometry):
                 face = Face3(a, b, d, [vec3(normals[a]), vec3(normals[b]), vec3(normals[d])])
                 # face = vec3(vec3(normals[a]), vec3(normals[b]), vec3(normals[d]))
                 self.faces.append(face)
-                self.faceVertexUvs[0].append([vec3(uvs[a]), vec3(uvs[b]), vec3(uvs[d])])
+                self.faceVertexUvs.append([vec3(uvs[a]), vec3(uvs[b]), vec3(uvs[d])])
 
                 face = Face3(b, c, d, [vec3(normals[b]), vec3(normals[c]), vec3(normals[d])])
                 # face = vec3(vec3(normals[b]), vec3(normals[c]), vec3(normals[d]))
                 self.faces.append(face)
-                self.faceVertexUvs[0].append([vec3(uvs[b]), vec3(uvs[c]), vec3(uvs[d])])
+                self.faceVertexUvs.append([vec3(uvs[b]), vec3(uvs[c]), vec3(uvs[d])])
 
         self.computeFaceNormals()

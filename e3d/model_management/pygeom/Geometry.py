@@ -16,7 +16,7 @@ class Geometry:
 
         self.faces = []
 
-        self.faceVertexUvs = [[]]
+        self.faceVertexUvs = []
 
         self.morphTargets = []
         self.morphColors = []
@@ -75,20 +75,20 @@ class Geometry:
 
             face.normal = cb
 
-    def computeVertexNormals(self, areaWeighted):
+    def computeVertexNormals(self, areaWeighted=False):
 
         # v, vl, f, fl, face, vertices
 
-        vertices = Array(self.vertices.length)
+        vertices = [0] * len(self.vertices)
         v = 0
-        vl = self.vertices.length
+        vl = len(self.vertices)
 
         while v < vl:
             vertices[v] = vec3()
             v += 1
 
         f = 0
-        fl = self.faces.length
+        fl = len(self.faces)
         if areaWeighted:
 
             # vertex normals weighted by triangle areas
@@ -105,13 +105,13 @@ class Geometry:
                 vB = self.vertices[face.b]
                 vC = self.vertices[face.c]
 
-                cb.subVectors(vC, vB)
-                ab.subVectors(vA, vB)
-                cb.cross(ab)
+                cb=(vC - vB)
+                ab =(vA -vB)
+                cb = cb.cross(ab)
 
-                vertices[face.a].add(cb)
-                vertices[face.b].add(cb)
-                vertices[face.c].add(cb)
+                vertices[face.a]+=(cb)
+                vertices[face.b]+=(cb)
+                vertices[face.c]+=(cb)
 
                 f += 1
 
@@ -120,26 +120,26 @@ class Geometry:
             while f < fl:
                 face = self.faces[f]
 
-                vertices[face.a].add(face.normal)
-                vertices[face.b].add(face.normal)
-                vertices[face.c].add(face.normal)
+                vertices[face.a]+=(face.normal)
+                vertices[face.b]+=(face.normal)
+                vertices[face.c]+=(face.normal)
                 f += 1
 
         v = 0
-        vl = self.vertices.length
+        vl = len(self.vertices)
 
         while v < vl:
             vertices[v].normalize()
             v += 1
 
         f = 0
-        fl = self.faces.length
+        fl = len(self.faces)
         while f < fl:
             face = self.faces[f]
 
-            face.vertexNormals[0] = vertices[face.a].clone()
-            face.vertexNormals[1] = vertices[face.b].clone()
-            face.vertexNormals[2] = vertices[face.c].clone()
+            face.vertexNormals.insert(0, vec3(vertices[face.a]))
+            face.vertexNormals.insert(1, vec3(vertices[face.b]))
+            face.vertexNormals.insert(2, vec3(vertices[face.c]))
             f += 1
 
 
@@ -311,13 +311,13 @@ class Geometry:
             #                   ( s1 * y2 - s2 * y1 ) * r,
             #                   ( s1 * z2 - s2 * z1 ) * r )
             #
-            #         tan1[ a ].add( sdir )
-            #         tan1[ b ].add( sdir )
-            #         tan1[ c ].add( sdir )
+            #         tan1[ a ]+=( sdir )
+            #         tan1[ b ]+=( sdir )
+            #         tan1[ c ]+=( sdir )
             #
-            #         tan2[ a ].add( tdir )
-            #         tan2[ b ].add( tdir )
-            #         tan2[ c ].add( tdir )
+            #         tan2[ a ]+=( tdir )
+            #         tan2[ b ]+=( tdir )
+            #         tan2[ c ]+=( tdir )
             #
             #     }
             #
