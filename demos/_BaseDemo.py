@@ -9,6 +9,7 @@ from e3d.backends import OGL3Backend
 from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
 from e3d.gui import Panel
+from _model_paths import *
 
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
@@ -101,14 +102,12 @@ class game:
         map(loadTexture, self.texturesToLoad)
 
     def prepareScene(self):
-        self.bumpymats = []
-        self.texmats = []
         engine = self.engine
         try:
             self.scene1 = engine.scenes.addScene('scene1')
             self.scene1.currentCamera = self.camera
             self.scene1.beforeUpdateCallback = self.scene1Update
-            self.scene1.ambientColor = vec3(.03, .06, .09)
+            self.scene1.ambientColor = vec3(.04, .06, .09)
 
         except Exception as ex:
             print('error in main.prepareScene: {}'.format(str(ex)))

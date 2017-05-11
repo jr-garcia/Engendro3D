@@ -18,25 +18,42 @@ class Demo(game):
 
     def loadModels(self):
         engine = self.engine
-        
-        engine.models.loadSphere("spheremodel", segmentsU=32)
-        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 20, 0], [0, 0, 0], 4)
+        self.camera.rotateX(30)
+        self.camera.position = vec3(0, 100.051, 208.345)
+
+        engine.models.loadSphere("spheremodel", segmentsU=8)
+        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [40, 18, 60], [0, 0, 0], 4)
         mats = self.sphere1.getMaterialByIndex(0)
         mats.specularPower = 50
         mats.useDiffuseTexture = True
         mats.setDefaultNormalMap()
         mats.textureRepeat = 4
+        # return
 
         engine.models.loadBox("boxmodel", [20], 2)
-        self.box1 = self.scene1.addModel('boxmodel', 'box1', [-20, 10, 0], [0, 0, 0], 1)
+        self.box1 = self.scene1.addModel('boxmodel', 'box1', [-60, 11, 0], [0, 0, 0], 1)
         mt = self.box1._materials[0]
         mt.specularPower = 40
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()
-
-        # engine.models.loadBox("pushboxmodel", [55, 3, 3], 2)
-        # self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
-        # self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
+                                              # radius=100, tube=40, radialSegments=64, tubularSegments=8, p=2, q=3,
+                                                # heightScale=1
+        engine.models.loadTorusKnot("tkmodel1", 12, 3, 64, 32, 3, 4)
+        engine.models.loadTorusKnot("tkmodel2", 12, 3, 64, 32, 3, 1)
+        engine.models.loadTorusKnot("tkmodel3", 12, 3, 48, 16, 1, 3)
+        engine.models.loadTorusKnot("tkmodel4", 12, 3, 48, 16)
+        self.tk1 = self.scene1.addModel('tkmodel1', 'tk1', [-20, 25, 0], [0, 0, 0], 1)
+        self.tk2 = self.scene1.addModel('tkmodel2', 'tk2', [20, 25, 0], [0, 0, 0], 1)
+        self.tk3 = self.scene1.addModel('tkmodel3', 'tk3', [-80, 25, 60], [0, 0, 0], 1)
+        self.tk4 = self.scene1.addModel('tkmodel4', 'tk4', [80, 25, -60], [0, 0, 0], 1)
+        mt = self.tk1._materials[0]
+        mt.specularPower = 40
+        mt.useDiffuseTexture = True
+        mt.setDefaultNormalMap()
+        mt.textureRepeat = .5  # todo: Should the textureRepeat be non-uniform?
+        self.tk2._materials[0] = mt
+        self.tk3._materials[0] = mt
+        self.tk4._materials[0] = mt
 
         engine.models.loadPlane("planemodelbig", 500, 500, 6)
         # engine.models.loadPlane("planemodel1", 1, 5)
@@ -51,57 +68,8 @@ class Demo(game):
         mt.setDefaultNormalMap()
         mt.textureRepeat = 80
 
-        # self.planer = self.scene1.addModel('planemodel1', 'planer', [300, 0, 0], [0, -80, 0], 280)
-        # mt = self.planer._materials[0]
-        # self.planer.moveUp(self.planer.getSize().y)
-        # mt.useNormalMapTexture = True
-        # mt.normalMapTextureID = 'testN'
-        # mt.textureRepeat = 10
-        # self.bumpymats.append(mt)
-
-        # self.planel = self.scene1.addModel('planemodel1', 'planel', [-300, 0, 0], [0, 80, 0], 280)
-        # self.planel.moveUp(self.planer.getSize().y)
-        # self.planel._materials[0] = mt
-        #
-        # self.planef = self.scene1.addModel('planemodel1', 'planef', [0, 0, -200], [0, 0, 0], 280)
-        # self.planef.moveUp(self.planer.getSize().y)
-        # self.planef._materials[0] = mt
-
-        # engine.models.loadModel(self.tubeMODEL, "tubemodel")
-
-        # self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 20, 0], [0, 0, 0], 7)
-        # self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
-        # self.tube.physicsBody.isDynamic = True
-
-        # self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7,
-        # shape=bodyShapesEnum.box)
-        # self.tube2.physicsBody.isDynamic = True
-        #
-        # self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7,
-        # shape=bodyShapesEnum.sphere)
-        # self.tube3.setAnimation(self.tube3.getAnimationsList()[1], True)
-        # self.tube3.physicsBody.isDynamic = True
-
-        # engine.models.loadModel(self.planepath, "planemodel")
-        # self.plane = self.scene1.addModel('planemodel', 'plane0', [0, 0, 0], [1, 0, 1], 2)
-        # # self.plane.visible = False
-        # mat = self.plane.getMaterialByIndex(0)
-        # mat.specularPower = 20000000000
-        # # mat.diffuseTextureID = 'grass'
-        # mat.useDiffuseTexture = True
-        # mat.textureRepeat = self.plane.uniformScale * 3
-
-        # self.planef = self.scene1.addModel('planemodel1', 'planef', [0, 0, -200], [0, 0, 0], 280)
-        # self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
-        # self.planel = self.scene1.addModel('planemodel1', 'planel', [-300, 0, 0], [0, 80, 0], 280)
-        # self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 90, 0], [0, 90, 0], 5, mass=7)
-        # self.ballcount = 0
-        # self.boxcount = 1
-        # self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [140, 6, 0], [0, 0, 0], 4, mass=50)
-        # self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-140, 6, 0], [0, 0, 0], 4, mass=50)
 
     def addLights(self):
-        print('Adding Lights')
         game.addLights(self)
         # self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
         # self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
@@ -109,51 +77,12 @@ class Demo(game):
         # self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
         # self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
 
-    def dropBox(self):
-        try:
-            self.boxcount += 1
-            sceneid = 'box' + str(self.boxcount)
-            pos = list(self.camera.position)
-            pos[1] += 20
-            box = self.scene1.addModel('boxmodel', sceneid, pos, [0, 0, 0], 1)
-            mats = box._materials[0]
-            mats.specularPower = 20
-            # mats.useDiffuseTexture = True
-            mats.diffuseColor = box.debugColor
-            box.physicsBody.isDynamic = True
-            box.physicsBody.punchCenter(250, self.camera.forward)
-        except Exception as ex:
-            print(ex.message)
-
-    def dropBall(self):
-        try:
-            sceneid = 'ball' + str(self.ballcount)
-            pos = list(self.camera.position)
-            pos[1] += 20
-            ball = self.scene1.addModel('spheremodel', sceneid, pos, [0, 0, 0], 1)
-            mat = ball._materials[0]
-            mat.specularPower = 50
-            mat.useDiffuseTexture = True
-            mat.diffuseTextureID = 'earth'
-            ball.physicsBody.isDynamic = True
-            ball.physicsBody.punchCenter(250, self.camera.forward)
-            self.ballcount += 1
-        except Exception as ex:
-            print(ex.message)
-
     def mouseMove(self, ev):
         if ev.eventName == 'motion':
             if self.window.hasFocus():
                 r = 1.0 / 10 if self.window.mouseLock else 1
                 self.camera.rotateY(-ev.xRel * r)
                 self.camera.rotateX(ev.yRel * r)
-        elif ev.eventName == 'buttonDown':
-            if ev.button == 'right':
-                self.dropBox()
-            elif ev.button == 'left':
-                self.dropBall()
-                # else:
-                #     print ev
 
     def keydown(self, e):
         if e.eventName == 'keyUp':
@@ -163,20 +92,18 @@ class Demo(game):
         if e.keyName == 'escape':  # ESC
             self.close()
         if e.keyName == 'f8':
-            self.window.renderingMan.debugModeActive = not self.window.renderingMan.debugModeActive
+            self.window.backend.debugModeActive = not self.window.backend.debugModeActive
         if e.keyName == 'f4':
-            self.window.renderingMan.showAsWireframe = not self.window.renderingMan.showAsWireframe
+            self.window.backend.showAsWireframe = not self.window.backend.showAsWireframe
         if e.keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
         if e.keyName.__contains__('ctrl'):
             self.dorot = not self.dorot
         if e.keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            logger.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            logger.log('Poligons drawn:{}'.format(self.window.renderingMan.poligonsDrawnThisUpdate),
-                       logLevelsEnum.info)
-            logger.log('Boxes: ' + str(self.boxcount), logLevelsEnum.debug)
-            logger.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
+            logger.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.error)
+            logger.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
+                       logLevelsEnum.error)
         if e.keyName == 'g':
             val = self.window.gamma
             print ('old gamma:' + str(val))
@@ -185,20 +112,8 @@ class Demo(game):
             else:
                 self.window.gamma = 1.7
             print ('new gamma:' + str(self.window.gamma))
-        if e.keyName == 'right':
-            self.scene1.physics.step(50)
-        if e.keyName == 'left':
-            self.scene1.physics.paused = False
-        if e.keyName == 'p':
-            self.box1.physicsBody.punchCenter(250, [1, .5, 0])
         if e.keyName == 'l':
             self.dlight.enabled = not self.dlight.enabled
-        if e.keyName == 'n':
-            for mat in self.bumpymats:
-                mat.useNormalMapTexture = not mat.useNormalMapTexture
-        if e.keyName == 't':
-            for mat in self.texmats:
-                mat.useDiffuseTexture = not mat.useDiffuseTexture
 
     def scene1Update(self, ev):
         ft = ev[0] + .01
