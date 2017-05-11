@@ -20,13 +20,10 @@ class game:
 
     def __init__(self):
         self.camrot = 3
-        self.quack = None
         self.dorot = True
         self.sphereMat = None
-        self.duck = None
         self.scene0 = None
         self.scene1 = None
-        self.spots = []
         self.onelayer = None
         self.plane = None
         self.dlight = None

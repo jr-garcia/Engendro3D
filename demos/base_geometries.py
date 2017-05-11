@@ -21,7 +21,7 @@ class Demo(game):
         self.camera.rotateX(30)
         self.camera.position = vec3(0, 100.051, 208.345)
 
-        engine.models.loadSphere("spheremodel", segmentsU=8)
+        engine.models.loadSphere("spheremodel", segmentsU=32)
         self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [40, 18, 60], [0, 0, 0], 4)
         mats = self.sphere1.getMaterialByIndex(0)
         mats.specularPower = 50
@@ -68,15 +68,6 @@ class Demo(game):
         mt.setDefaultNormalMap()
         mt.textureRepeat = 80
 
-
-    def addLights(self):
-        game.addLights(self)
-        # self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
-        # self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
-        # self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
-        # self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
-        # self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
-
     def mouseMove(self, ev):
         if ev.eventName == 'motion':
             if self.window.hasFocus():
@@ -118,24 +109,15 @@ class Demo(game):
     def scene1Update(self, ev):
         ft = ev[0] + .01
         movespeed = ft / 10.0
-        # npos = list(self.camera._position)
-        # npos[1] -= 100000000
         npos = self.camera.forward
         npos[2] *= 100000000
-        # res = self.scene1.physics.castRay(self.camera._position, npos)
-        # if res:
-        #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
         self.lastspeed = movespeed
-
+        spherespeed = - .05
         ran1 = 45 * sin(ev[1] / 1000.0)
         ran2 = 45 * sin(ev[1] / 500.0)
-        for s in self.spots:
-            s.rotation = vec3(ran2, 0, ran1)
-        # if self.dorot:
-            # if self.pushbox1:
-            #     self.pushbox1.rotateY(-.07 * ft)
-            #     self.pushbox2.rotateY(-.07 * ft)
-                # self.box1.rotateY(-.07 * ft)
+        if self.dorot:
+            if self.sphere1:
+                self.sphere1.rotateY(spherespeed * ft)
         if self.window.events.isKeyPressed('w'):
             self.camera.moveForward(movespeed)
         elif self.window.events.isKeyPressed('s'):
