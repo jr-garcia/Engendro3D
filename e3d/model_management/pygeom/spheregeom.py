@@ -83,5 +83,5 @@ class SphereGeometry(Geometry):
                     self.faceVertexUvs.append([vec3(uv2), uv3, vec3(uv4)])
 
         # Remove inside faces.
-        self.faces = self.faces[0:len(self.faces)/2]
-        self.faceVertexUvs = self.faceVertexUvs[0:len(self.faceVertexUvs) / 2]
+        self.faces = self.faces[0:int(len(self.faces)/2)]
+        self.faceVertexUvs = self.faceVertexUvs[0:int(len(self.faceVertexUvs) / 2)]
