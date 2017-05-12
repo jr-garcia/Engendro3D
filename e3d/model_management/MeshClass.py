@@ -121,7 +121,8 @@ class Mesh:
 
     @staticmethod
     def fromObjectInfo(vertices, faces, minmax, UVsOrCalculationType, normals, tangents=None, bitangents=None,
-                       transform=None, mesh_mBones=None, colors=None, materialIndex=0, boneDir=None):
+                       transform=None, mesh_mBones=None, colors=None, materialIndex=0, boneDir=None,
+                       forceReIndexing=False):
         """
 
         @rtype : Mesh
@@ -151,7 +152,7 @@ class Mesh:
         hasBones = mesh_mBones is not None
         texCoords = []
 
-        reindexing_required = False
+        reindexing_required = forceReIndexing
 
         if not hasNormals or len(normals) < len(vertices):
             logger.meassure('calculate normals')

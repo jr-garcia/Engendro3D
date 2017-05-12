@@ -414,7 +414,7 @@ class Model:
             nct = NormalsCalculationTypeEnum.smooth
 
         try:
-            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvsList, nct)
+            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvsList, nct, forceReIndexing=True)
         except Exception as ex:
             ex.message = 'Error creating mesh from info: ' + ex.message
             raise
