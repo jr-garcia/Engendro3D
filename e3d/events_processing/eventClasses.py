@@ -114,6 +114,8 @@ class KeyEvent(Event):
         self.keyCode = event.keysym.sym
         # self.keyScanCode = SDL_GetScancodeFromKey(event.keysym.sym)
         self.keyName = SDL_GetKeyName(event.keysym.sym).lower()
+        if type(self.keyName) is bytes:
+            self.keyName = self.keyName.decode()
         if etype == SDL_KEYDOWN:
             self.eventName = KeyEventName.keyDown
         else:
