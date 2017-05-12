@@ -117,7 +117,7 @@ class Window(object):
         if iconPath:
             self.setIcon(iconPath)
         else:
-            self.setIcon(os.path.join(self.engine.path, 'defaults', 'textures', 'e3dlogo.png'))
+            self.setIcon(os.path.join(self.engine.path.defaults.textures, 'e3dlogo.png'))
 
         self.gui.initialize(self.engine, self.backend,
                             self.engine.textures.getDefaultTexture(), self)

@@ -41,7 +41,7 @@ class game:
 
         nsize = [640, 480]
         # Create the Engendro3D.Window
-        self.window = self.engine.createWindow(title, size=nsize, iconPath='Engendro3D/defaults/e3dlogo.png')
+        self.window = self.engine.createWindow(title, size=nsize)
 
         self.camera = SimpleCamera([0, 0, 0], [0, 180, 0])
 
