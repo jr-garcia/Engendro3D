@@ -1,6 +1,6 @@
 # ![e3d_Logo](./e3d/defaults/textures/e3dlogo.png) Engendro3D™
 
-OpenGL 3D Game Engine for Python. **_Version 0.52_**
+OpenGL 3D Game Engine for Python. **_Version 0.5_**
 
 <h2><font color =red>Work in Progress. Not production ready.<br> No stability is guaranteed.</font></h1>
 
