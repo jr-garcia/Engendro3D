@@ -111,6 +111,7 @@ class OGL3Backend(BaseBackend):
 
     def drawAll(self, drawingData):
         self.drawingData = drawingData
+        self._poliCount = 0
         # postUsed = False
         sceneNeeded = False
 
