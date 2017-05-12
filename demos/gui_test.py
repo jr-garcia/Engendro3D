@@ -37,7 +37,7 @@ class game:
         self.camera = SimpleCamera(vec3(0, 30, 200), vec3(0, 180, 0), ID='maincam')
 
         # self.camera.rotateY(180)
-        self.duck = None
+        self.triangle = None
         self.dorot = True
         self.camrot = 3
         self.quack = None
@@ -99,10 +99,10 @@ class game:
         movespeed = ft / 10.0
         self.lastspeed = movespeed
         if self.dorot:
-            if self.duck:
-                self.duck.rotateY(.1 * ft)
-            if self.duck2:
-                self.duck2.rotateY(-.1 * ft / 2.0)
+            if self.triangle:
+                self.triangle.rotateY(.1 * ft)
+            if self.triangle2:
+                self.triangle2.rotateY(-.1 * ft / 2.0)
 
         if self.window.events.isKeyPressed('w'):
             self.camera.moveForward(movespeed)
@@ -129,18 +129,12 @@ class game:
             self.scene1.currentCamera = self.camera
             # self.scene1.beforeUpdateCallback = self.scene1Update
 
-            engine.models.loadModel(_model_paths.triangleMODEL, "duckmodel", forceStatic=True)
-            self.duck = self.scene1.addModel('duckmodel', 'duck1', vec3(0, 5, 5), vec3(0), 1.5)
-            mat = self.duck.getMaterialByIndex(0)
+            engine.models.loadModel(_model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
+            self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 5, 5), vec3(0), 1.5)
+            mat = self.triangle.getMaterialByIndex(0)
             # mat.shaderID = 'normals'
             # mat.isLightAffected = False
             mat.useDiffuseTexture = True
-            # quackpath = os.path.join(os.path.dirname(__file__), "sounds", "Duck.wav")
-            # engine.sounds.loadSound('quacksound', quackpath)
-            # self.quack = self.duck.attachSound('quacksound', 'quack')
-            # self.quack.volume = 60
-            # self.quack.looped = True
-            # self.quack.play()
 
         except Exception as ex:
             print('error in main.prepareScene: ' + str(ex))

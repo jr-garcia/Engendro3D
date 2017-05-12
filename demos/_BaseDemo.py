@@ -1,4 +1,4 @@
-from cgkit.cgtypes import vec3
+from cycgkit.cgtypes import vec3
 
 from _do_import import resolve_import
 resolve_import()

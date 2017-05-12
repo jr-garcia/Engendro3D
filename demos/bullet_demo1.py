@@ -1,7 +1,7 @@
 from _BaseDemo import game, runDemo, tubeMODEL
 
 from math import sin
-from cgkit.cgtypes import vec3
+from cycgkit.cgtypes import vec3
 from e3d.LoggerClass import logger, logLevelsEnum
 
 

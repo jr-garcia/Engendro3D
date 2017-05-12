@@ -1,7 +1,7 @@
 from _BaseDemo import game, runDemo
 
 from math import sin
-from cgkit.cgtypes import vec3
+from cycgkit.cgtypes import vec3
 from e3d.LoggerClass import logger, logLevelsEnum
 
 
@@ -78,7 +78,7 @@ class Demo(game):
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
-        if e.keyName.__contains__('shift'):
+        if 'shift' in e.keyName:
             self.window.mouseLock = not self.window.mouseLock
         if e.keyName == 'escape':  # ESC
             self.close()
@@ -88,7 +88,7 @@ class Demo(game):
             self.window.backend.showAsWireframe = not self.window.backend.showAsWireframe
         if e.keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
-        if e.keyName.__contains__('ctrl'):
+        if 'ctrl' in e.keyName:
             self.dorot = not self.dorot
         if e.keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
