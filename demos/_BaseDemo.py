@@ -28,7 +28,7 @@ class game:
         self.plane = None
         self.dlight = None
         self.lastspeed = 0
-        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], )
+        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], logLevel=logLevelsEnum.debug)
         self.window = None
         self.firstRun = False
         self.pendingTex = 0
@@ -95,8 +95,8 @@ class game:
             # self.isWaitingTex = True
             self.engine.textures.loadTexture(args[0], args[1], args[2])
 
-        logger.log('Loading Textures.', logLevelsEnum.warning)
-        map(loadTexture, self.texturesToLoad)
+        logger.log('Loading Textures.', logLevelsEnum.info)
+        list(map(loadTexture, self.texturesToLoad))
 
     def prepareScene(self):
         engine = self.engine
@@ -112,28 +112,13 @@ class game:
 
         self.camera.position = [0, 10, 230]
 
-        print('Switch scene 0 >> 1')
+        logger.log('Switch scene 0 >> 1', logLevelsEnum.debug)
         engine.scenes.setCurrentSceneID('scene1')
-        self.addLights()
         self.loadModels()
+        self.addLights()
 
     def loadModels(self):
         pass
-
-    def createLightSphere(self, ltype, pos, color):
-        nlight = self.scene1.addLight(ltype, pos, vec3(0, 0, 0))
-        nlight.color = color
-        nlight.spotIntensity = .1
-        nlight.spotRange = .7
-        nlight.attenuation = 250
-        lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
-        ncol = list(color)
-        ncol.append(1.0)
-        mat = lmod._materials[0]
-        mat.emissiveColor = ncol
-        mat.isLightAffected = False
-        if ltype == 2:
-            self.spots.append(nlight)
 
     def scene1Update(self, ev):
         pass

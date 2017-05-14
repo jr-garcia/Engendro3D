@@ -17,6 +17,22 @@ class Demo(game):
 
         self.bumpymats = []
         self.texmats = []
+        self.spots = []
+
+    def createLightSphere(self, ltype, pos, color):
+        nlight = self.scene1.addLight(ltype, pos, vec3(0, 0, 0))
+        nlight.color = color
+        nlight.spotIntensity = .1
+        nlight.spotRange = .7
+        nlight.attenuation = 250
+        lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
+        ncol = list(color)
+        ncol.append(1.0)
+        mat = lmod._materials[0]
+        mat.emissiveColor = ncol
+        mat.isLightAffected = False
+        if ltype == 2:
+            self.spots.append(nlight)
 
     def loadModels(self):
         engine = self.engine
@@ -84,7 +100,7 @@ class Demo(game):
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 20, 0], [0, 0, 0], 7)
-        self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
+        self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
         # self.tube.physicsBody.isDynamic = True
 
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7)
@@ -98,10 +114,9 @@ class Demo(game):
         self.plane = self.scene1.addModel('planemodel', 'plane0', [0, 0, 0], [1, 0, 1], 1)
         # self.plane.visible = False
         mat = self.plane.getMaterialByIndex(0)
-        mat.specularPower = 20000000000
-        # mat.diffuseTextureID = 'grass'
+        mat.setDefaultNormalMap()
         mat.useDiffuseTexture = True
-        mat.textureRepeat = self.plane.uniformScale * 3
+        mat.textureRepeat = 80
 
         self.ballcount = 0
         self.boxcount = 1
@@ -109,11 +124,11 @@ class Demo(game):
     def addLights(self):
         print('Adding Lights')
         game.addLights(self)
-        # self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
-        # self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
-        # self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
-        # self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
-        # self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
+        self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
+        self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
+        self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
+        self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
+        self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
 
     def dropBox(self):
         try:
@@ -145,7 +160,7 @@ class Demo(game):
             ball.physicsBody.punchCenter(250, self.camera.forward)
             self.ballcount += 1
         except Exception as ex:
-            print(ex.message)
+            print(str(ex))
 
     def mouseMove(self, ev):
         if ev.eventName == 'motion':

@@ -9,11 +9,6 @@ class Demo(game):
     def __init__(self):
         game.__init__(self)
         self.texturesToLoad = [
-            ['e3dlogo.png', 'logo'],
-            # ['Grass.jpg', 'grass'],
-            ['./textures/n_deep.png', 'defND', True],
-            ['./textures/n_irr.png', 'defNI', True],
-            ['./textures/nmap_test.png', 'testN', True],
             ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
 
     def loadModels(self):
