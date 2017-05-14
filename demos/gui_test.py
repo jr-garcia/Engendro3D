@@ -36,7 +36,6 @@ class game:
         self.scene1 = None
         self.camera = SimpleCamera(vec3(0, 30, 200), vec3(0, 180, 0), ID='maincam')
 
-        # self.camera.rotateY(180)
         self.triangle = None
         self.dorot = True
         self.camrot = 3
