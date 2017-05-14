@@ -79,6 +79,7 @@ class DrawingData:
         self.clearColor = (0.1, .3, .4)
         self.sky = None
         self.defaultSceneParams = None
+        self.transformations = {}
 
     def extend(self, otherData):
         assert isinstance(otherData, DrawingData)

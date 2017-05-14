@@ -366,7 +366,7 @@ class OGL3Backend(BaseBackend):
     def renderMesh(self, mesh, currentShader):
         self._poliCount += mesh.primitiveCount
 
-        stride = mesh._stride
+        stride = int(mesh._stride)
         used_attribs = []
         for dd in mesh._declaration:
             u = self._enableAttribute(currentShader, dd._name, stride, dd._offset)

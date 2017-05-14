@@ -7,7 +7,9 @@ from ..backends.base_backend import DrawingData
 from ..cameras.SimpleCameraClass import SimpleCamera
 from ..commonValues import *
 from ..model_management.ModelInstanceClass import ModelInstance
+from ..model_management.AnimationModule import Animation
 from ..physics_management.physicsModule import bodyShapesEnum, scenePhysics
+from cycgkit.cgtypes import mat4
 
 
 # from cyBullet.bullet import ACTIVE_TAG, WANTS_DEACTIVATION
@@ -43,6 +45,7 @@ class Scene(object):
 
         self.physics = scenePhysics(gravity, resolution)
         self._currentTransformations = None
+        self._currentModel = None
 
     def __repr__(self):
         return self.ID
@@ -333,41 +336,47 @@ class Scene(object):
                 defaultObjectParams.hasBones = currentModel.hasBones
                 defaultObjectParams.construct()
 
+                self._currentModel = currentModel
+
                 if currentModel.hasBones:
-                    if currentShader.isUniformUsed('BoneTransforms[0]') and currentModel.hasBones:
-                        time = -1
-                        if currentModelInstance._animationID != '':
-                            time = self.calculateAnimationTime(netTime, currentModelInstance, currentModel)
-                        self.applyBoneTransforms(time)
-                    print('not implemented currentModel.hasBones debug bounding box')
-                    # self._currentAnimatedBBox.clear()
-                Scene.extractRenderInfo(currentModelInstance, defaultObjectParams, currentModel.rootNode, newDrawingData)
+                    time = -1
+                    if currentModelInstance._animationID != '':
+                        time = Scene.calculateAnimationTime(netTime, currentModelInstance, currentModel)
+                else:
+                    time = None
+                Scene.extractRenderInfo(currentModelInstance, defaultObjectParams, currentModel.rootNode,
+                                        newDrawingData, time, self)
 
         return newDrawingData
 
     @staticmethod
-    def extractRenderInfo(currentModelInstance, defaultParams, node, newDrawingData):
+    def extractRenderInfo(currentModelInstance, defaultParams, node, newDrawingData, time, scene):
         for mesh in node._meshes:
             meshid = mesh.ID
+            if time is not None:
+                # todo: implement currentModel.hasBones debug bounding box
+                newDrawingData.transformations[meshid] = scene.applyBoneTransforms(currentModelInstance, time, mesh)
+                # self._currentAnimatedBBox.clear()
             newDrawingData.meshes.add(mesh)
             meshMat = currentModelInstance._materials[mesh._materialIndex]
             newDrawingData.instances[meshid].append((meshMat, defaultParams))
         for cnode in node._childNodes:
-            Scene.extractRenderInfo(currentModelInstance, defaultParams, cnode, newDrawingData)
+            Scene.extractRenderInfo(currentModelInstance, defaultParams, cnode, newDrawingData, time, scene)
 
-    def calculateAnimationTime(self, netTime, currentModelInstance, currentModel):
+    @staticmethod
+    def calculateAnimationTime(netTime, currentModelInstance, currentModel):
         assert isinstance(currentModelInstance, ModelInstance)
         model = currentModelInstance
         if model.animState == ModelInstance.animationState.playing:
             if model._animationStartupTime == -1:
-                model._animationStartupTime = self._netTime
+                model._animationStartupTime = netTime
 
             if model._animLastPauseStartup != -1:
-                model._animationPausedTime += self._netTime - model._animLastPauseStartup
+                model._animationPausedTime += netTime - model._animLastPauseStartup
                 model._animLastPauseStartup = -1
 
             anim = currentModel.animations[currentModelInstance._animationID]
-            assert isinstance(anim, animation)
+            assert isinstance(anim, Animation)
             btime = (((netTime - model._animationStartupTime) - model._animationPausedTime) / 1000.0) * anim.ticks
 
             time = btime
@@ -381,30 +390,31 @@ class Scene(object):
 
         elif model.animState == ModelInstance.animationState.paused:
             if model._animationPausedTime == -1:
-                model._animationPausedTime = self._frameTime
+                model._animationPausedTime = netTime
             return model._animationLastPlayedFrame
         else:
             model._animationStartupTime = -1
             model._animationPausedTime = -1
 
-    def applyBoneTransforms(self, time, mesh):
+    def applyBoneTransforms(self, currentModelInstance, time, mesh):
         if time < 0:
-            ID = self._currentModelInstance.getAnimationsList()[0]
+            ID = list(currentModelInstance.getAnimationsList())[0]
             anim = self._currentModel.animations[ID]
-            self._currentTransformations = self._currentModel.skeleton.getBindPose(anim, mesh)
+            currentTransformations = self._currentModel.skeleton.getBindPose(anim, mesh)
         else:
-            anim = self._currentModel.animations[self._currentModelInstance._animationID]
-            self._currentTransformations = self._currentModel.skeleton.getAnimationTranformations(anim, time, mesh)
+            anim = self._currentModel.animations[currentModelInstance._animationID]
+            currentTransformations = self._currentModel.skeleton.getAnimationTranformations(anim, time, mesh)
 
-        for b in mesh.boneMinMax.items():
-            flatm = self._currentTransformations[b[0]]
-            pointa = flatm * b[1][0]
-            self._currentAnimatedBBox.addPoint(pointa)
-            pointb = flatm * b[1][1]
-            self._currentAnimatedBBox.addPoint(pointb)
+        # for b in mesh.boneMinMax.items():
+            # flatm = currentTransformations[b[0]]
+            # pointa = flatm * b[1][0]
+            # self._currentAnimatedBBox.addPoint(pointa)
+            # pointb = flatm * b[1][1]
+            # self._currentAnimatedBBox.addPoint(pointb)
 
-        self._currentShader.buildBoneTransf(self._currentTransformations, self._currentModel.boneDir)
-        # self._currentShader.buildBoneTransfMulti(self._currentTransformations, self._currentModel.boneDir)
+        # self._currentShader.buildBoneTransf(currentTransformations, self._currentModel.boneDir)
+        # self._currentShader.buildBoneTransfMulti(currentTransformations, self._currentModel.boneDir)
+        return currentTransformations
 
 
 class DefaultSceneParameters(object):

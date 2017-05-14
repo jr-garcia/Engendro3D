@@ -282,7 +282,7 @@ class Mesh:
                     coord[1] = 1 - coord[1]
                     vertexStream.extend(coord)
 
-            vl = list(v)
+            vl = vec3(v)
             if baketrans:
                 cv = newMesh._minmax
                 newMesh._minmax[0][0] = min(cv[0][0], vl[0])
@@ -314,7 +314,7 @@ class Mesh:
                                         newMesh.boneMinMax[bName][1][1] = max(cv[1][1], vl[1])
                                         newMesh.boneMinMax[bName][1][2] = max(cv[1][2], vl[2])
                                     else:
-                                        newMesh.boneMinMax[bName] = [list(vl), list(vl)]
+                                        newMesh.boneMinMax[bName] = [vl, vl]
                                 bb += 1
                             else:
                                 logger.log('Vertex {} is affected by more than 4 bones.'.format(currentVertexN))
@@ -796,7 +796,7 @@ class VertexDeclaration(object):
         @param offset:
         """
         self._name = vname
-        self._offset = offset
+        self._offset = int(offset)
 
     def __repr__(self):
         return '{}, offset:{}'.format(self._name, self._offset)

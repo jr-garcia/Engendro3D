@@ -4,7 +4,7 @@ from cycgkit.cgtypes import mat4, quat, vec3, slerp
 from cycgkit.boundingbox import BoundingBox
 from copy import deepcopy
 
-from .AnimationModule import animation, transformationValues
+from .AnimationModule import Animation, transformationValues
 from ..LoggerClass import logger, logLevelsEnum
 from .NodeClass import Node
 from .MeshClass import Mesh, UVCalculationTypeEnum, NormalsCalculationTypeEnum
@@ -45,7 +45,7 @@ class Skeleton(object):
         def getAnimTransforms(self, animation, time, mesh, parentTransformation, finalTransformations):
             """
 
-            @type animation: AnimationModule.animation
+            @type animation: AnimationModule.Animation
             """
             nodeTransformation = self.localTransformation
             globalTransformation = nodeTransformation
@@ -304,7 +304,7 @@ class Model:
 
     def _getAnimations(self, anims):
         for a in anims:
-            nanim = animation(a)
+            nanim = Animation(a)
             self.animations[a.mName] = nanim
             nanim.printIt()
             bb = 0
