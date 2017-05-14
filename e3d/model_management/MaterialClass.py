@@ -6,8 +6,8 @@ class Material(object):
     def __init__(self):
         self._ID = ""
         self._difCol = vec4(.5, .5, .5, 1.0)
-        self.emissiveColor = vec4(0.0, 0.0, 0.0, 1.0)
-        self.specularColor = vec4(1.0, 1.0, 1.0, 1.0)
+        self._emCol = vec4(0.0, 0.0, 0.0, 1.0)
+        self._specCol = vec4(1.0, 1.0, 1.0, 1.0)
         self.specularPower = 40.0
         self._shaderID = "default"
         self.textureRepeat = 1.0
@@ -38,10 +38,31 @@ class Material(object):
     shaderProperties = property(_getShaderProps)
 
     def _setDiffCol(self, value):
-        """
+        self._difCol = Material._checkColor(value)
 
-        @type value: vec4
-        """
+    def _getDiffCol(self):
+        return self._difCol
+
+    diffuseColor = property(_getDiffCol, _setDiffCol, doc='Diffuse color passed to the shader')
+
+    def _setEmCol(self, value):
+        self._emCol = Material._checkColor(value)
+
+    def _getEmCol(self):
+        return self._emCol
+
+    emissiveColor = property(_getEmCol, _setEmCol, doc='Emissive color passed to the shader')
+
+    def _setSpecCol(self, value):
+        self._emCol = Material._checkColor(value)
+
+    def _getSpecCol(self):
+        return self._emCol
+
+    specularColor = property(_getSpecCol, _setSpecCol, doc='Specular color passed to the shader')
+
+    @staticmethod
+    def _checkColor(value):
         if isinstance(value, vec4):
             nvalue = value
         elif isinstance(value, list):
@@ -53,12 +74,7 @@ class Material(object):
         else:
             raise TypeError('type {} not supported for color assigment'.format(str(type(value))))
 
-        self._difCol = nvalue
-
-    def _getDiffCol(self):
-        return self._difCol
-
-    diffuseColor = property(_getDiffCol, _setDiffCol, doc='Diffuse Color passed to the shader')
+        return vec4(nvalue)
 
     @staticmethod
     def _fromMaterial(baseMat):
