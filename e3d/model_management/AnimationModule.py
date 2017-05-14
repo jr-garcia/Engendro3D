@@ -1,4 +1,4 @@
-class animation(object):
+class Animation(object):
     def __init__(self, anim):
         """
 
