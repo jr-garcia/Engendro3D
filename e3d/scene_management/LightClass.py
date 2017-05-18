@@ -12,23 +12,22 @@ class lightTypesEnum(object):
 
 
 class light(Base3DObject):
-    spotIntensity = 0
-    color = vec3(1, 1, 1)
-    spotRange = .50
-    type = lightTypesEnum.directional
-    attenuation = 150.0
-
     def __init__(self, type, position=None, rotation=None, ID=''):
         """
 
 
         @rtype : light
         """
+        self.spotIntensity = 0.0
+        self.color = vec3(1, 1, 1)
+        self.spotRange = .50
+        self.type = lightTypesEnum.directional
+        self.attenuation = 250.0
         if not rotation:
             rotation = vec3(0, 0, 0)
         if not position:
             position = vec3(10, 0, 0)
-        super(light, self).__init__(position, rotation, 1, [1, 1, 1], ID=ID)
+        super(light, self).__init__(position, rotation, 1, vec3(1, 1, 1), ID=ID)
         self._forwardConstant = vec3(0, -1, 0)
         self.type = type
         self._struct = ShaderStruct()
@@ -50,4 +49,3 @@ class light(Base3DObject):
 
     def __repr__(self):
         return super(light, self).__repr__() + ' type:{}'.format(self.type)
-

@@ -1,4 +1,5 @@
 import numpy as np
+from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
 
@@ -17,7 +18,7 @@ class OGL3Backend(BaseBackend):
         self._currentRenderTarget = None
         self.fullScreenEffects = FSEManager(engine,
                                             self)  # todo: move FSEManager to engine?, so all fseffects are shared among windows
-        self._defaultClearColor = [0.50, 0.50, 0.50]
+        self._defaultClearColor = vec3(0.50, 0.50, 0.50)
         self._lastClearColor = None
         self._setClearColor(self._defaultClearColor)
         self.shaders = engine.shaders

@@ -1,7 +1,7 @@
 from collections import OrderedDict, defaultdict
 from abc import ABCMeta
 
-from cycgkit.cgtypes import vec4
+from cycgkit.cgtypes import vec3, vec4
 
 from e3d.model_management.MaterialClass import ShaderProperty
 
@@ -76,7 +76,7 @@ class DrawingData:
     def __init__(self):
         self.meshes = set()
         self.instances = defaultdict(list)
-        self.clearColor = (0.1, .3, .4)
+        self.clearColor = vec3(0.1, .3, .4)
         self.sky = None
         self.defaultSceneParams = None
         self.transformations = {}

@@ -41,7 +41,7 @@ class Scene(object):
         self.bottom = -500
 
         self.ambientColor = [v / 3.0 for v in [0.23, 0.34, 0.65]]
-        self.bgColor = [0.23, 0.34, 0.65]
+        self.bgColor = vec3(0.23, 0.34, 0.65)
 
         self.physics = scenePhysics(gravity, resolution)
         self._currentTransformations = None

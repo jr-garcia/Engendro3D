@@ -58,6 +58,7 @@ vec3 calcBumpedNormal()
 
 float calculateSpot(vec3 dir, vec3 lpos, vec2 params)
 {
+    // http://pyopengl.sourceforge.net/context/tutorials/shader_10.html
     float spot_effect = 1.0;
     float spot_cos = dot( normalize(dir),-lpos);
     if (spot_cos <= params.x)
@@ -77,6 +78,11 @@ float calculateSpot(vec3 dir, vec3 lpos, vec2 params)
     }
 
     return spot_effect;
+}
+
+float getDist(float dist, float att)
+{
+    return 1.0 - clamp(dist / att, 0.0, 1.0);
 }
 
 void phong_weightCalc(int i,
@@ -107,14 +113,15 @@ void phong_weightCalc(int i,
               specular = pow(dot(normalize(campos), reflect(light_pos, frag_normal)), SpecularPower);
             if (distance != 0.0)
             {
-                  att = 1.0 - (distance / attenuation);
+                att = getDist(distance, attenuation);
                 direct_lighting *= att;
                 specular *= att;
             }
+            diffuse_ += Lights[i].color * max(0.0, direct_lighting * spotf);
+            specular_ += ((Material_specular * Lights[i].color) * max(0.0, specular));
         }
     }
-    diffuse_ += Lights[i].color * max(0.0, direct_lighting);
-    specular_ += (Material_specular * Lights[i].color) * max(0.0, specular * spotf);
+
 }
 
 void main()
