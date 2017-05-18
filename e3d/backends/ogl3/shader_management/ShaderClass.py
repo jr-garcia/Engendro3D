@@ -251,26 +251,29 @@ class Shader:
     def unSet(self):
         self._sman._setShaderState(self, 0)
 
-    def buildBoneTransf(self, bonetrans, boneDir):
+    def setBoneTransformations(self, bonetrans, boneDict):
         bth = self._uniformsHandlesCache['BoneTransforms[0]']
         btith = self._uniformsHandlesCache.get('BoneTransformsIT[0]')
         for b in bonetrans.items():
-            boneTransHandle = bth + boneDir[b[0]]
-            vecVal = b[1].toList()
+            name = b[0]
+            transformation = b[1]
+            boneTransHandle = bth + boneDict[name]
+            vecVal = np.asarray(transformation, np.float32).reshape((-1))
+            # todo: require a 'flatten' todo: method in cycgkit's mat4 ?
             glUniformMatrix4fv(boneTransHandle, 1, 0, vecVal)
             if btith:
-                boneTransITHandle = btith + boneDir[b[0]]
-                vecVal = b[1].transpose().inverse().toList()
+                boneTransITHandle = btith + boneDict[name]
+                vecVal = np.asarray(transformation.transposed().inversed(), np.float32).reshape((-1))
                 glUniformMatrix4fv(boneTransITHandle, 1, 0, vecVal)
 
-    def buildBoneTransfMulti(self, bonetrans, boneDir):
-        boneTransHandle = self._uniformsHandlesCache['BoneTransforms[0]']
-        boneTransITHandle = self._uniformsHandlesCache.get('BoneTransformsIT[0]', -1)
-        buildBoneTransfC(bonetrans, boneDir, boneTransHandle, boneTransITHandle, self._tempBoneArray,
-                         self._tempBoneITArray)
+    # def setBoneTransformationsMulti(self, bonetrans, boneDict):
+    #     boneTransHandle = self._uniformsHandlesCache['BoneTransforms[0]']
+    #     boneTransITHandle = self._uniformsHandlesCache.get('BoneTransformsIT[0]', -1)
+    #     buildBoneTransfC(bonetrans, boneDict, boneTransHandle, boneTransITHandle, self._tempBoneArray,
+    #                      self._tempBoneITArray)
         # for b in bonetrans.iteritems():
-        # self._tempBoneArray[boneDir[b[0]]] = b[1].toList()
-        #     self._tempBoneITArray[boneDir[b[0]]] = b[1].transpose().inverse().toList()
+        # self._tempBoneArray[boneDict[b[0]]] = b[1].toList()
+        #     self._tempBoneITArray[boneDict[b[0]]] = b[1].transposed().inversed().toList()
         # self.setMultipleValues(boneTransHandle, self._tempBoneArray)
         # self.setMultipleValues(boneTransITHandle, self._tempBoneITArray)
 

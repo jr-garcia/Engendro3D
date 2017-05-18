@@ -18,7 +18,7 @@ class Node(object):
 
     @staticmethod
     def fromAssimpNode(cnode, scene, parentTransform, matcache, useChannel0AsUVChannel, lastUVs, uvsfilled,
-                       boneDir, forceStatic, meshes):
+                       boneDict, forceStatic, meshes):
         """
 
 
@@ -31,9 +31,9 @@ class Node(object):
         @rtype : Node
         """
         self = Node(cnode.mName)
-        # self.transformation = mat4(cnode.transformation.tolist()).transpose() * parentTransform
-        self.transformation = mat4(cnode.mTransformation.tolist()) * parentTransform
-        # self.transformation = parentTransform * mat4(cnode.transformation.tolist()).transpose()
+        # self.transformation = mat4(cnode.transformation).transpose() * parentTransform
+        self.transformation = mat4(cnode.mTransformation) * parentTransform
+        # self.transformation = parentTransform * mat4(cnode.transformation).transpose()
 
         if useChannel0AsUVChannel > 0:
             if not uvsfilled:
@@ -64,12 +64,12 @@ class Node(object):
         if cnode.mNumMeshes > 0:
             for mi in cnode.mMeshes:
                 mesh = Mesh.fromAssimpMesh(meshes[mi], self.transformation, useChannel0AsUVChannel,
-                                           lastUVs, boneDir, forceStatic)
+                                           lastUVs, boneDict, forceStatic)
                 self._meshes.append(mesh)
         if cnode.mNumChildren > 0:
             for cn in cnode.mChildren:
                 n = Node.fromAssimpNode(cn, scene, self.transformation, matcache, useChannel0AsUVChannel, lastUVs,
-                                        uvsfilled, boneDir, forceStatic, meshes)
+                                        uvsfilled, boneDict, forceStatic, meshes)
                 if (len(n._meshes) > 0) | (len(n._childNodes) > 0):
                     self._childNodes.append(n)
 

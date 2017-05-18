@@ -4,10 +4,10 @@ from cycgkit.cgtypes import *
 
 class Material(object):
     def __init__(self):
-        self._ID = ""
-        self._difCol = vec4(.5, .5, .5, 1.0)
-        self._emCol = vec4(0.0, 0.0, 0.0, 1.0)
-        self._specCol = vec4(1.0, 1.0, 1.0, 1.0)
+        self._ID = "[{}]".format(id(self))
+        self._difCol = vec3(.5, .5, .5)
+        self._emCol = vec3(0.0, 0.0, 0.0)
+        self._specCol = vec3(1.0, 1.0, 1.0)
         self.specularPower = 40.0
         self._shaderID = "default"
         self.textureRepeat = 1.0
@@ -63,18 +63,19 @@ class Material(object):
 
     @staticmethod
     def _checkColor(value):
-        if isinstance(value, vec4):
+        if isinstance(value, vec3):
             nvalue = value
         elif isinstance(value, list):
-            nvalue = list(value)
-            while len(nvalue) != 4:
-                nvalue.append(value[0])
+            if not len(value) == 3:
+                raise RuntimeError('wrong number of elements for color assignment. '
+                                   'Required 3, got {}'.format(len(value)))
+            nvalue = value
         elif isinstance(value, (int, float)):
-            nvalue = [value] * 4
+            nvalue = [value] * 3
         else:
-            raise TypeError('type {} not supported for color assigment'.format(str(type(value))))
+            raise TypeError('type {} not supported for color assigment. Use list of len=3, vec4 or single number.'.format(str(type(value))))
 
-        return vec4(nvalue)
+        return vec3(nvalue)
 
     @staticmethod
     def _fromMaterial(baseMat):

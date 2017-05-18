@@ -310,7 +310,7 @@ cdef class Shader:
     def unSet(self):
         self._sman._setCurrentShaderState(self, 0)
 
-    def buildBoneTransf(self, dict bonetrans, dict boneDir):
+    def buildBoneTransf(self, dict bonetrans, dict boneDict):
         cdef vector[float] vecVal
         cdef int boneTransHandle
         cdef int boneTransITHandle
@@ -318,24 +318,24 @@ cdef class Shader:
         cdef int bth = self._uniformsHandlesCache['BoneTransforms[0]']
         cdef int btith = self._uniformsHandlesCache.get('BoneTransformsIT[0]')
         for b in bonetrans.iteritems():
-            boneTransHandle = bth + boneDir[b[0]]
+            boneTransHandle = bth + boneDict[b[0]]
             vecVal = b[1].toList()
             with nogil:
                 glUniformMatrix4fv(boneTransHandle, 1, 0, &vecVal[0])
             if btith:
-                boneTransITHandle = btith + boneDir[b[0]]
-                vecVal = b[1].transpose().inverse().toList()
+                boneTransITHandle = btith + boneDict[b[0]]
+                vecVal = b[1].transposed().inversed().toList()
                 with nogil:
                     glUniformMatrix4fv(boneTransITHandle, 1, 0, &vecVal[0])
 
-    def buildBoneTransfMulti(self, bonetrans, boneDir):
+    def buildBoneTransfMulti(self, bonetrans, boneDict):
         boneTransHandle = self._uniformsHandlesCache['BoneTransforms[0]']
         boneTransITHandle = self._uniformsHandlesCache.get('BoneTransformsIT[0]', -1)
-        buildBoneTransfC(bonetrans, boneDir, boneTransHandle, boneTransITHandle, self._tempBoneArray,
+        buildBoneTransfC(bonetrans, boneDict, boneTransHandle, boneTransITHandle, self._tempBoneArray,
                          self._tempBoneITArray)
         # for b in bonetrans.iteritems():
-        # self._tempBoneArray[boneDir[b[0]]] = b[1].toList()
-        #     self._tempBoneITArray[boneDir[b[0]]] = b[1].transpose().inverse().toList()
+        # self._tempBoneArray[boneDict[b[0]]] = b[1].toList()
+        #     self._tempBoneITArray[boneDict[b[0]]] = b[1].transposed().inversed().toList()
         # self.setMultipleValues(boneTransHandle, self._tempBoneArray)
         # self.setMultipleValues(boneTransITHandle, self._tempBoneITArray)
 

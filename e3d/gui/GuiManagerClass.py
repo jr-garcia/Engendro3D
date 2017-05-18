@@ -7,7 +7,7 @@ from ..Base3DObjectClass import DefaultObjectParameters
 from .LayerClass import Layer
 from .FontRendering import CharRangesEnum
 from .FontRendering.MSDFAtlasRenderer import NAMEFORMATSTRING, render
-from ..backends.base_backend import DrawingData
+from ..backends.base_backend import DrawingData, InstanceData
 from ..model_management.MeshClass import Mesh, NormalsCalculationTypeEnum, UVCalculationTypeEnum
 from ..scene_management.SceneClass import DefaultSceneParameters
 from ..events_processing.EventsListenerClass import EventsListener
@@ -166,7 +166,7 @@ class GuiManager:
         meshid = self.quadmesh.ID
 
         meshMat = child._material
-        layerDrawingData.instances[meshid].append((meshMat, defaultObjectParams))
+        layerDrawingData.instances[meshid].append(InstanceData(meshMat, defaultObjectParams))
 
         for c in child._children:
             if c.visible:

@@ -3,11 +3,10 @@ from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
 
-from e3d.backends.base_backend import _setObjectUniforms, _setSceneUniforms, setMaterialValues
 from .RenderTarget_OGL3 import RenderTarget
 from .shader_management.ShadersManagerClass import ShadersManager
 from ..RenderTargetBase import attachmentTypeEnum, renderTextureTypeEnum
-from ..base_backend import BaseBackend
+from ..base_backend import BaseBackend, _setObjectUniforms, _setSceneUniforms, setMaterialValues, _setBoneTransformationsForMesh
 from ...fse_management.FSEManagerClass import FSEManager, FullScreenEffect
 
 
@@ -320,8 +319,8 @@ class OGL3Backend(BaseBackend):
         for mesh in drawingData.meshes:
             resetRequired = True
             meshid = mesh.ID
-            instancesList = drawingData.instances.get(meshid)
-            if instancesList is None or len(instancesList) < 1:
+            renderDataPerinstance = drawingData.instances.get(meshid)
+            if renderDataPerinstance is None or len(renderDataPerinstance) < 1:
                 continue
             vertexBuffer = self.vertexBuffers.get(meshid)
             if vertexBuffer is None:
@@ -344,7 +343,7 @@ class OGL3Backend(BaseBackend):
             else:
                 currentShader = None
 
-            for currentMat, defaultObjectParams in instancesList:
+            for currentMat, defaultObjectParams, transformations, modelID in renderDataPerinstance:
                 if not self._shaderOverride:
                     currentShader = self._engine.shaders._shadersCache[currentMat.shaderID]
                     if currentShader is None:
@@ -357,6 +356,8 @@ class OGL3Backend(BaseBackend):
                         resetRequired = False
 
                 _setObjectUniforms(currentShader, defaultObjectParams)
+                if transformations:
+                    _setBoneTransformationsForMesh(currentShader, transformations, drawingData.modelBoneDirs[modelID])
                 setMaterialValues(self.textures, currentShader, currentMat)
                 self.renderMesh(mesh, currentShader)
 

@@ -72,14 +72,38 @@ class ShaderStruct(OrderedDict):
         self[key] = value
 
 
+class InstanceData:
+    def __init__(self, meshMaterial, defaultParams, transformations=None, modelID=None):
+        self._stuff = [meshMaterial, defaultParams, transformations, modelID]
+
+    def __getitem__(self, item):
+        return self._stuff[item]
+
+    def __setitem__(self, key, value):
+        self._stuff[key] = value
+
+    def __len__(self):
+        return len(self._stuff)
+
+
+class _appendableInstanceData(list):
+    def __init__(self):
+        super(_appendableInstanceData, self).__init__()
+
+    def append(self, object):
+        if not isinstance(object, InstanceData) or not issubclass(type(object), InstanceData):
+            raise TypeError('only "InstanceData" type can be appended. got {}'.format(type(object)))
+        super(_appendableInstanceData, self).append(object)
+
+
 class DrawingData:
     def __init__(self):
         self.meshes = set()
-        self.instances = defaultdict(list)
+        self.modelBoneDirs = {}
+        self.instances = defaultdict(_appendableInstanceData)
         self.clearColor = vec3(0.1, .3, .4)
         self.sky = None
         self.defaultSceneParams = None
-        self.transformations = {}
 
     def extend(self, otherData):
         assert isinstance(otherData, DrawingData)
@@ -126,7 +150,7 @@ def setMaterialValues(textures, shader, mat):
 
     setUnif('uvOffset', vec4(mat.uvOffset))
 
-    setShaderProperties(shader, mat.shaderProperties)
+    _setMaterialShaderProperties(shader, mat.shaderProperties)
 
 
 def _setSceneUniforms(shader, params):
@@ -187,10 +211,14 @@ def _setObjectUniforms(shader, params):
     shader._reportInactive = ori
 
 
-def setShaderProperties(shader, props):
+def _setMaterialShaderProperties(shader, props):
     paramsList = []
     for p in props:
         assert isinstance(p, ShaderProperty)
         paramsList.append((p.shaderName, p.getVal()))
 
     shader.setUniformsList(paramsList)
+
+
+def _setBoneTransformationsForMesh(shader, transformations, moelboneDir):
+    shader.setBoneTransformations(transformations, moelboneDir)

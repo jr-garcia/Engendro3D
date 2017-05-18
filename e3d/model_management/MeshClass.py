@@ -54,7 +54,7 @@ class Mesh:
     indexCount = property(fget=get_IndexCount)
 
     @staticmethod
-    def fromAssimpMesh(mesh, transform, useChannel0AsUVChannel, lastUVs, boneDir, forceStatic):
+    def fromAssimpMesh(mesh, transform, useChannel0AsUVChannel, lastUVs, boneDict, forceStatic):
         """
 
 
@@ -114,14 +114,14 @@ class Mesh:
                     ex.message)
 
         nMesh = Mesh.fromObjectInfo(vertices, mesh.mFaces, None, texCoords, normals, tangents, bitangents, transform,
-                                    bones, colours, mesh.mMaterialIndex, boneDir)
+                                    bones, colours, mesh.mMaterialIndex, boneDict)
 
-        # return Mesh.fromAssimpMesh2(mesh, transform, useChannel0AsUVChannel, lastUVs, boneDir, forceStatic)
+        # return Mesh.fromAssimpMesh2(mesh, transform, useChannel0AsUVChannel, lastUVs, boneDict, forceStatic)
         return nMesh
 
     @staticmethod
     def fromObjectInfo(vertices, faces, minmax, UVsOrCalculationType, normals, tangents=None, bitangents=None,
-                       transform=None, mesh_mBones=None, colors=None, materialIndex=0, boneDir=None,
+                       transform=None, mesh_mBones=None, colors=None, materialIndex=0, boneDict=None,
                        forceReIndexing=False):
         """
 
@@ -303,7 +303,7 @@ class Mesh:
                             if bb < 4:
                                 bName = b.mName
                                 bonewl[bb] = float(w.mWeight)
-                                boneil[bb] = float(boneDir[bName])
+                                boneil[bb] = float(boneDict[bName])
                                 if bonewl[bb] > 0.0:
                                     if bName in newMesh.boneMinMax.keys():
                                         cv = list(newMesh.boneMinMax[bName])

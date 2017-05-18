@@ -24,7 +24,7 @@ class Skeleton(object):
             self.ID = node.mName
             self.children = []
             self.transforms = {}
-            self.localTransformation = mat4(node.mTransformation.tolist()).transpose()
+            self.localTransformation = mat4(node.mTransformation).transpose()
             # self.localTransformation = parentTransformation * self.localTransformation
             self.parent = parent
             if bool(node.mChildren):
@@ -115,12 +115,12 @@ class Skeleton(object):
                         scaleMatrix = mat4.scaling(vec3(transformationInfo.scale))
                         nodeTransformation = positionMatrix * rotationMatrix * scaleMatrix
 
-                    nodeTransformation = nodeTransformation.transpose()
+                    nodeTransformation = nodeTransformation.transposed()
                     globalTransformation = nodeTransformation * parentTransformation
                     if self.ID in mesh.boneOffsets.keys():
                         offset = mesh.boneOffsets[self.ID]
                         finalTransformations[self.ID] = offset * globalTransformation
-                        finalTransformations[self.ID] = finalTransformations[self.ID].transpose()
+                        finalTransformations[self.ID] = finalTransformations[self.ID].transposed()
                         animation.transforms[id(mesh)][self.ID][time] = finalTransformations[self.ID]
                     else:
                         animation.transforms[id(mesh)][self.ID][time] = globalTransformation
@@ -177,7 +177,7 @@ class Model:
         self._engine = engine
         self.materials = []
         self.animations = {}
-        self.boneDir = {}
+        self.boneDict = {}
         self.hasBones = False
         self.boundingBox = None
         self._directory = ''
@@ -256,7 +256,7 @@ class Model:
 
         try:
             newModel.rootNode = Node.fromAssimpNode(cnode, scene, world, newModel.materials, useChannel0AsUVChannel,
-                                                    lastUVs, uvsFilled, newModel.boneDir, forceStatic, scene.mMeshes)
+                                                    lastUVs, uvsFilled, newModel.boneDict, forceStatic, scene.mMeshes)
 
             if pretransformAccuracy >= 0:
                 logger.meassure('Pre calculating animation frames')
@@ -288,7 +288,7 @@ class Model:
 
     def __getSkeletonRoot(self, bnode):
         for c in bnode.children:
-            if c.name in self.boneDir.keys():
+            if c.name in self.boneDict.keys():
                 return c
             return self.__getSkeletonRoot(c)
 
@@ -309,8 +309,8 @@ class Model:
             nanim.printIt()
             bb = 0
             for b in nanim.boneKeys.keys():
-                if b not in self.boneDir:
-                    self.boneDir[b] = bb
+                if b not in self.boneDict:
+                    self.boneDict[b] = bb
                     bb += 1
 
     def cacheMaterials(self, materialsList):
@@ -375,8 +375,8 @@ class Model:
             lcol = col.tolist()
         else:
             lcol = col
-        if len(lcol) == 3:
-            lcol.append(1.0)
+        if len(lcol) == 4:
+            lcol.pop()
         return lcol
 
     @staticmethod

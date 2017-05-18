@@ -3,7 +3,7 @@ from e3d.update_management.pickleableMethods import updateLightTransformation, u
 from e3d.update_management.renderingListCreation import getOrderedModelInstances
 from .LightClass import light, lightTypesEnum
 from .SkyboxClass import Skybox
-from ..backends.base_backend import DrawingData
+from ..backends.base_backend import DrawingData, InstanceData
 from ..cameras.SimpleCameraClass import SimpleCamera
 from ..commonValues import *
 from ..model_management.ModelInstanceClass import ModelInstance
@@ -339,9 +339,10 @@ class Scene(object):
                 self._currentModel = currentModel
 
                 if currentModel.hasBones:
+                    newDrawingData.modelBoneDirs[currentModelID] = currentModel.boneDict
                     time = -1
                     if currentModelInstance._animationID != '':
-                        time = Scene.calculateAnimationTime(netTime, currentModelInstance, currentModel)
+                        time = Scene.calculateInstanceAnimationTime(netTime, currentModelInstance, currentModel)
                 else:
                     time = None
                 Scene.extractRenderInfo(currentModelInstance, defaultObjectParams, currentModel.rootNode,
@@ -353,18 +354,21 @@ class Scene(object):
     def extractRenderInfo(currentModelInstance, defaultParams, node, newDrawingData, time, scene):
         for mesh in node._meshes:
             meshid = mesh.ID
+            transformations = None
             if time is not None:
                 # todo: implement currentModel.hasBones debug bounding box
-                newDrawingData.transformations[meshid] = scene.applyBoneTransforms(currentModelInstance, time, mesh)
+                transformations = scene.getInstanceAnimationTransformations(currentModelInstance,
+                                                                            time, mesh)
                 # self._currentAnimatedBBox.clear()
             newDrawingData.meshes.add(mesh)
             meshMat = currentModelInstance._materials[mesh._materialIndex]
-            newDrawingData.instances[meshid].append((meshMat, defaultParams))
+            newDrawingData.instances[meshid].append(InstanceData(meshMat, defaultParams, transformations,
+                                                     currentModelInstance._baseModelID))
         for cnode in node._childNodes:
             Scene.extractRenderInfo(currentModelInstance, defaultParams, cnode, newDrawingData, time, scene)
 
     @staticmethod
-    def calculateAnimationTime(netTime, currentModelInstance, currentModel):
+    def calculateInstanceAnimationTime(netTime, currentModelInstance, currentModel):
         assert isinstance(currentModelInstance, ModelInstance)
         model = currentModelInstance
         if model.animState == ModelInstance.animationState.playing:
@@ -396,7 +400,7 @@ class Scene(object):
             model._animationStartupTime = -1
             model._animationPausedTime = -1
 
-    def applyBoneTransforms(self, currentModelInstance, time, mesh):
+    def getInstanceAnimationTransformations(self, currentModelInstance, time, mesh):
         if time < 0:
             ID = list(currentModelInstance.getAnimationsList())[0]
             anim = self._currentModel.animations[ID]
@@ -412,8 +416,6 @@ class Scene(object):
             # pointb = flatm * b[1][1]
             # self._currentAnimatedBBox.addPoint(pointb)
 
-        # self._currentShader.buildBoneTransf(currentTransformations, self._currentModel.boneDir)
-        # self._currentShader.buildBoneTransfMulti(currentTransformations, self._currentModel.boneDir)
         return currentTransformations
 
 
