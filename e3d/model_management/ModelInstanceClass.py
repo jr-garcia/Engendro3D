@@ -39,7 +39,7 @@ class ModelInstance(Base3DObject):
         self.animationQuality = animationQuality
 
     def getAnimationsList(self):
-        return self._models._getModel(self._baseModelID).animations.keys()
+        return list(self._models._getModel(self._baseModelID).animations.keys())
 
     def attachSound(self, bufferID, onObjectID):
         """

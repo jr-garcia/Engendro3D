@@ -3,6 +3,7 @@ from assimpcy import aiImportFile, aiPostProcessSteps as pp
 from cycgkit.cgtypes import mat4, quat, vec3, slerp
 from cycgkit.boundingbox import BoundingBox
 from copy import deepcopy
+from collections import OrderedDict
 
 from .AnimationModule import Animation, transformationValues
 from ..LoggerClass import logger, logLevelsEnum
@@ -176,7 +177,7 @@ class Model:
         self._shaders = engine.shaders
         self._engine = engine
         self.materials = []
-        self.animations = {}
+        self.animations = OrderedDict()
         self.boneDict = {}
         self.hasBones = False
         self.boundingBox = None
