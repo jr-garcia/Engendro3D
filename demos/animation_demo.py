@@ -9,57 +9,30 @@ class Demo(game):
     def __init__(self):
         game.__init__(self)
         self.texturesToLoad = [
-            ['e3dlogo.png', 'logo'],
-            ['./textures/n_deep.png', 'defND', True],
-            ['./textures/n_irr.png', 'defNI', True],
-            ['./textures/nmap_test.png', 'testN', True],
-            ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
-
-        self.bumpymats = []
-        self.texmats = []
-        self.spots = []
+            ['e3dlogo.png', 'logo']]
 
     def loadModels(self):
         engine = self.engine
 
-        # self.camera.rotateX(25)
-        # self.camera.rotateY(30)
         self.camera.position = vec3(0, 43, 186)
-
-        # engine.models.loadBox("boxmodel", [6], 1)
-        # self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 15, 0], [0, 0, 0], 5)
-        # self.box1.physicsBody.isDynamic = True
-        # mt = self.box1._materials[0]
-        # mt.specularPower = 40
-        # mt.useDiffuseTexture = True
-        # mt.useNormalMapTexture = True
-        # mt.normalMapTextureID = 'defNI'
 
         engine.models.loadPlane("planemodelbig", 600, 600, 20)
         self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
         mt = self.plane1._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
-        mt.useNormalMapTexture = True
-        mt.normalMapTextureID = 'defNI'
-        mt.textureRepeat = 40
-        self.bumpymats.append(mt)
-        self.texmats.append(mt)
+        mt.setDefaultNormalMap()
+        mt.textureRepeat = 10
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.tube = self.scene1.addModel('tubemodel', 'tube1', [-50, 0, 0], [0, 0, 0], 7)
         self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
-        # self.tube.physicsBody.isDynamic = True
-        mt = self.tube._materials[0]
-        mt.specularPower *= 4
 
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 0, 0], [0, 0, 0], 7)
-        # self.tube2.physicsBody.isDynamic = True
 
         self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7)
         self.tube3.setAnimation(list(self.tube3.getAnimationsList())[1], True)
-        # self.tube3.physicsBody.isDynamic = True
 
     def mouseMove(self, ev):
         if ev.eventName == 'motion':
@@ -116,18 +89,9 @@ class Demo(game):
         # if res:
         #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
         self.lastspeed = movespeed
-        self.scene1.ambientColor = vec3(.004, .006, .009)
-        self.scene1.bgColor = vec3(.04, .06, .09)
 
         ran1 = 45 * sin(ev[1] / 1000.0)
         ran2 = 45 * sin(ev[1] / 500.0)
-        for s in self.spots:
-            s.rotation = vec3(ran2, 0, ran1)
-        # if self.dorot:
-            # if self.pushbox1:
-            #     self.pushbox1.rotateY(-.07 * ft)
-            #     self.pushbox2.rotateY(-.07 * ft)
-                # self.box1.rotateY(-.07 * ft)
         if self.window.events.isKeyPressed('w'):
             self.camera.moveForward(movespeed)
         elif self.window.events.isKeyPressed('s'):

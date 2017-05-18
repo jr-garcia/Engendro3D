@@ -37,6 +37,8 @@ class Demo(game):
     def loadModels(self):
         engine = self.engine
 
+        self.scene1.ambientColor = vec3(.004, .006, .009)
+        self.scene1.bgColor = vec3(.04, .06, .09)
         self.camera.rotateX(30)
         self.camera.rotateY(30)
         self.camera.position = vec3(107.262, 148.928, 22.752)
@@ -230,8 +232,6 @@ class Demo(game):
         # if res:
         #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
         self.lastspeed = movespeed
-        self.scene1.ambientColor = vec3(.004, .006, .009)
-        self.scene1.bgColor = vec3(.04, .06, .09)
 
         ran1 = 45 * sin(ev[1] / 1000.0)
         ran2 = 45 * sin(ev[1] / 500.0)
