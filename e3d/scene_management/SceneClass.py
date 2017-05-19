@@ -54,7 +54,7 @@ class Scene(object):
         return ID in self._models
 
     def addModel(self, modelID, IDInScene, position, rotation, uniformScale, animationQuality=1,
-                 shape=bodyShapesEnum.auto, mass=None, isDynamic=False):
+                 shape=bodyShapesEnum.auto, mass=None, isDynamic=False, materialsList=None):
         """
 
 
@@ -75,7 +75,8 @@ class Scene(object):
         if model:
             if shape == bodyShapesEnum.auto:
                 shape = model._preShape
-            modelIns = ModelInstance(model.materials, modelID, self._engine, IDInScene, animationQuality, position,
+            materials = model.materials if materialsList is None else materialsList
+            modelIns = ModelInstance(materials, modelID, self._engine, IDInScene, animationQuality, position,
                                      rotation, uniformScale, shape, mass, isDynamic)
             self.__currentDebugColor += 1
             if self.__currentDebugColor > len(self._DebugColors) - 1:
