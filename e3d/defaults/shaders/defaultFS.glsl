@@ -15,10 +15,10 @@ struct light
 
 uniform mat3 NormalMatrix;
 uniform bool UseDiffuseTexture;
-uniform vec4 DiffuseColor;
+uniform vec3 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 uniform bool UseEmissiveTexture;
-uniform vec4 EmissiveColor;
+uniform vec3 EmissiveColor;
 uniform sampler2D EmissiveTexture;
 uniform bool UseNormalMapTexture;
 uniform sampler2D NormalMapTexture;
@@ -133,7 +133,7 @@ void main()
     }
     else
     {
-        objectdiffuse = DiffuseColor;
+        objectdiffuse = vec4(DiffuseColor, 1);
     }
 
     vec3 diffuse = vec3(0);
