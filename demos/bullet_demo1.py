@@ -26,10 +26,8 @@ class Demo(game):
         nlight.spotRange = .7
         nlight.attenuation = 190
         lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
-        ncol = list(color)
-        ncol.append(1.0)
         mat = lmod._materials[0]
-        mat.emissiveColor = ncol
+        mat.emissiveColor = color
         mat.isLightAffected = False
         if ltype == 2:
             self.spots.append(nlight)
@@ -114,7 +112,8 @@ class Demo(game):
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7)
         # self.tube2.physicsBody.isDynamic = True
 
-        # self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7, shape=bodyShapesEnum.sphere)
+        # self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7,
+        # shape=bodyShapesEnum.sphere)
         # self.tube3.setAnimation(self.tube3.getAnimationsList()[1], True)
         # self.tube3.physicsBody.isDynamic = True
 

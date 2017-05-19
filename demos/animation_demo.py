@@ -27,12 +27,12 @@ class Demo(game):
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.tube = self.scene1.addModel('tubemodel', 'tube1', [-50, 0, 0], [0, 0, 0], 7)
-        self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
+        self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
 
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 0, 0], [0, 0, 0], 7)
 
         self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7)
-        self.tube3.setAnimation(list(self.tube3.getAnimationsList())[1], True)
+        self.tube3.setAnimation(self.tube3.getAnimationsList()[1], True)
 
     def mouseMove(self, ev):
         if ev.eventName == 'motion':

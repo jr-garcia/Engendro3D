@@ -25,10 +25,8 @@ class Demo(game):
         nlight.spotRange = .7
         nlight.attenuation = randint(150, 250)
         lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
-        ncol = list(color)
-        ncol.append(1.0)
         mat = lmod._materials[0]
-        mat.emissiveColor = ncol
+        mat.emissiveColor = color
         mat.isLightAffected = False
         if ltype == 2:
             self.spots.append(nlight)

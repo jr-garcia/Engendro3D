@@ -54,10 +54,10 @@ class Material(object):
     emissiveColor = property(_getEmCol, _setEmCol, doc='Emissive color passed to the shader')
 
     def _setSpecCol(self, value):
-        self._emCol = Material._checkColor(value)
+        self._specCol = Material._checkColor(value)
 
     def _getSpecCol(self):
-        return self._emCol
+        return self._specCol
 
     specularColor = property(_getSpecCol, _setSpecCol, doc='Specular color passed to the shader')
 
