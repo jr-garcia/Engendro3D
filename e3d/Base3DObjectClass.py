@@ -102,10 +102,9 @@ class Base3DObject(Attachable):
             fs = size
             noff = offset
 
-        self._pOffset = noff
+        self._pOffset = vec3(noff)
 
-        self.physicsBody = None
-        # self.physicsBody = rigidObject(self, shape, mass, fs, isDynamic)
+        self.physicsBody = rigidObject(self, shape, mass, vec3(fs), isDynamic)
 
         # <<<<<<<<<<<<<<<<<<<<<<<<<<
 

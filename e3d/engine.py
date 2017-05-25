@@ -12,6 +12,7 @@ from .events_processing.EventsManagerClass import Event, EventsManager
 from .scene_management.ScenesManagerClass import ScenesManager
 from .texture_management.TextureManagerClass import TexturesManager
 from .window import Window
+from .ThreadingManagerClass import ThreadingManager
 
 
 class globalsStruct:
@@ -47,7 +48,7 @@ class Engine:
         self.scenes = ScenesManager()
         self.sounds = None
         self.io = None
-        self.threading = None
+        self.threading = ThreadingManager()
         self.globals = globalsStruct()
         self.localqueue = None
         self._running = False
@@ -55,13 +56,13 @@ class Engine:
 
         self.__setAttribs(multiSampleLevel, maxContext)
 
-    def initialize(self):
+    def initialize(self, maxThreads=2):
         self.__createDummyWindowAndContext()
         loadGL()
         self._fillGLInfo()
-        self._initializeManagers(0)
+        self._initializeManagers(maxThreads)
 
-    def _initializeManagers(self, maxThreads=0):
+    def _initializeManagers(self, maxThreads):
         # self.localqueue = Queue()
 
         logger.log('Initializing systems...')
@@ -86,10 +87,8 @@ class Engine:
         # from .IOHelperClass import IOHelper
         # self.io = IOHelper()
 
-        # print('\t Threading...')
-        # from ..ThreadingManagerClass import ThreadingManager
-        # self.threading = ThreadingManager()
-        # self.threading.initialize(maxThreads)
+        print('\t Threading...')
+        self.threading.initialize(maxThreads)
 
         print('\t Scenes...')
         self.scenes.initialize(self)
@@ -163,7 +162,7 @@ class Engine:
         self.shaders.terminate()
         self.sounds.terminate()
         self.scenes.terminate()
-        # self.threading.terminate()
+        self.threading.terminate()
 
         # self.localqueue.close()
 

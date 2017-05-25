@@ -8,11 +8,11 @@ from ..cameras.SimpleCameraClass import SimpleCamera
 from ..commonValues import *
 from ..model_management.ModelInstanceClass import ModelInstance
 from ..model_management.AnimationModule import Animation
-from ..physics_management.physicsModule import bodyShapesEnum, scenePhysics
+from ..physics_management.physicsModule import bodyShapesEnum, ScenePhysics
 from cycgkit.cgtypes import mat4
 
 
-# from cyBullet.bullet import ACTIVE_TAG, WANTS_DEACTIVATION
+from bullet.bullet import ACTIVE_TAG, WANTS_DEACTIVATION
 
 
 class Scene(object):
@@ -43,7 +43,7 @@ class Scene(object):
         self.ambientColor = [v / 3.0 for v in [0.23, 0.34, 0.65]]
         self.bgColor = vec3(0.23, 0.34, 0.65)
 
-        self.physics = scenePhysics(gravity, resolution)
+        self.physics = ScenePhysics(gravity, resolution)
         self._currentTransformations = None
         self._currentModel = None
 
@@ -85,8 +85,8 @@ class Scene(object):
             self._models[IDInScene] = modelIns
             self._instancesOrderedByModel = getOrderedModelInstances(self)
             self.physics.addRigidObject(modelIns.physicsBody)
-            # if not modelIns.physicsBody.isDynamic: #todo: reenable
-            #     modelIns.physicsBody._reBuildMass(0.0)
+            if not modelIns.physicsBody.isDynamic:
+                modelIns.physicsBody._reBuildMass(0.0)
             return modelIns
         else:
             raise KeyError(
@@ -148,8 +148,7 @@ class Scene(object):
                 m._dirtyP = False
 
         if len(simpleUpdateList) > 0:
-            # res = self._engine.threading.map(updateModelTransformation, simpleUpdateList)
-            res = list(map(updateModelTransformation, simpleUpdateList))
+            res = self._engine.threading.map(updateModelTransformation, simpleUpdateList)
 
             if res:
                 for mt in res:
@@ -164,21 +163,19 @@ class Scene(object):
                         m.physicsBody._phyUpdWait = 0
                         m.visible = False
                     else:
-                        # todo:reimplement physics
-                        # if m.physicsBody._beyondBoundary:
-                        #     m.visible = True   # todo: add previous state detection
-                        #     self.physics.addRigidObject(m.physicsBody)
-                        # if not m.physicsBody._isTempKin:
-                        #     m.physicsBody._setAsKinematic()
-                        # m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
-                        # m.physicsBody._phyUpdWait = 2
+                        if m.physicsBody._beyondBoundary:
+                            m.visible = True   # todo: add previous state detection
+                            self.physics.addRigidObject(m.physicsBody)
+                        if not m.physicsBody._isTempKin:
+                            m.physicsBody._setAsKinematic()
+                        m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
+                        m.physicsBody._phyUpdWait = 2
 
                         for Sn in m._attachedSounds.values():
                             Sn.soundSource.position = list(m._position)
 
     def _physicsModelsUpdate(self):
         # Todo: implement per model calbacks
-        return
         updatables = {}
         physicsUpdateList = []
 
@@ -208,7 +205,7 @@ class Scene(object):
             if m.physicsBody._isTempKin and m.physicsBody._phyUpdWait == 0:
                 m.physicsBody._setAsDynamic()
 
-        if physicsUpdateList.__len__() > 0:
+        if len(physicsUpdateList) > 0:
             res = self._engine.threading.map(updateModelTransformation, physicsUpdateList)
 
             if res:
@@ -228,7 +225,7 @@ class Scene(object):
                         Sn.soundSource.position = list(m._position)
 
     def _UpdateLights(self):
-        # Todo: implement per model calbacks
+        # Todo: implement per model callbacks
         updatables = {}
         simpleUpdateList = []
         for m in self._lights.values():
@@ -239,27 +236,27 @@ class Scene(object):
                 m._dirty = False
                 m._dirtyP = False
 
-        if simpleUpdateList.__len__() > 0:
-            # res = self._engine.threading.map(updateLightTransformation, simpleUpdateList)
-            res = list(map(updateLightTransformation, simpleUpdateList))
+        if len(simpleUpdateList) > 0:
+            res = self._engine.threading.map(updateLightTransformation, simpleUpdateList)
+            # res = list(map(updateLightTransformation, simpleUpdateList))
 
             if res:
                 for mt in res:
                     ID, rot = mt
                     m = updatables[ID]
                     m._rotationMatrix = rot
-                    # if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
-                    #     self.physics.removeRigidObject(m.physicsBody)
-                    #     m.physicsBody._phyUpdWait = 0
-                    #     m.visible = False
-                    # else:
-                    #     if m.physicsBody._beyondBoundary:
-                    #         m.visible = True   # todo: add previous state detection
-                    #         self.physics.addRigidObject(m.physicsBody)
-                    #     if not m.physicsBody._isTempKin:
-                    #         m.physicsBody._setAsKinematic()
-                    #     m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
-                    #     m.physicsBody._phyUpdWait = 2
+                    if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
+                        self.physics.removeRigidObject(m.physicsBody)
+                        m.physicsBody._phyUpdWait = 0
+                        m.visible = False
+                    else:
+                        if m.physicsBody._beyondBoundary:
+                            m.visible = True   # todo: add previous state detection
+                            self.physics.addRigidObject(m.physicsBody)
+                        if not m.physicsBody._isTempKin:
+                            m.physicsBody._setAsKinematic()
+                        m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
+                        m.physicsBody._phyUpdWait = 2
 
     def setDefaultSkyBox(self):
         self._sky = Skybox('default', self._engine)

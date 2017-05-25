@@ -1,5 +1,5 @@
 from numpy import array, arctan2, arcsin
-# from cyBullet.bullet import Vector3, Quaternion, Transform
+from bullet.bullet import Vector3, Quaternion, Transform
 from cycgkit.cgtypes import quat, mat4, vec3
 
 radian = 0.0174532925

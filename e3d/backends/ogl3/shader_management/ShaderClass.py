@@ -231,10 +231,9 @@ class Shader:
             name, val = it
             paramName = structParamName + '.' + name
             if isinstance(val, list):
-                print('setStruct list', paramName)
-                # handle = self._uniformsHandlesCache.get(paramName, -1)
-                # if handle >= 0:
-                #     self.setMultipleValues(handle, val)
+                handle = self._uniformsHandlesCache.get(paramName, -1)
+                if handle >= 0:
+                    self.setMultipleValues(handle, val)
             elif isinstance(val, ShaderStruct):
                 self.setStruct(paramName, val)
             else:
@@ -259,7 +258,7 @@ class Shader:
             transformation = b[1]
             boneTransHandle = bth + boneDict[name]
             vecVal = np.asarray(transformation, np.float32).reshape((-1))
-            # todo: require a 'flatten' todo: method in cycgkit's mat4 ?
+            # todo: require a 'flatten' method in cycgkit's mat4 ?
             glUniformMatrix4fv(boneTransHandle, 1, 0, vecVal)
             if btith:
                 boneTransITHandle = btith + boneDict[name]

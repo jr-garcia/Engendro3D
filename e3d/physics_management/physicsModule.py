@@ -1,23 +1,23 @@
 from __future__ import print_function
 from ..commonValues import *
-# from cyBullet.bullet import *
+from bullet.bullet import *
 from ..LoggerClass import logger, logLevelsEnum
 
 
-class scenePhysics(object):
+class ScenePhysics(object):
     def __init__(self, gravity, resolution):
-        self.__res = resolution
+        self._resolution = resolution
         self.__paused = False
-        self.__requiredSteppedTimelapse = 0
+        self._requiredSteppedTimelapse = 0
         self._bodies = {}
         # broadphase = getBroadphaseHandle()
         # collisionConfiguration = CollisionConfiguration()
         # dispatcher = btCollisionDispatcher(collisionConfiguration)
         # solver = SequentialImpulseConstraintSolver()
-        # self.dynamicsWorld = DiscreteDynamicsWorld()
         # If you want to use soft bodies, use btSoftRigidDynamicsWorld, otherwise use btDiscreteDynamicsWorld
         # http://stackoverflow.com/questions/2474939/bullet-physics-when-to-choose-which-dynamicsworld?rq=1
-        # self.dynamicsWorld.setGravity(Vector3(0, gravity * 100, 0))
+        self.dynamicsWorld = DiscreteDynamicsWorld()
+        self.dynamicsWorld.setGravity(Vector3(0, gravity * 100, 0))
 
     def _setPaused(self, value):
         self.__paused = value
@@ -29,15 +29,15 @@ class scenePhysics(object):
 
     def step(self, miliseconds):
         self.__paused = True
-        self.__requiredSteppedTimelapse = miliseconds / 1000.0
+        self._requiredSteppedTimelapse = miliseconds / 1000.0
 
     def _setRes(self, value):
         if value > 0:
             raise ValueError('Resolution for physics world must be higer than 0.')
-        self.__res = value
+        self._resolution = value
 
     def _getRes(self):
-        return self.__res
+        return self._resolution
 
     resolution = property(_getRes, _setRes)
 
@@ -51,7 +51,6 @@ class scenePhysics(object):
     gravity = property(_getGrav, _setGrav)
 
     def addRigidObject(self, physicsBody):
-        return
         self._bodies[id(physicsBody.body)] = physicsBody
         self.dynamicsWorld.addRigidBody(physicsBody.body)
 
@@ -60,21 +59,20 @@ class scenePhysics(object):
         self.dynamicsWorld.removeRigidBody(physicsBody.body)
 
     def update(self, elapsedTime):
-        return
-        if self.__requiredSteppedTimelapse != 0:
-            elapsedTime = self.__requiredSteppedTimelapse
-            self.__requiredSteppedTimelapse = 0
+        if self._requiredSteppedTimelapse != 0:
+            elapsedTime = self._requiredSteppedTimelapse
+            self._requiredSteppedTimelapse = 0
         elif self.__paused:
             return
         if elapsedTime > 0:
-            fixedStep = (1.0 / float(self.__res))
+            fixedStep = (1.0 / float(self._resolution))
             originalFixedStep = fixedStep
             steps = int(elapsedTime / fixedStep) + 1
             if steps >= 20:
                 fixedStep = 1 / 60.0
             stepsNeeded = self.dynamicsWorld.stepSimulation(elapsedTime, steps, fixedStep)
             if steps > stepsNeeded and originalFixedStep != fixedStep:
-                self.dynamicsWorld.stepSimulation(0.05, steps, 1.0 / float(self.__res))
+                self.dynamicsWorld.stepSimulation(0.05, steps, 1.0 / float(self._resolution))
                 # print ('max', steps, 'needed', stepsNeeded)
 
     def castRay(self, fromPos, toPos):
@@ -98,7 +96,7 @@ class CastRayResult(object):
     def __init__(self, btRes, scenePhys):
         """
 
-        @type scenePhys: scenePhysics
+        @type scenePhys: ScenePhysics
         """
         self.physicsObject = scenePhys._bodies.get(id(btRes.collisionObject))
         if not self.physicsObject:
@@ -256,39 +254,39 @@ class rigidObject(object):
         self.body.applyCentralImpulse(fvec)
 
 
-# class e3dMotionState(overridableMotionState):
-#     # def setWorldTransform(self, transform):
-#     #     """
-#     #     Called from bullet to set 3d object transformation.
-#     #     @param transform:
-#     #     @type transform: Transform
-#     #     @return:
-#     #     @rtype: None
-#     #     """
-#     #     try:
-#     #         ob = self.bObject
-#     #         ob._dirtyP = True
-#     #     except Exception as ex:
-#     #         logger.log('e3dMotionState/setWorldTransform error: ' + ex.message)
-#
-#     def _setKinematicState(self, pos, rotMat):
-#         # todo: add offset
-#         self.worldTrans = btTransformFromPosRotMat(pos, rotMat)
-#         # # rigidBody.setCenterOfMassTransform(myMotionState.getWorldTransform() ?????????
-#
-#     def getWorldTransform(self):
-#         """
-#         Sends info to bullet with 3d object transformation.
-#         @return:
-#         @rtype: Transform
-#         """
-#         return self.worldTrans
-#
-#     def __init__(self, transform):
-#         """
-#
-#
-#         @rtype : e3dMotionState
-#         """
-#         self.worldTrans = transform
-#         self.bObject = None
+class e3dMotionState(overridableMotionState):
+    # def setWorldTransform(self, transform):
+    #     """
+    #     Called from bullet to set 3d object transformation.
+    #     @param transform:
+    #     @type transform: Transform
+    #     @return:
+    #     @rtype: None
+    #     """
+    #     try:
+    #         ob = self.bObject
+    #         ob._dirtyP = True
+    #     except Exception as ex:
+    #         logger.log('e3dMotionState/setWorldTransform error: ' + ex.message)
+
+    def _setKinematicState(self, pos, rotMat):
+        # todo: add offset
+        self.worldTrans = btTransformFromPosRotMat(pos, rotMat)
+        # # rigidBody.setCenterOfMassTransform(myMotionState.getWorldTransform() ?????????
+
+    def getWorldTransform(self):
+        """
+        Sends info to bullet with 3d object transformation.
+        @return:
+        @rtype: Transform
+        """
+        return self.worldTrans
+
+    def __init__(self, transform):
+        """
+
+
+        @rtype : e3dMotionState
+        """
+        self.worldTrans = transform
+        self.bObject = None
