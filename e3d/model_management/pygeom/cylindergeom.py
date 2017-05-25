@@ -13,7 +13,7 @@ class CylinderGeometry(Geometry):
     def __init__(self, radiusTop=20, radiusBottom=20, height=100, radialSegments=8, heightSegments=1, openEnded=False,
                  thetaStart=0.0, thetaLength=2.0 * math.pi):
 
-        super(CylinderGeometry, self).__init__()
+        Geometry.__init__(self)
         radialSegments = math.floor(radialSegments) or 8
         heightSegments = math.floor(heightSegments) or 1
 
@@ -43,6 +43,8 @@ class CylinderGeometry(Geometry):
         indexArray = []
         halfHeight = height / 2.0
         groupStart = 0.0
+        heightSegments = int(heightSegments)
+        radialSegments = int(radialSegments)
 
         # generate geometry
 
@@ -169,7 +171,7 @@ class CylinderGeometry(Geometry):
             # now we generate the surrounding vertices, normals and uvs
 
             for x in range(radialSegments + 1):
-                u = x / radialSegments
+                u = x / float(radialSegments)
                 theta = u * thetaLength + thetaStart
 
                 cosTheta = math.cos(theta)
@@ -203,7 +205,7 @@ class CylinderGeometry(Geometry):
                 c = centerIndexStart + x
                 i = centerIndexEnd + x
 
-                if top == True:
+                if top:
 
                     # face top
 
@@ -228,12 +230,12 @@ class CylinderGeometry(Geometry):
 
         index = generateTorso(groupStart, index)
 
-        if openEnded == False:
+        if not openEnded:
 
             if radiusTop > 0:
                 index, groupStart = generateCap(True, index, groupStart)
             if radiusBottom > 0:
-                index, groupStart = generateCap(False, index, groupStart)
+                _, __ = generateCap(False, index, groupStart)
 
         # build geometry
 

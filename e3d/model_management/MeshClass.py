@@ -148,8 +148,7 @@ class Mesh:
 
         if normals is None:
             normals = NormalsCalculationTypeEnum.hard
-        if len(normals) < len(vertices) or \
-                        normals in [NormalsCalculationTypeEnum.smooth, NormalsCalculationTypeEnum.hard]:
+        if len(normals) < len(vertices) or isinstance(normals, type(NormalsCalculationTypeEnum.smooth)):
             logger.meassure('calculate normals')
             if normals == NormalsCalculationTypeEnum.hard:
                 normals, vertices, faces = Mesh.calculateHardNormals(vertices, faces)

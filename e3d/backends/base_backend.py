@@ -91,7 +91,7 @@ class _appendableInstanceData(list):
         super(_appendableInstanceData, self).__init__()
 
     def append(self, object):
-        if not isinstance(object, InstanceData) or not issubclass(type(object), InstanceData):
+        if not isinstance(object, InstanceData) and not issubclass(type(object), InstanceData):
             raise TypeError('only "InstanceData" type can be appended. got {}'.format(type(object)))
         super(_appendableInstanceData, self).append(object)
 

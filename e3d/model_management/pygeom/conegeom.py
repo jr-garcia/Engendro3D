@@ -11,7 +11,7 @@ from .cylindergeom import CylinderGeometry
 
 class ConeGeometry(CylinderGeometry):
     def __init__(self, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength):
-        super(ConeGeometry, self).__init__(0.000010, radius, height, radialSegments, heightSegments, openEnded, thetaStart,
+        CylinderGeometry.__init__(self, 0.0000001, radius, height, radialSegments, heightSegments, openEnded, thetaStart,
                                            thetaLength)
         self.type = 'ConeGeometry'
 
