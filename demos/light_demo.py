@@ -24,13 +24,16 @@ class Demo(game):
         nlight.spotIntensity = random()  # .1
         nlight.spotRange = .7
         nlight.attenuation = randint(150, 250)
-        lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
+
+        if ltype == 2:
+            self.spotAngles[nlight] = (randint(1, 50) - randint(10, 50)), (randint(1, 50) - randint(10, 50))
+            lmod = self.scene1.addModel('conemodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
+            self.spots.append((nlight, lmod))  # todo: add multimaterial to cylinder for lighted csp only
+        else:
+            lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
         mat = lmod._materials[0]
         mat.emissiveColor = color
         mat.isLightAffected = False
-        if ltype == 2:
-            self.spots.append(nlight)
-            self.spotAngles[nlight] = (randint(1, 50) - randint(10, 50)), (randint(1, 50) - randint(10, 50))
 
     def loadModels(self):
         engine = self.engine
@@ -48,11 +51,11 @@ class Demo(game):
         mats.useNormalMapTexture = True
         mats.normalMapTextureID = 'defND'
         mats.textureRepeat = 4
-        self.sphereMat = mats
         self.bumpymats.append(mats)
         self.texmats.append(mats)
 
         engine.models.loadSphere("spheremodel", 12)
+        engine.models.loadCone("conemodel", 20, 10, radialSegments=20)
 
         engine.models.loadBox("boxmodel", [6], 1)
         self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 90, 0], [0, 90, 0], 5, mass=7)
@@ -68,9 +71,9 @@ class Demo(game):
         self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [40, 6, 0], [0, 0, 0], 1, mass=50)
         self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-40, 6, 0], [0, 0, 0], 1, mass=50)
 
-        engine.models.loadPlane("planemodelbig", 600, 600, 20)
+        engine.models.loadPlane("planemodelbig", 600, 600, 50)
         # engine.models.loadPlane("planemodelback", 600, 300, 10)
-        engine.models.loadPlane("planemodelWalls", 600, 300, 20)
+        engine.models.loadPlane("planemodelWalls", 600, 300, 50)
         # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
         # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
         # 2. Poor Tessellation Hurts Lighting
@@ -100,14 +103,11 @@ class Demo(game):
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
-        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 20, 0], [0, 0, 0], 7)
-        self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
+        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 0, 0], [0, 0, 0], 7)
+        self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
 
-        self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7)
-
-        # self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7, shape=bodyShapesEnum.sphere)
-        # self.tube3.setAnimation(self.tube3.getAnimationsList()[1], True)
-        # self.tube3.physicsBody.isDynamic = True
+        self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [150, 0, 0], [0, 0, 0], 7)
+        self.tube2.setAnimation(self.tube2.getAnimationsList()[1], True)
 
     def addLights(self):
         print('Adding Lights')
@@ -177,9 +177,10 @@ class Demo(game):
         self.scene1.bgColor = vec3(.04, .06, .09)
 
         ran1 = 45 * sin(ev[1] / 500.0)
-        for s in self.spots:
-            s.rotation = vec3(self.spotAngles[s][0] * sin(ev[1] / 1000.0), 0,
-                              self.spotAngles[s][1] * sin(ev[1] / 500.0))
+        for s, m in self.spots:
+            rotVec = vec3(self.spotAngles[s][0] * sin(ev[1] / 1000.0), 0, self.spotAngles[s][1] * sin(ev[1] / 500.0))
+            s.rotation = rotVec
+            m.rotation = rotVec
         if self.dorot:
             self.sphere1.rotateY(-.07 * ft)
         if self.window.events.isKeyPressed('w'):

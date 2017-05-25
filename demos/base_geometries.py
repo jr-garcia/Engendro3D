@@ -23,7 +23,6 @@ class Demo(game):
         mats.useDiffuseTexture = True
         mats.setDefaultNormalMap()
         mats.textureRepeat = 4
-        # return
 
         engine.models.loadBox("boxmodel", [20], 2)
         self.box1 = self.scene1.addModel('boxmodel', 'box1', [-60, 11, 0], [0, 0, 0], 1)
@@ -62,6 +61,18 @@ class Demo(game):
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()
         mt.textureRepeat = 80
+
+        engine.models.loadCylinder("cylindermodel",radialSegments=10)
+        self.cyli1 = self.scene1.addModel('cylindermodel', 'cyli1', [-20, 20, 70], [0, 0, 0], .4)
+        mats = self.cyli1.getMaterialByIndex(0)
+        mats.specularPower = 50
+        mats.useDiffuseTexture = True
+
+        engine.models.loadCone("conemodel", radialSegments=10)
+        self.cone1 = self.scene1.addModel('conemodel', 'cone1', [-60, 20, 70], [0, 0, 0], .4)
+        mats = self.cone1.getMaterialByIndex(0)
+        mats.specularPower = 50
+        mats.useDiffuseTexture = True
 
     def mouseMove(self, ev):
         if ev.eventName == 'motion':

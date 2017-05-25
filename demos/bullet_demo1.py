@@ -106,8 +106,8 @@ class Demo(game):
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 20, 0], [0, 0, 0], 7)
-        self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
-        # self.tube.physicsBody.isDynamic = True
+        self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
+        self.tube.physicsBody.isDynamic = True
 
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7)
         # self.tube2.physicsBody.isDynamic = True

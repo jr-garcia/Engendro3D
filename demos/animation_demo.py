@@ -1,4 +1,4 @@
-from _BaseDemo import game, runDemo, tubeMODEL
+from _BaseDemo import game, runDemo, tubeMODEL, dwarfMODEL
 
 from math import sin
 from cycgkit.cgtypes import vec3
@@ -14,7 +14,8 @@ class Demo(game):
     def loadModels(self):
         engine = self.engine
 
-        self.camera.position = vec3(0, 43, 186)
+        self.camera.position = vec3(0, 170, 290)
+        self.camera.rotateX(20)
 
         engine.models.loadPlane("planemodelbig", 600, 600, 20)
         self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
@@ -26,13 +27,17 @@ class Demo(game):
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
-        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-50, 0, 0], [0, 0, 0], 7)
+        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-120, 0, 0], [0, 0, 0], 7)
         self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
 
-        self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 0, 0], [0, 0, 0], 7)
+        # self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 0, 0], [0, 0, 0], 7)
 
-        self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7)
+        self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [120, 0, 0], [0, 0, 0], 7)
         self.tube3.setAnimation(self.tube3.getAnimationsList()[1], True)
+
+        engine.models.loadModel(dwarfMODEL, 'dwarfmodel', preCalculateFrames=-1)
+        self.dwarf = self.scene1.addModel('dwarfmodel', 'dwarf', vec3(0), vec3(0, 180, 0), 20)
+        self.dwarf.setAnimation(self.dwarf.getAnimationsList()[0], True)
 
     def mouseMove(self, ev):
         if ev.eventName == 'motion':
