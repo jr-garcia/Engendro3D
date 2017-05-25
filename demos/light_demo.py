@@ -71,14 +71,14 @@ class Demo(game):
         self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [40, 6, 0], [0, 0, 0], 1, mass=50)
         self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-40, 6, 0], [0, 0, 0], 1, mass=50)
 
-        engine.models.loadPlane("planemodelbig", 600, 600, 50)
+        engine.models.loadPlane("floorplane", 600, 600, 50)
         # engine.models.loadPlane("planemodelback", 600, 300, 10)
         engine.models.loadPlane("planemodelWalls", 600, 300, 50)
         # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
         # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
         # 2. Poor Tessellation Hurts Lighting
-        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
-        mt = self.plane1._materials[0]
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1)
+        mt = self.floor._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
         mt.useNormalMapTexture = True

@@ -182,7 +182,7 @@ class game:
             # self.tube._materials[0].opacity = .5
 
             # engine.models.loadModel(self.planepath, "planemodel")
-            # self.plane = self.scene1.addModel('planemodel', 'plane1', vec3(0), vec3(0), 20)
+            # self.plane = self.scene1.addModel('planemodel', 'floor', vec3(0), vec3(0), 20)
             # mat = self.plane.getMaterialByIndex(0)
             # mat.specularPower = 1000
             # mat.diffuseTextureID = 'grass'

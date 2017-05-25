@@ -17,48 +17,33 @@ class Demo(game):
 
         self.bumpymats = []
         self.texmats = []
-        self.spots = []
-
-    def createLightSphere(self, ltype, pos, color):
-        nlight = self.scene1.addLight(ltype, pos, vec3(0, 0, 0))
-        nlight.color = color
-        nlight.spotIntensity = .1
-        nlight.spotRange = .7
-        nlight.attenuation = 190
-        lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
-        mat = lmod._materials[0]
-        mat.emissiveColor = color
-        mat.isLightAffected = False
-        if ltype == 2:
-            self.spots.append(nlight)
-
+        
     def loadModels(self):
         engine = self.engine
 
         self.scene1.ambientColor = vec3(.004, .006, .009)
         self.scene1.bgColor = vec3(.04, .06, .09)
-        self.camera.rotateX(30)
-        self.camera.rotateY(30)
-        self.camera.position = vec3(107.262, 148.928, 22.752)
+        # self.camera.rotateX(30)
+        # self.camera.rotateY(30)
+        self.camera.position = vec3(0, 90, 350)
         
-        engine.models.loadSphere("mainspheremodel", 32)
-        self.sphere1 = self.scene1.addModel('mainspheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
-        # self.sphere1.physicsBody.isDynamic = True
-        mats = self.sphere1.getMaterialByIndex(0)
+        engine.models.loadSphere("bigspheremodel", 32)
+        self.bigSphere = self.scene1.addModel('bigspheremodel', 'bigSphere', [0, 10, 0], [0, 0, 0], 4, mass=8)
+        self.bigSphere.physicsBody.isDynamic = True
+        mats = self.bigSphere.getMaterialByIndex(0)
         mats.specularPower = 50
         mats.useDiffuseTexture = True
         mats.useNormalMapTexture = True
         mats.normalMapTextureID = 'defND'
         mats.textureRepeat = 4
-        self.sphereMat = mats
         self.bumpymats.append(mats)
         self.texmats.append(mats)
 
         engine.models.loadSphere("spheremodel", 12)
 
         engine.models.loadBox("boxmodel", [6], 1)
-        self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 90, 0], [0, 90, 0], 5, mass=7)
-        # self.box1.physicsBody.isDynamic = True
+        self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 90, 0], [0, 90, 0], 1, mass=7)
+        self.box1.physicsBody.isDynamic = True
         mt = self.box1._materials[0]
         mt.specularPower = 40
         mt.useDiffuseTexture = True
@@ -67,50 +52,46 @@ class Demo(game):
         self.bumpymats.append(mt)
         self.texmats.append(mt)
 
-        engine.models.loadBox("pushboxmodel", [25, 10, 10], 2)
+        engine.models.loadBox("pushboxmodel", [50, 10, 10], 1)
         self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [40, 6, 0], [0, 0, 0], 1, mass=50)
         self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-40, 6, 0], [0, 0, 0], 1, mass=50)
 
-        engine.models.loadPlane("planemodelbig", 600, 600, 20)
-        # engine.models.loadPlane("planemodelback", 600, 300, 10)
+        engine.models.loadPlane("floorplane", 600, 600, 1)
         engine.models.loadPlane("planemodelWalls", 600, 300, 20)
-        # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
-        # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
-        # 2. Poor Tessellation Hurts Lighting
-        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
-        mt = self.plane1._materials[0]
+
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 5, mass=50)
+        mt = self.floor._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
         mt.useNormalMapTexture = True
         mt.normalMapTextureID = 'defNI'
-        mt.textureRepeat = 40
+        mt.textureRepeat = 10
         self.bumpymats.append(mt)
         self.texmats.append(mt)
 
-        self.planer = self.scene1.addModel('planemodelWalls', 'planer', [300, 150, 0], [90, -90, 0], 1)
+        self.planer = self.scene1.addModel('planemodelWalls', 'planer', [300, 150, 0], [90, 0, 0], 1)
+        self.planer.rotateY(-90)
         mt = self.planer._materials[0]
-        # self.planer.moveUp(self.planer.getSize().y)
         mt.useNormalMapTexture = True
         mt.normalMapTextureID = 'testN'
         mt.textureRepeat = 10
         self.bumpymats.append(mt)
 
-        self.planel = self.scene1.addModel('planemodelWalls', 'planel', [-300, 150, 0], [90, 90, 0], 1)
-        # self.planel.moveUp(self.planer.getSize().y)
+        self.planel = self.scene1.addModel('planemodelWalls', 'planel', [-300, 150, 0], [90, 0, 0], 1)
+        self.planel.rotateY(90)
         self.planel._materials[0] = mt
 
         self.planef = self.scene1.addModel('planemodelWalls', 'planef', [0, 150, -300], [90, 0, 0], 1)
-        self.planef.moveUp(self.planer.getSize().y)
         self.planef._materials[0] = mt
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 20, 0], [0, 0, 0], 7)
         self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
-        self.tube.physicsBody.isDynamic = True
+        # self.tube.physicsBody.isDynamic = True
 
         self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [0, 70, 0], [0, 0, 0], 7)
-        # self.tube2.physicsBody.isDynamic = True
+        self.tube2.physicsBody.isDynamic = True
 
         # self.tube3 = self.scene1.addModel('tubemodel', 'tube3', [50, 0, 0], [0, 0, 0], 7,
         # shape=bodyShapesEnum.sphere)
@@ -119,15 +100,6 @@ class Demo(game):
 
         self.ballcount = 0
         self.boxcount = 1
-
-    def addLights(self):
-        print('Adding Lights')
-        game.addLights(self)
-        self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
-        self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
-        self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
-        self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
-        self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
 
     def dropBox(self):
         try:
@@ -138,7 +110,6 @@ class Demo(game):
             box = self.scene1.addModel('boxmodel', sceneid, pos, [0, 0, 0], 1)
             mats = box._materials[0]
             mats.specularPower = 20
-            # mats.useDiffuseTexture = True
             mats.diffuseColor = box.debugColor
             box.physicsBody.isDynamic = True
             box.physicsBody.punchCenter(250, self.camera.forward)
@@ -232,14 +203,10 @@ class Demo(game):
         #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
         self.lastspeed = movespeed
 
-        ran1 = 45 * sin(ev[1] / 1000.0)
-        ran2 = 45 * sin(ev[1] / 500.0)
-        for s in self.spots:
-            s.rotation = vec3(ran2, 0, ran1)
-        # if self.dorot:
-            # if self.pushbox1:
-            #     self.pushbox1.rotateY(-.07 * ft)
-            #     self.pushbox2.rotateY(-.07 * ft)
+        if self.dorot:
+            if self.pushbox1:
+                self.pushbox1.rotateY(-.07 * ft)
+                self.pushbox2.rotateY(-.07 * ft)
                 # self.box1.rotateY(-.07 * ft)
         if self.window.events.isKeyPressed('w'):
             self.camera.moveForward(movespeed)

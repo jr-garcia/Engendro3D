@@ -17,9 +17,9 @@ class Demo(game):
         self.camera.position = vec3(0, 170, 290)
         self.camera.rotateX(20)
 
-        engine.models.loadPlane("planemodelbig", 600, 600, 20)
-        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
-        mt = self.plane1._materials[0]
+        engine.models.loadPlane("floorplane", 600, 600, 20)
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1)
+        mt = self.floor._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()

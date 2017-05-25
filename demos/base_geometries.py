@@ -49,14 +49,14 @@ class Demo(game):
         self.tk3._materials[0] = mt
         self.tk4._materials[0] = mt
 
-        engine.models.loadPlane("planemodelbig", 500, 500, 6)
+        engine.models.loadPlane("floorplane", 500, 500, 6)
         # engine.models.loadPlane("planemodel1", 1, 5)
         # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
         # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
         # 2. Poor Tessellation Hurts Lighting
-        self.plane1 = self.scene1.addModel('planemodelbig', 'plane1', [0, 0, 0], [0, 0, 0], 1)
-        mt = self.plane1._materials[0]
-        # self.plane1._materials[0]  =mt
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1)
+        mt = self.floor._materials[0]
+        # self.floor._materials[0]  =mt
         mt.specularPower = 50
         mt.useDiffuseTexture = True
         mt.setDefaultNormalMap()
