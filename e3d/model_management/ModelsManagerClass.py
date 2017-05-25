@@ -4,6 +4,7 @@ import os
 from ..LoggerClass import logger, logLevelsEnum
 from .ModelClass import Model
 from .geomModelsModule import geomTypeEnum
+import math
 
 # from ThreadedSystemClass import ThreadedSystem
 
@@ -98,6 +99,33 @@ class ModelsManager(object):
         except:
             raise
 
+    def loadCylinder(self, ID, radiusTop=20, radiusBottom=20, height=100, radialSegments=8, heightSegments=8,
+                     openEnded=False, thetaStart=0.0, thetaLength=2.0 * math.pi):
+        try:
+            if ID in self._modelsCache.keys():
+                raise KeyError('The ID already exist.')
+            dictInfo = [radiusTop, radiusBottom, height, radialSegments, heightSegments,
+                     openEnded, thetaStart, thetaLength]
+            mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.cylinder, dictInfo)
+            self._modelsCache[ID] = mod
+            self._lastUVs = []
+            self._lastChannel = -1
+        except:
+            raise
+
+    def loadCone(self, ID, radius=20, height=100, radialSegments=8, heightSegments=4,
+                     openEnded=False, thetaStart=0.0, thetaLength=2.0 * math.pi):
+        try:
+            if ID in self._modelsCache.keys():
+                raise KeyError('The ID already exist.')
+            dictInfo = [radius, height, radialSegments, heightSegments, openEnded, thetaStart,
+                        thetaLength]
+            mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.cone, dictInfo)
+            self._modelsCache[ID] = mod
+            self._lastUVs = []
+            self._lastChannel = -1
+        except:
+            raise
     def loadBox(self, ID, size, segmentsX=1, segmentsY=None, segmentsZ=None):
         try:
             if ID in self._modelsCache.keys():

@@ -5,6 +5,8 @@ from cycgkit.cgtypes import vec3, vec4
 from .Geometry import Geometry
 from .face3 import Face3
 
+# Based on TorusKnotGeometry.js from https://github.com/mrdoob/three.js
+
 
 class TorusKnotGeometry(Geometry):
     def __init__(self, radius=100, tube=40, radialSegments=64, tubularSegments=8, p=2, q=3, heightScale=1):
@@ -87,6 +89,3 @@ class TorusKnotGeometry(Geometry):
 
                 self.faces.append(Face3(b, c, d))
                 self.faceVertexUvs.append([vec3(uvb), vec3(uvc), vec3(uvd)])
-
-        self.computeFaceNormals()
-        self.computeVertexNormals()

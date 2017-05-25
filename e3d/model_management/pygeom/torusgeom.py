@@ -5,6 +5,8 @@ from cycgkit.cgtypes import vec3, vec4
 from .Geometry import Geometry
 from .face3 import Face3
 
+# Based on TorusGeometry.js from https://github.com/mrdoob/three.js
+
 
 class TorusGeometry(Geometry):
     def __init__(self, radius=100, tube=40, radialSegments=8, tubularSegments=6, arc=math.pi * 2):

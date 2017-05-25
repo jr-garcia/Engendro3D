@@ -395,6 +395,7 @@ class Model:
         minmax = bbox.getBounds()
         uvsList = [[]] * 8
         uvsList[0] = uvs
+        forceReIndexing = False
 
         if gtype in [geomTypeEnum.sphere, geomTypeEnum.torusKnot]:
             model._preShape = bodyShapesEnum.sphere
@@ -410,14 +411,19 @@ class Model:
         elif gtype == geomTypeEnum.plane:
             model._preShape = bodyShapesEnum.box
             nct = NormalsCalculationTypeEnum.hard
+        elif gtype in [geomTypeEnum.cylinder, geomTypeEnum.cone]:
+            forceReIndexing = True
+            model._preShape = bodyShapesEnum.box
+            nct = NormalsCalculationTypeEnum.hard
         else:
+            model._preShape = bodyShapesEnum.box
             uvsList = UVCalculationTypeEnum.spherical
             nct = NormalsCalculationTypeEnum.smooth
 
         try:
-            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvsList, nct, forceReIndexing=True)
+            mesh = Mesh.fromObjectInfo(verts, inds, minmax, uvsList, nct, forceReIndexing=forceReIndexing)
         except Exception as ex:
-            ex.message = 'Error creating mesh from info: ' + ex.message
+            ex.message = 'Error creating mesh from info: ' + str(ex)
             raise
 
         model.rootNode._meshes.append(mesh)

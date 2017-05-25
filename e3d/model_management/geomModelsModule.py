@@ -6,6 +6,8 @@ from .pygeom.spheregeom import SphereGeometry
 from .pygeom.boxgeom import BoxGeometry
 from .pygeom.planegeom import PlaneGeometry
 from .pygeom.torusknotgeom import TorusKnotGeometry
+from .pygeom.cylindergeom import CylinderGeometry
+from .pygeom.conegeom import ConeGeometry
 
 
 class geomTypeEnum(object):
@@ -15,6 +17,8 @@ class geomTypeEnum(object):
     plane = 'plane'
     torusKnot = 'torusKnot'
     icosphere = 'icosphere'
+    cylinder = 'cylinder'
+    cone = 'cone'
 
 
 def _getObjData(geomObj):
@@ -25,9 +29,9 @@ def _getObjData(geomObj):
     for i in range(len(geomObj.faces)):
         f = geomObj.faces[i]
         ind.append(f.abcVec3())
-        uvs[f.a] = geomObj.faceVertexUvs[i][0]
-        uvs[f.b] = geomObj.faceVertexUvs[i][1]
-        uvs[f.c] = geomObj.faceVertexUvs[i][2]
+        uvs[int(f.a)] = geomObj.faceVertexUvs[i][0]
+        uvs[int(f.b)] = geomObj.faceVertexUvs[i][1]
+        uvs[int(f.c)] = geomObj.faceVertexUvs[i][2]
 
     bbox = geomObj.boundingBox = BoundingBox()
     for v in vert:
@@ -61,8 +65,11 @@ def getObjectInfo(gtype, attDict):
         segY = attDict.get('segmentsY')
         geomObj = PlaneGeometry(sx, 1, sy, segX, segY, segY)
     elif gtype == geomTypeEnum.torusKnot:
-        # radius, tube, radialSegments, tubularSegments, p, q, heightScale = attDict
         geomObj = TorusKnotGeometry(*attDict)
+    elif gtype == geomTypeEnum.cylinder:
+        geomObj = CylinderGeometry(*attDict)
+    elif gtype == geomTypeEnum.cone:
+        geomObj = ConeGeometry(*attDict)
     else:
         raise NotImplementedError('geometryType not found :(', gtype, attDict)
 

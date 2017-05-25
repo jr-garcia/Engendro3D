@@ -139,30 +139,25 @@ class Mesh:
         newMesh.ID = id(newMesh)
         newMesh._materialIndex = materialIndex
 
-        if normals is not None:
-            if isinstance(normals, type(NormalsCalculationTypeEnum.hard)):
-                hasNormals = False
-            else:
-                hasNormals = True
-        else:
-            hasNormals = False
-
         hasColors = colors is not None and colors[0] is not None
         hasTangents = tangents is not None
         hasBones = mesh_mBones is not None
         texCoords = []
 
-        reindexing_required = forceReIndexing
+        reindexingRequired = forceReIndexing
 
-        if not hasNormals or len(normals) < len(vertices):
+        if normals is None:
+            normals = NormalsCalculationTypeEnum.hard
+        if len(normals) < len(vertices) or \
+                        normals in [NormalsCalculationTypeEnum.smooth, NormalsCalculationTypeEnum.hard]:
             logger.meassure('calculate normals')
-            if normals == NormalsCalculationTypeEnum.hard or (
-                        not hasNormals and normals != NormalsCalculationTypeEnum.smooth):
+            if normals == NormalsCalculationTypeEnum.hard:
                 normals, vertices, faces = Mesh.calculateHardNormals(vertices, faces)
-                reindexing_required = True
+                reindexingRequired = True
             else:
                 normals = Mesh.calculateSmoothNormals(vertices, faces)
-            hasNormals = True
+
+        hasNormals = True
 
         logger.meassure('calculate UVs')
         uvsTypes = [list, ndarray]
@@ -186,13 +181,13 @@ class Mesh:
         faces = [list(f) for f in faces]
         if hasAnyTex:
             texCoords[0] = [list(t) for t in texCoords[0]]
-        normals = [list(n) for n in normals]
+        normals = [list(n) for n in normals]         #    todo: convert everything to vec3?
 
         if UVsOrCalculationType == UVCalculationTypeEnum.spherical:
             texCoords.append(Mesh.calculateSphericalUVS(vertices))
             Mesh.fixSphereUVs(vertices, faces, texCoords[0], normals)
             newMesh._hasTexCoords[0] = True
-            reindexing_required = True
+            reindexingRequired = True
         elif UVsOrCalculationType == UVCalculationTypeEnum.box:
             texCoords.append(Mesh.calculateBoxUVS(vertices, faces, normals))
             newMesh._hasTexCoords[0] = True
@@ -209,7 +204,7 @@ class Mesh:
         tangents = [list(t) for t in tangents]
         bitangents = [list(b) for b in bitangents]
 
-        if reindexing_required:
+        if reindexingRequired:
             logger.meassure('Re-indexing')
             res = Mesh.reIndexMesh(vertices, faces, normals, tangents, bitangents, texCoords[0])
             vertices, faces, normals, tangents, bitangents, texCoords[0] = res
@@ -356,7 +351,7 @@ class Mesh:
             normal = list(normals[i])
             newVertices.extend(triang)
             finalNormals.extend([normal] * 3)
-            nvLen = newVertices.__len__()
+            nvLen = len(newVertices)
             newFaces.append([nvLen - 3, nvLen - 2, nvLen - 1])
 
         return finalNormals, newVertices, newFaces

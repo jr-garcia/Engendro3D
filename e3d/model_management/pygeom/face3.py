@@ -1,5 +1,7 @@
 from cycgkit.cgtypes import vec3
 
+# Based on Face3.js from https://github.com/mrdoob/three.js
+
 
 class Face3:
     def __init__(self, a, b, c, normals=None):

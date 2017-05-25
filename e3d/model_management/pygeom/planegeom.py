@@ -5,6 +5,8 @@ from cycgkit.cgtypes import vec3, vec4
 from .Geometry import Geometry
 from .face3 import Face3
 
+# Based on BoxGeometry.js from https://github.com/mrdoob/three.js
+
 
 class PlaneGeometry(Geometry):
     def __init__(self, width, height, depth, widthSegments=1, heightSegments=1, depthSegments=1):
@@ -23,7 +25,7 @@ class PlaneGeometry(Geometry):
         height_half = height / 2.0
         depth_half = depth / 2.0
 
-        def buildPlane(u, v, udir, vdir, width, height, depth, materialIndex):
+        def buildPlane(u, v, udir, vdir, width, height, depth):
             gridX = widthSegments
             gridY = heightSegments
             width_half = width / 2.0
@@ -87,12 +89,12 @@ class PlaneGeometry(Geometry):
                     self.faces.append(face)
                     self.faceVertexUvs.append([vec3(uvb), vec3(uvc), vec3(uvd)])
 
-        # buildPlane('z', 'y', - 1, - 1, depth, height, width_half, 0)  # px
-        # buildPlane('z', 'y', 1, - 1, depth, height, - width_half, 1)  # nx
-        buildPlane('x', 'z', 1, 1, width, depth, height_half, 2)  # py
-        # buildPlane('x', 'z', 1, - 1, width, depth, - height_half, 3)  # ny
-        # buildPlane('x', 'y', 1, - 1, width, height, depth_half, 4)  # pz
-        # buildPlane('x', 'y', - 1, - 1, width, height, - depth_half, 5)  # nz
+        # buildPlane('z', 'y', - 1, - 1, depth, height, width_half)  # px
+        # buildPlane('z', 'y', 1, - 1, depth, height, - width_half)  # nx
+        buildPlane('x', 'z', 1, 1, width, depth, height_half)  # py
+        # buildPlane('x', 'z', 1, - 1, width, depth, - height_half)  # ny
+        # buildPlane('x', 'y', 1, - 1, width, height, depth_half)  # pz
+        # buildPlane('x', 'y', - 1, - 1, width, height, - depth_half)  # nz
 
         self.mergeVertices()
 

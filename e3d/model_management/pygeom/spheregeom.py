@@ -5,6 +5,8 @@ from cycgkit.cgtypes import vec3, vec4
 from .Geometry import Geometry
 from .face3 import Face3
 
+# Based on SphereGeometry.js from https://github.com/mrdoob/three.js
+
 
 class SphereGeometry(Geometry):
     def __init__(self, radius=50.0, widthSegments=None,

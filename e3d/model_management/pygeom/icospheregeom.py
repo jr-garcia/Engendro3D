@@ -6,9 +6,10 @@ from .Geometry import Geometry
 from .face3 import Face3
 
 
+# Based on https://gamedev.stackexchange.com/a/31312
+
 class IcoSphereGeometry(Geometry):
     def __init__(self, detailLevel=3):
-        # from https://gamedev.stackexchange.com/a/31312
 
         Geometry.__init__(self)
 
