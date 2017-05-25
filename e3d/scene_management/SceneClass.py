@@ -62,7 +62,7 @@ class Scene(object):
         @param animationQuality: The quality for the steps of the animations. The higer,
           more frames will be fetched from the animations. If animations are incomplete or
           show jumps, raise this value. Must be equal or higher than 0. Default 1.
-        @param modelID: The ID of a model previously loaded with _engine.models.loadModel.
+        @param modelID: The ID of a model previously loaded with engine.models.loadModel.
         @param IDInScene: The ID that this instance will have in the scene.
         @type animationQuality: int
         @rtype : ModelInstance

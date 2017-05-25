@@ -122,7 +122,10 @@ def scaleNumber(val, src, dst):
     >> scaleNumber(1, (0.0, 2.0), (0.0, 1.0))
     0.5
     """
-    return ((val - src[0]) / (src[1] - src[0])) * (dst[1] - dst[0]) + dst[0]
+    try:
+        return ((val - src[0]) / (src[1] - src[0])) * (dst[1] - dst[0]) + dst[0]
+    except ZeroDivisionError:
+        return min(max(val, 1.0), 0.0)
 
 
 def _threeAxisRot(r11, r12, r21, r31, r32):
