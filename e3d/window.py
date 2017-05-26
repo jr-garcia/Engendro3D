@@ -98,7 +98,7 @@ class Window(object):
             parentAsVoid = ct.pointer(ct.c_void_p(parent))
             self._SDL_Window = SDL_CreateWindowFrom(parentAsVoid)
         else:
-            self._SDL_Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, self._size[0],
+            self._SDL_Window = SDL_CreateWindow(title, 0, 0, self._size[0],
                                                 self._size[1], flags)
         if not self._SDL_Window:
             sdlerr = SDL_GetError()
