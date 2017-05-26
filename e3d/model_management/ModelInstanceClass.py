@@ -20,14 +20,12 @@ class ModelInstance(Base3DObject):
         mod = manfred.models._getModel(modelID)
         if not mod:
             raise KeyError('Model \'{}\' not found. Try loading it first.')
-        # mins, maxs = mod.boundingBox.getBounds()  # todo: reimplement this
-        mins, maxs = (0, 0, 0), (10, 10, 10)
+        mins, maxs = mod.boundingBox.getBounds()
         size = [0, 0, 0]
         size[0] = (abs(maxs[0]) / 2.0) + (abs(mins[0]) / 2.0)
         size[1] = (abs(maxs[1]) / 2.0) + (abs(mins[1]) / 2.0)
         size[2] = (abs(maxs[2]) / 2.0) + (abs(mins[2]) / 2.0)
-        # offset = mod.boundingBox.center()  # todo: reimplement this
-        offset = 0, 0, 0
+        offset = mod.boundingBox.center()
         super(ModelInstance, self).__init__(position, rotation, uniformScale, size, shape, mass, isDynamic, ID, offset)
         self._materials = []
         self._attachedSounds = {}
