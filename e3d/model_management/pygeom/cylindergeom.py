@@ -241,7 +241,4 @@ class CylinderGeometry(Geometry):
 
         self.setIndex(indices)
         self.vertices = vertices
-        # self.__setattr__('normals', normals)
-
-        for f in self.faces:
-            self.faceVertexUvs.append([uvs[int(f.a)], uvs[int(f.b)], uvs[int(f.c)]])
+        self.setFaceUVS(uvs)

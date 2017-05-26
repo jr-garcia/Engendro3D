@@ -136,3 +136,7 @@ class Geometry:
     def setIndex(self, indices):
         for v in indices:
             self.faces.append(Face3(v.x, v.y, v.z))
+
+    def setFaceUVS(self, uvs):
+        for f in self.faces:
+            self.faceVertexUvs.append([uvs[int(f.a)], uvs[int(f.b)], uvs[int(f.c)]])

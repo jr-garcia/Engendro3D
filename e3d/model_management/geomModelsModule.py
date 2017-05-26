@@ -60,10 +60,10 @@ def getObjectInfo(gtype, attDict):
         geomObj = BoxGeometry(sx, sy, sz, segX, segY, segZ)
     elif gtype == geomTypeEnum.plane:
         sx = attDict.get('sizeX')
-        sy = attDict.get('sizeY')
+        sz = attDict.get('sizeZ')
         segX = attDict.get('segmentsX')
-        segY = attDict.get('segmentsY')
-        geomObj = PlaneGeometry(sx, 1, sy, segX, segY, segY)
+        segZ = attDict.get('segmentsZ')
+        geomObj = PlaneGeometry(sx, sz, segX, segZ)
     elif gtype == geomTypeEnum.torusKnot:
         geomObj = TorusKnotGeometry(*attDict)
     elif gtype == geomTypeEnum.cylinder:

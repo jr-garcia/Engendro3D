@@ -151,11 +151,11 @@ class ModelsManager(object):
         except:
             raise
 
-    def loadPlane(self, ID, sizeX=10, sizeY=None, segmentsX=4, segmentsY=None):
+    def loadPlane(self, ID, sizeX=10, sizeZ=None, segmentsX=4, segmentsZ=None):
         try:
-            sizeY = sizeY or sizeX
-            segmentsY = segmentsY or segmentsX
-            dictInfo = {'sizeX': sizeX, 'sizeY': sizeY, 'segmentsX': segmentsX, 'segmentsY': segmentsY}
+            sizeZ = sizeZ or sizeX
+            segmentsZ = segmentsZ or segmentsX
+            dictInfo = {'sizeX': sizeX, 'sizeZ': sizeZ, 'segmentsX': segmentsX, 'segmentsZ': segmentsZ}
             mod = Model.fromGeometryModel(self._engine, ID, geomTypeEnum.plane, dictInfo)
             self._modelsCache[ID] = mod
             self._lastUVs = []
