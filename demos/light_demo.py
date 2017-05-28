@@ -22,13 +22,13 @@ class Demo(game):
         nlight = self.scene1.addLight(ltype, pos, vec3(0, 0, 0))
         nlight.color = color
         nlight.spotIntensity = random()  # .1
-        nlight.spotRange = .7
-        nlight.attenuation = randint(150, 250)
+        nlight.spotRange = .9
+        nlight.attenuation = randint(150, 300)
 
         if ltype == 2:
-            self.spotAngles[nlight] = (randint(1, 50) - randint(10, 50)), (randint(1, 50) - randint(10, 50))
+            self.spotAngles[nlight] = (randint(1, 30) - randint(10, 50)), (randint(1, 30) - randint(10, 50))
             lmod = self.scene1.addModel('conemodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
-            self.spots.append((nlight, lmod))  # todo: add multimaterial to cylinder for lighted csp only
+            self.spots.append((nlight, lmod))
         else:
             lmod = self.scene1.addModel('spheremodel', nlight.ID + 'sph', pos, [0, 0, 0], 1)
         mat = lmod._materials[0]
@@ -67,10 +67,6 @@ class Demo(game):
         self.bumpymats.append(mt)
         self.texmats.append(mt)
 
-        engine.models.loadBox("pushboxmodel", [25, 10, 10], 2)
-        self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [40, 6, 0], [0, 0, 0], 1, mass=50)
-        self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-40, 6, 0], [0, 0, 0], 1, mass=50)
-
         engine.models.loadPlane("floorplane", 600, 600, 50)
         # engine.models.loadPlane("planemodelback", 600, 300, 10)
         engine.models.loadPlane("planemodelWalls", 600, 300, 50)
@@ -83,18 +79,20 @@ class Demo(game):
         mt.useDiffuseTexture = True
         mt.useNormalMapTexture = True
         mt.normalMapTextureID = 'defNI'
-        mt.textureRepeat = 40
+        mt.textureRepeat = 10
         self.bumpymats.append(mt)
         self.texmats.append(mt)
 
-        self.planer = self.scene1.addModel('planemodelWalls', 'planer', [300, 150, 0], [90, -90, 0], 1)
+        self.planer = self.scene1.addModel('planemodelWalls', 'planer', [300, 150, 0], [90, 0, 0], 1)
+        self.planer.rotateY(-90)
         mt = self.planer._materials[0]
         mt.useNormalMapTexture = True
         mt.normalMapTextureID = 'testN'
         mt.textureRepeat = 10
         self.bumpymats.append(mt)
 
-        self.planel = self.scene1.addModel('planemodelWalls', 'planel', [-300, 150, 0], [90, 90, 0], 1)
+        self.planel = self.scene1.addModel('planemodelWalls', 'planel', [-300, 150, 0], [90, 0, 0], 1)
+        self.planel.rotateY(90)
         self.planel._materials[0] = mt
 
         self.planef = self.scene1.addModel('planemodelWalls', 'planef', [0, 150, -300], [90, 0, 0], 1)
@@ -103,18 +101,18 @@ class Demo(game):
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
 
-        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 0, 0], [0, 0, 0], 7)
+        self.tube = self.scene1.addModel('tubemodel', 'tube1', [-150, 0, 0], [0, 0, 0], 9)
         self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
 
-        self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [150, 0, 0], [0, 0, 0], 7)
+        self.tube2 = self.scene1.addModel('tubemodel', 'tube2', [150, 0, 0], [0, 0, 0], 9)
         self.tube2.setAnimation(self.tube2.getAnimationsList()[1], True)
 
     def addLights(self):
         print('Adding Lights')
         game.addLights(self)
         self.dlight.enabled = False
-        self.createLightSphere(2, vec3(-190.0, 110.0, 0.0), vec3(1.0, 0.0, 0.0))
-        self.createLightSphere(2, vec3(0.0, 70.0, -150.0), vec3(1.0, 1.0, 0.0))
+        self.createLightSphere(2, vec3(-259.0, 120.0, 0.0), vec3(1.0, 0.0, 0.0))
+        self.createLightSphere(2, vec3(0.0, 270.0, -190.0), vec3(1.0, 1.0, 0.0))
         self.createLightSphere(1, vec3(-50.0, 30.0, 290.0), vec3(0.0, 1.0, 0.0))
         self.createLightSphere(2, vec3(0.0, 150.0, 0.0), vec3(.50, .0, 1.0))
         self.createLightSphere(1, vec3(280.0, 30.0, 10.0), vec3(0.0, .0, 1.0))
@@ -165,18 +163,9 @@ class Demo(game):
     def scene1Update(self, ev):
         ft = ev[0] + .01
         movespeed = ft / 10.0
-        # npos = list(self.camera._position)
-        # npos[1] -= 100000000
-        npos = self.camera.forward
-        npos[2] *= 100000000
-        # res = self.scene1.physics.castRay(self.camera._position, npos)
-        # if res:
-        #     print (res.physicsObject._base3DObject.ID, res.hitPosition)
-        self.lastspeed = movespeed
         self.scene1.ambientColor = vec3(.004, .006, .009)
         self.scene1.bgColor = vec3(.04, .06, .09)
 
-        ran1 = 45 * sin(ev[1] / 500.0)
         for s, m in self.spots:
             rotVec = vec3(self.spotAngles[s][0] * sin(ev[1] / 1000.0), 0, self.spotAngles[s][1] * sin(ev[1] / 500.0))
             s.rotation = rotVec
