@@ -38,7 +38,7 @@ class Material(object):
     shaderProperties = property(_getShaderProps)
 
     def _setDiffCol(self, value):
-        self._difCol = Material._checkColor(value)
+        self._difCol = self._checkColor(value)
 
     def _getDiffCol(self):
         return self._difCol
@@ -46,7 +46,7 @@ class Material(object):
     diffuseColor = property(_getDiffCol, _setDiffCol, doc='Diffuse color passed to the shader')
 
     def _setEmCol(self, value):
-        self._emCol = Material._checkColor(value)
+        self._emCol = self._checkColor(value)
 
     def _getEmCol(self):
         return self._emCol
@@ -54,15 +54,14 @@ class Material(object):
     emissiveColor = property(_getEmCol, _setEmCol, doc='Emissive color passed to the shader')
 
     def _setSpecCol(self, value):
-        self._specCol = Material._checkColor(value)
+        self._specCol = self._checkColor(value)
 
     def _getSpecCol(self):
         return self._specCol
 
     specularColor = property(_getSpecCol, _setSpecCol, doc='Specular color passed to the shader')
 
-    @staticmethod
-    def _checkColor(value):
+    def _checkColor(self, value):
         if isinstance(value, vec3):
             nvalue = value
         elif isinstance(value, list):
@@ -73,7 +72,7 @@ class Material(object):
         elif isinstance(value, (int, float)):
             nvalue = [value] * 3
         else:
-            raise TypeError('type {} not supported for color assigment. Use list of len=3, vec4 or single number.'.format(str(type(value))))
+            raise TypeError('type {} not supported for color assigment. Use list of len=3, vec3 or single number.'.format(str(type(value))))
 
         return vec3(nvalue)
 

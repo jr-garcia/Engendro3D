@@ -39,7 +39,7 @@ class BaseControl(Base3DObject):
         self._is2D = True
         super(BaseControl, self).__init__(position, rotation, 1, 1)
         self.ID = ''
-        self._material = Material()
+        self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
@@ -84,7 +84,7 @@ class BaseControl(Base3DObject):
         return self._material.diffuseColor
 
     def _setColor(self, value):
-        self._material.diffuseColor = vec4(value)
+        self._material.diffuseColor = value
 
     color = property(_getColor, _setColor)
 
@@ -274,3 +274,25 @@ def ewMul(a, b):
 
 def ewDiv(a, b):
     return vec3(a.x / b.x, a.y / b.y, a.z / b.z)
+
+
+class Material2D(Material):
+    def __init__(self):
+        Material.__init__(self)
+
+    def _checkColor(self, value):
+        if isinstance(value, vec4):
+            nvalue = value
+        elif isinstance(value, list):
+            if not len(value) == 4:
+                raise RuntimeError('wrong number of elements for color assignment. '
+                                   'Required 3, got {}'.format(len(value)))
+            nvalue = value
+        elif isinstance(value, (int, float)):
+            nvalue = [value] * 4
+        else:
+            raise TypeError(
+                'type {} not supported for color assigment. Use list of len=4, vec4 or single number.'.format(
+                    str(type(value))))
+
+        return vec4(nvalue)

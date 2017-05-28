@@ -172,9 +172,9 @@ class game:
         # self.char.fontBorder = 0.1
         # self.char.fontWeight = .5
 
+        self.label2 = Label([.0, .4], [.99, .2], 'Gui is not ready. Needs a lot of work.', parent=textLayer, fontID='auto')
         self.label = Label([.01, .09], [.4, .2], '%Help oqm0!', parent=textLayer, fontID='auto',
                            fontColor=[1, 1, 1, 1], fontBorder=.0, fontBorderColor=[0, 0, 0, 1])
-        # self.label2 = Label([.0, .4], [.99, .2], '%Help oqm01', parent=textLayer, fontID='auto')
         self.label.color = [0, 0, 0, .5]
         # self.label2.color = [.5]
 
