@@ -1,4 +1,5 @@
 from os import path
+from cycgkit.cgtypes import vec3
 
 
 ignoredchars = [' ', '\n', '\r', '\t']
@@ -48,7 +49,7 @@ class Element(object):
                 fn = nm[0].strip()
                 val = self._clearString(nm[1].strip())
                 if fn == 'clear':
-                    self.members[fn] = self.stringAsList_floats(val)
+                    self.members[fn] = vec3(self.stringAsList_floats(val))
                 elif fn == 'size':
                     self.members[fn] = self.stringAsList_ints(val)
                 elif fn in ['in', 'out']:

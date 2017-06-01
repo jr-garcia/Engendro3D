@@ -102,7 +102,7 @@ class OGL3Backend(BaseBackend):
     def _setClearColor(self, color):
         """
 
-        @type color: list
+        @type color: vec3
         """
         if not self._lastClearColor or self._lastClearColor != color:
             r, g, b = color
