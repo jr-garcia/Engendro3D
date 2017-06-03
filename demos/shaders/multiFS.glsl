@@ -29,9 +29,7 @@ uniform float SpecularPower;
 uniform mat4 ModelView;
 uniform mat4 Model;
 uniform mat4 View;
-//varying vec3 mvNormals;
 varying vec4 vPos;
-varying float vFdepth;
 
 vec3 Material_specular = vec3(1,1,1);
 
@@ -46,6 +44,23 @@ varying vec3 nmNormal;
 varying vec3 nmTangent;
 varying vec3 nmBiTangent;
 uniform bool activeLights[MAXLIGHTS];
+
+varying float zpos;
+uniform float zFar;
+uniform float zNear;
+
+
+
+float LinearizeDepth(float z)
+{
+  z = -z;
+  float n = zNear; // camera z near
+  float f = zFar; // camera z far
+  return (z-zNear)/(zFar-zNear);
+// From http://www.geeks3d.com/20091216/geexlab-how-to-visualize-the-depth-buffer-in-glsl/
+//  return (2.0 * n) / (f + n - z * (f - n));
+}
+
 
 vec3 calcBumpedNormal()
 {
@@ -175,15 +190,11 @@ void main()
     vec4 fdifColor = vec4(clamp(final, 0.0, 1.0) , Opacity);
 
     // added for multi
-//    vec3 newNorms = .5 * normalize(mvNormals) + .5;
     vec3 newNorms = .5 * normalize(finalNormal) + .5;
-    //newNorms.z = 1.0 - newNorms.z;
-//    vec4 normColor = vec4(finalNormal, 1.0);
     vec4 normColor = vec4(newNorms, 1.0);
 
     gl_FragData[0] = fdifColor;
     gl_FragData[1] = normColor;
-//    gl_FragData[2] = vec4(campos, 1.0);
     gl_FragData[2] = vPos;
-    gl_FragData[3] = vec4(vec3(vFdepth), 1.0);
+    gl_FragData[3] = vec4(vec3(LinearizeDepth(zpos)), 1.0);
  }

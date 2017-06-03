@@ -167,8 +167,8 @@ def _setSceneUniforms(shader, params):
     paramsList.append(('Projection', params.projection))
     paramsList.append(('ViewProjection', params.ViewProjection))
     paramsList.append(('AmbientColor', params.ambientColor))
-    paramsList.append(('ZNear', float(params.zNear)))
-    paramsList.append(('ZFar', float(params.zFar)))
+    paramsList.append(('zNear', float(params.zNear)))
+    paramsList.append(('zFar', float(params.zFar)))
     paramsList.append(('CamPos', params.cameraPosition))
     paramsList.append(('WindowSize', params.windowSize))
     LightCount = 0

@@ -11,16 +11,10 @@ from e3d.gui import Panel
 import os
 
 from random import randint as ri, random as rf
+from _model_paths import *
 
 
 class game:
-    planepath = os.path.join(os.path.dirname(__file__), os.pardir, "e3d", "defaults", "primitives", "plane.x")
-    duckMODEL = os.path.join(os.path.dirname(__file__), "models", "duck", "duck.3DS")
-    # duckMODEL = os.path.join(os.path.dirname(__file__), "models", 'dragon.obj')
-    dragonModel = os.path.join(os.path.dirname(__file__), "models", 'dragon.obj')
-    dwarfMODEL = os.path.join(os.path.dirname(__file__), "models", 'dwarf', "dwarf.x")
-    tubeMODEL = os.path.join(os.path.dirname(__file__), "models", 'first_bone.x')
-
     camera = None
 
     def __init__(self, title):
@@ -31,8 +25,6 @@ class game:
         nsize = [640, 480]
 
         # Initialize the Engine
-        # self.engine = Engine(loglevel=logLevelsEnum.debug, multisampleLevel=16, restrictContextTo=[2, 1])
-
         self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1])
         self.engine.initialize()
 
@@ -42,9 +34,8 @@ class game:
         self.window.onMouseEvent = self.mouseMove
 
         self.scene1 = None
-        self.camera = SimpleCamera(vec3(0, 30, 200), vec3(0, 180, 0), ID='maincam')
+        self.camera = SimpleCamera(vec3(0, 30, 200), vec3(0, 180, 0), ID='maincam', zFar=900)
 
-        # self.camera.rotateY(180)
         self.duck = None
         self.dorot = True
         self.camrot = 3
@@ -58,7 +49,6 @@ class game:
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
-        # print "Key pressed=", e.keyName
         try:
             e.keyName = e.keyName.decode()
         except:
@@ -67,16 +57,6 @@ class game:
             self.window.mouseLock = not self.window.mouseLock
         if e.keyName == 'escape':  # ESC
             self.close()
-        if e.keyName == 'l':
-            for l in self.lights:
-                l.rotation = vec3(ri(-200, 200), ri(-200, 200), ri(-380, 280))
-                l.position = vec3(ri(-200, 200), ri(-200, 200), ri(-380, 280))
-                l.type = ri(0, 1)
-                l.color = vec3(ri(0, 1), ri(0, 1), ri(0, 1))
-        # if e.keyName == 'left':
-        #     self.dwarf.moveLeft(5)
-        # if e.keyName == 'right':
-        #     self.dwarf.moveRight(5)
         if e.keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
         if e.keyName.__contains__('ctrl'):
@@ -97,9 +77,6 @@ class game:
         movespeed = ft / 10.0
         self.lastspeed = movespeed
         if self.dorot:
-            self.lights[0].rotateZ(.1 * ft)
-            # print ('sun rot', self.dlight.rotation)
-            # print ('sun frw', self.dlight.forward)
             if self.duck:
                 self.duck.rotateY(.1 * ft)
             if self.duck2:
@@ -129,7 +106,7 @@ class game:
                                                                             'simpleMultiRTT', 'simple')
             # self.window.backend.debugModeActive = True
             engine.textures.loadTexture('e3dlogo.png', 'logo')
-            # engine.textures.loadTexture('Grass.jpg', 'grass')
+            engine.textures.loadTexture('./textures/Grass.jpg', 'grass')
 
             # engine.shaders.loadShader('shaders/multiVS.glsl', 'shaders/multiFS.glsl', 'multi')
 
@@ -138,54 +115,38 @@ class game:
             self.scene1.beforeUpdateCallback = self.scene1Update
             # self.scene1.setDefaultSkyBox()
             self.scene1.ambientColor = [v / 3.0 for v in [0.23, 0.34, 0.65]]
+            self.scene1.bgColor = [0,0,0]  # fixme: This is overriden by the effect
             # self.scene1.ambientColor = [.23, .34, .45]
-            # self.dlight = self.scene1.addLight()
-            # self.dlight.color = vec3(1.0, 1.0, .80)
-            # self.dlight.rotation = vec3(45, 45, 0)
+            self.dlight = self.scene1.addLight()
+            self.dlight.color = vec3(1.0, 1.0, .80)
+            self.dlight.rotation = vec3(45, 45, 0)
 
-            # Random lights
-            self.lights = []
-            for i in range(8):
-                l = self.scene1.addLight(ri(0, 1), rotation=vec3(ri(-200, 200), ri(-200, 200), ri(-380, 280)),
-                                         ID='li' + str(i))
-                l.color = vec3(ri(0, 1), ri(0, 1), ri(0, 1))
-                l.position = vec3(ri(-200, 200), ri(-200, 200), ri(-380, 280))
-                self.lights.append(l)
-            # self.window.mouseLock = True
-
-            # self.rlight = self.scene1.addLight(1)
-            # self.rlight.color = vec3(1.0, .0, .0)
-            # self.rlight.rotation = vec3(-5, 45, 50)
-
-            engine.models.loadModel(self.duckMODEL, "duckmodel", forceStatic=True)
-            self.duck = self.scene1.addModel('duckmodel', 'duck1', vec3(0, -20, 5), vec3(0), 1)
+            engine.models.loadModel(duckMODEL, "duckmodel", forceStatic=True)
+            self.duck = self.scene1.addModel('duckmodel', 'duck1', vec3(0, -20, -10), vec3(0), 1)
             # mat = self.duck.getMaterialByIndex(0)
             # mat.shaderID = 'normals'
             # mat.shaderID = 'multi'
 
-            self.duck2 = self.scene1.addModel('duckmodel', 'duck2', vec3(-20, 30, -100), vec3(0), 1.7)
+            self.duck2 = self.scene1.addModel('duckmodel', 'duck2', vec3(-100, 0, -200), vec3(0), 1.7)
 
-            # engine.models.loadModel(self.dwarfMODEL, "dwarfmodel", preCalculateFrames=-1)
-            # self.dwarf = self.scene1.addModel('dwarfmodel', 'dwarf1', vec3(0), vec3(0), 13)
-            # self.dwarf._materials[0].specularPower = 50
-            # self.dwarf._materials[1].specularPower = 50
-            # self.dwarf.rotateY(180)
-            # self.dwarf.moveRight(100)
-            # self.dwarf.setAnimation(list(self.dwarf.getAnimationsList())[0], True)
+            engine.models.loadModel(dwarfMODEL, "dwarfmodel", preCalculateFrames=-1)
+            self.dwarf = self.scene1.addModel('dwarfmodel', 'dwarf1', vec3(0), vec3(0), 13)
+            self.dwarf.rotateY(180)
+            self.dwarf.moveRight(100)
+            self.dwarf.setAnimation(self.dwarf.getAnimationsList()[0], True)
 
-            # engine.models.loadModel(self.tubeMODEL, "tubemodel")
-            # self.tube = self.scene1.addModel('tubemodel', 'tube1', vec3(0), vec3(0), 7)
-            # self.tube.setAnimation(list(self.tube.getAnimationsList())[0], True)
-            # self.tube.moveRight(100)
-            # self.tube._materials[0].opacity = .5
+            engine.models.loadModel(tubeMODEL, "tubemodel")
+            self.tube = self.scene1.addModel('tubemodel', 'tube1', vec3(0), vec3(0), 7)
+            self.tube.setAnimation(self.tube.getAnimationsList()[0], True)
+            self.tube.moveRight(100)
 
-            # engine.models.loadModel(self.planepath, "planemodel")
-            # self.plane = self.scene1.addModel('planemodel', 'floor', vec3(0), vec3(0), 20)
-            # mat = self.plane.getMaterialByIndex(0)
-            # mat.specularPower = 1000
-            # mat.diffuseTextureID = 'grass'
-            # mat.useDiffuseTexture = True
-            # mat.textureRepeat = 60
+            engine.models.loadPlane("planemodel")
+            self.plane = self.scene1.addModel('planemodel', 'floor', vec3(0, -20, 0), vec3(0), 100)
+            mat = self.plane.getMaterialByIndex(0)
+            mat.specularPower = 10000000000
+            mat.diffuseTextureID = 'grass'
+            mat.useDiffuseTexture = True
+            mat.textureRepeat = 60
 
         except Exception as ex:
             print('error in main.prepareScene: ' + str(ex))
@@ -193,15 +154,13 @@ class game:
             self.engine.terminate()
             raise
 
-        # self.window.backend.showAsWireframe = True #todo: implement as wireframe
-
         engine.scenes.currentSceneID = 'scene1'
 
     def buildGui(self):
         self.onelayer = self.window.gui.addLayer('one')
         logos = []
         pSize = [0.1, 0.1]
-        sSize = [0.2, 0.2]
+        rtSize = [0.1, 0.12]
         fDis = 1.0 - pSize[0]
         logos.append(Panel([0.0, 0.0], pSize, self.onelayer))
         logos.append(Panel([fDis, 0.0], pSize, self.onelayer))
@@ -211,10 +170,10 @@ class game:
             panel.backgroundImageID = 'logo'
             panel.opacity = .5
             
-        diffuse = Panel([0.0, 0.0], sSize, self.onelayer)
-        normals = Panel([sSize[0], 0.0], sSize, self.onelayer)
-        positions = Panel([sSize[0] * 2, 0.0], sSize, self.onelayer)
-        depth = Panel([sSize[0] * 3, 0.0], sSize, self.onelayer)
+        diffuse = Panel([0.0, 0.0], rtSize, self.onelayer)
+        normals = Panel([rtSize[0], 0.0], rtSize, self.onelayer)
+        positions = Panel([rtSize[0] * 2, 0.0], rtSize, self.onelayer)
+        depth = Panel([rtSize[0] * 3, 0.0], rtSize, self.onelayer)
         diffuse.backgroundImageID = self.fse.ID + '_diffuse'
         normals.backgroundImageID = self.fse.ID + '_normals'
         positions.backgroundImageID = self.fse.ID + '_positions'

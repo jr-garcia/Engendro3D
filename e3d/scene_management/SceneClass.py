@@ -1,6 +1,6 @@
-from e3d.Base3DObjectClass import DefaultObjectParameters
-from e3d.update_management.pickleableMethods import updateLightTransformation, updateModelTransformation
-from e3d.update_management.renderingListCreation import getOrderedModelInstances
+from ..Base3DObjectClass import DefaultObjectParameters
+from ..update_management.pickleableMethods import updateLightTransformation, updateModelTransformation
+from ..update_management.renderingListCreation import getOrderedModelInstances
 from .LightClass import light, lightTypesEnum
 from .SkyboxClass import Skybox
 from ..backends.base_backend import DrawingData, InstanceData
@@ -9,6 +9,8 @@ from ..commonValues import *
 from ..model_management.ModelInstanceClass import ModelInstance
 from ..model_management.AnimationModule import Animation
 from ..physics_management.physicsModule import bodyShapesEnum, ScenePhysics
+from ..model_management.MaterialClass import Material
+
 from cycgkit.cgtypes import mat4
 
 
@@ -40,12 +42,21 @@ class Scene(object):
         self.__currentDebugColor = 0
         self.bottom = -500
 
+        self._material = Material()
         self.ambientColor = [v / 3.0 for v in [0.23, 0.34, 0.65]]
-        self.bgColor = vec3(0.23, 0.34, 0.65)
+        self._material.diffuseColor = vec3(0.23, 0.34, 0.65)
 
         self.physics = ScenePhysics(gravity, resolution)
         self._currentTransformations = None
         self._currentModel = None
+
+    def _getBGColor(self):
+        return self._material.diffuseColor
+
+    def _setBGColor(self, val):
+        self._material.diffuseColor = val
+
+    bgColor = property(_getBGColor, _setBGColor)
 
     def __repr__(self):
         return self.ID

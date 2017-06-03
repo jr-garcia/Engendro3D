@@ -30,7 +30,6 @@ uniform mat4 BoneTransforms[50];
 uniform mat4 BoneTransformsIT[50];
 uniform bool HasBones;
 uniform light Lights[MAXLIGHTS];
-//uniform int LightCount;
 uniform bool IsLightAffected;
 uniform bool UpSideDownTextures;
 
@@ -46,12 +45,10 @@ uniform bool activeLights[MAXLIGHTS];
 
 // for added multi
 uniform mat4 boneTransformsIT[50];
-uniform float zFar;
-uniform float zNear;
 varying vec2 f_texcoord;
-//varying vec3 mvNormals;
 varying vec4 vPos;
-varying float vFdepth;
+varying float zpos;
+
 
 void phong_preCalc(
             in vec3 vertex_position,
@@ -99,7 +96,6 @@ void main()
         nmNormal = NormalMatrix * addBoneMat(vec4(normal, 0.0), boneindexes, boneweights, BoneTransformsIT).xyz;
         gl_Position = ModelViewProjection * vec4(npos.xyz, 1.0);
         // added for multi
-//        mvNormals = addBoneMat(vec4(normal, 0.0), boneindexes, boneweights, boneTransformsIT).xyz;
         vPos = vec4(npos.xyz, 1.0);
     }
     else
@@ -110,7 +106,6 @@ void main()
        gl_Position = ModelViewProjection * vec4(position, 1.0);
 
        // added for multi
-//       mvNormals = normal;
        vPos = vec4(position, 1.0);
     }
 
@@ -124,9 +119,5 @@ void main()
     }
 
     // added for multi
-    vec4 gpos = ModelViewProjection * vPos;
-//    vec4 gpos = vec4(position, 1.0);
-    //fdepth =(2.0 * zNear) / (zFar + zNear - gpos.z * (zFar - zNear));
-    //    vFdepth = (-gpos.z-zNear)/(zFar-zNear);
-    vFdepth =  1.0 -(gpos.z / zFar);
+    zpos = (ModelView * vPos).z;
 }
