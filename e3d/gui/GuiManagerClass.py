@@ -139,13 +139,11 @@ class GuiManager:
         newDrawingData.meshes.add(self.quadmesh)
 
         for layer in self._layersOrder:
-            layerDrawingData = DrawingData()
             if layer.visible:
                 layer._update()
                 for child in layer._children:
                     if child.visible:
-                        self._buildLayerDrawingData(child, None, layerDrawingData)
-            newDrawingData.extend(layerDrawingData)
+                        self._buildLayerDrawingData(child, None, newDrawingData)
 
         return newDrawingData
 

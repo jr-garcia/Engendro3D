@@ -75,13 +75,15 @@ class game:
                 pass
             return
         if e.keyName.__contains__('shift'):
-            self.label.fontID = 'auto'
+            self.label1.fontID = 'auto'
+            self.label2.fontID = 'auto'
         if e.keyName == 'escape':  # ESC
             self.close()
         if e.keyName.__contains__('alt'):
             self.window.setFullScreen(not self.window.isFullScreen())
         if e.keyName.__contains__('ctrl'):
-            self.label.fontID = 'default'
+            self.label1.fontID = 'default'
+            self.label2.fontID = 'default'
         if e.keyName == 'f1':  # F1
             np = [round(d, 3) for d in self.camera.position]
             print('Camera pos:{0}'.format(str(np)))

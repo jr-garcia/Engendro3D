@@ -274,7 +274,8 @@ class OGL3Backend(BaseBackend):
     def resize(self, size):
         glViewport(0, 0, size[0], size[1])
 
-    def _enableAttribute(self, shader, attribName, stride, vBuffer):
+    @staticmethod
+    def _enableAttribute(shader, attribName, stride, vBuffer):
         """
 
         @param attribName: "color", "normal", "tangent", "bitangent", "texcoord" 0 -2,
@@ -304,7 +305,8 @@ class OGL3Backend(BaseBackend):
 
         return rl
 
-    def _disableAttribute(self, attribName, currentShader):
+    @staticmethod
+    def _disableAttribute(attribName, currentShader):
         res = currentShader._attributesHandlesCache.get(attribName, -1)
         glDisableVertexAttribArray(res)
 
@@ -351,7 +353,10 @@ class OGL3Backend(BaseBackend):
                     if not currentShader._isSet:
                         currentShader.set()
                         _setSceneUniforms(currentShader, drawingData.defaultSceneParams)
+                        attribs = OGL3Backend.enableAttributes(mesh, currentShader)
                     if resetRequired:
+                        OGL3Backend.disableAttributes(attribs)
+                        attribs = OGL3Backend.enableAttributes(mesh, currentShader)
                         currentShader.reset()
                         resetRequired = False
 
@@ -359,25 +364,30 @@ class OGL3Backend(BaseBackend):
                 if transformations:
                     _setBoneTransformationsForMesh(currentShader, transformations, drawingData.modelBoneDirs[modelID])
                 setMaterialValues(self.textures, currentShader, currentMat)
-                self.renderMesh(mesh, currentShader)
+                self.renderMesh(mesh)
 
+            OGL3Backend.disableAttributes(attribs)
             indexBuffer.unbind()
             vertexBuffer.unbind()
         self._engine.shaders._setShaderState(self._engine.shaders._currentShader, 0)
 
-    def renderMesh(self, mesh, currentShader):
-        self._poliCount += mesh.primitiveCount
-
+    @staticmethod
+    def enableAttributes(mesh, currentShader):
         stride = int(mesh._stride)
         used_attribs = []
         for dd in mesh._declaration:
-            u = self._enableAttribute(currentShader, dd._name, stride, dd._offset)
+            u = OGL3Backend._enableAttribute(currentShader, dd._name, stride, dd._offset)
             used_attribs.extend(u)
+        return used_attribs
 
-        glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0)  # Using indexing
-
+    @staticmethod
+    def disableAttributes(used_attribs):
         for att in used_attribs:
             glDisableVertexAttribArray(att)
+
+    def renderMesh(self, mesh):
+        self._poliCount += mesh.primitiveCount
+        glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0)  # Using indexing
 
     def _bindScreenQuad(self):
         if not self._screenQuadVBO:
