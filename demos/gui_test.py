@@ -172,11 +172,15 @@ class game:
         # self.char.fontBorder = 0.1
         # self.char.fontWeight = .5
 
-        self.label2 = Label([.0, .4], [.99, .2], 'Gui is not ready. Needs a lot of work.', parent=textLayer, fontID='auto')
-        self.label = Label([.01, .09], [.4, .2], '%Help oqm0!', parent=textLayer, fontID='auto',
-                           fontColor=[1, 1, 1, 1], fontBorder=.0, fontBorderColor=[0, 0, 0, 1])
-        self.label.color = [0, 0, 0, .5]
-        # self.label2.color = [.5]
+        self.label1 = Label([.02, .09], [.8, .08], 'Gui is not yet ready. '
+                                                   'It needs a lot of work.', parent=textLayer,
+                            fontID='default')
+        self.label2 = Label([.05, .4], [.8, .2], '%#@%^%(*)!', parent=textLayer, fontID='auto',
+                           fontColor=[.5, .5,0, .8], fontBorder=.01, fontBorderColor=[0, 1, 0, 1])
+
+        self.label1.color = [1, 0, 0, 1]
+        self.label2.borderSize = 3
+        self.label2.borderColor = vec4(1)
 
 
 mainGame = game('Initializing... | Engendro3D OpenGL')

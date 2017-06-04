@@ -3,8 +3,7 @@ from cycgkit.cgtypes import vec3, vec4, mat4
 
 from ..Base3DObjectClass import Base3DObject
 from ..model_management.MaterialClass import *
-from .GuiManagerClass import DEFAULT2DSHADERID
-from .GuiManagerClass import GuiManager
+from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 
 
 class BaseControl(Base3DObject):
@@ -66,6 +65,8 @@ class BaseControl(Base3DObject):
         self._realScale = vec3(1)
         self._inverseScale = vec3(1)
         self._material.shaderProperties.append(Vec3ShaderProperty('realSize', self._realSize))
+        self._material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._internalSize))
+        self._material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
         self._material.shaderProperties.append(Vec3ShaderProperty('realScale', self._realScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
@@ -152,9 +153,11 @@ class BaseControl(Base3DObject):
     def _setAbsoluteScale(self, value):
         """
 
-        @type value: vec3
+        @type value: list
         """
-        if hasattr(value, '__getitem__'):
+        if isinstance(value, vec3):
+            v2 = value
+        elif hasattr(value, '__getitem__'):
             if len(value) == 2:
                 v2 = list(value)
                 v2.append(1)
@@ -167,6 +170,10 @@ class BaseControl(Base3DObject):
 
         self._scale = vec3(v2)
         self._dirty = True
+        try:
+            self._material.shaderProperties['size'] = self._scale
+        except KeyError:
+            pass
 
     size = property(fget=_getAbsoluteScale, fset=_setAbsoluteScale,
                     doc='Size of control in percentage of parent\'s size')
@@ -230,6 +237,7 @@ class BaseControl(Base3DObject):
         self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
 
         self._material.shaderProperties['realSize'] = self._realSize
+        self._material.shaderProperties['internalSize'] = self._internalSize
         self._material.shaderProperties['realScale'] = self._realScale
         self._material.shaderProperties['inverseScale'] = self._inverseScale
 

@@ -70,8 +70,6 @@ void main()
         realPos.x > (realSize.x - borderSize) || realPos.y > (realSize.y - borderSize))
     {
         objectdiffuse = vec4(borderColor.rgb, borderColor.a * Opacity);
-//            gl_FragColor = objectdiffuse;
-//        return;
     }
     else
     {

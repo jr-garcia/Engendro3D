@@ -16,8 +16,9 @@ uniform bool showSDF=False;
 
 uniform vec3 realScale;
 uniform vec3 realSize;
+uniform vec3 size;
+uniform vec3 internalSize;
 uniform vec3 WindowSize;
-varying vec2 relPos;  //todo:replace with in/out
 varying vec3 originalPosition;
 
 uniform vec3 relativePosition;
@@ -42,10 +43,10 @@ void main()
         float balpha = smoothstep(nborder - fb_gamma, nborder + fb_gamma, dist);
         float fbalpha = smoothstep(nweight - fb_gamma, nweight + fb_gamma, dist);
 
-        float localx = originalPosition.x * realScale.x;
-        if (relativePosition.x  >= .50){
-            FinalColor = vec4(localx,0,0,1);
-            return;
+        float localx = relativePosition.x + (originalPosition.x * size.x);
+        if (localx > 1.0){
+            discard;
+//            return;
                  }
 
         if (showSDF)
