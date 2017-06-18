@@ -21,20 +21,21 @@ class globalsStruct:
     oglminor = None
     glslmajor = None
     glslminor = None
-    dummycontext = None
-    dummywindow = None
+    dummyContext = None
+    dummyWindow = None
     glslall = None
     multisample = False
 
 
 class Engine:
-    def __init__(self, backend, multiSampleLevel, maxContext=(2, 1), logLevel=logLevelsEnum.error):
+    def __init__(self, backend, multiSampleLevel, maxContext=(2, 1), logLevel=logLevelsEnum.error, useQT=False):
         logger.logLevel = logLevel
-        # Init SDL>>>>>>>>>>>>>>>>>>>>>>>>>
-        if SDL_Init(SDL_INIT_EVERYTHING) != 0:
-            sdlerr = self.getSDLError()
-            logger.log('Error on SDL init: ' + sdlerr)
-            raise Exception('Error on SDL init: ' + sdlerr)
+        if not useQT:
+            # Init SDL>>>>>>>>>>>>>>>>>>>>>>>>>
+            if SDL_Init(SDL_INIT_EVERYTHING) != 0:
+                sdlerr = self.getSDLError()
+                logger.log('Error on SDL init: ' + sdlerr)
+                raise Exception('Error on SDL init: ' + sdlerr)
 
         self.maxContext = maxContext
         assert issubclass(backend, BaseBackend)
@@ -53,8 +54,10 @@ class Engine:
         self.localqueue = None
         self._running = False
         self._windows = {}
+        self._useQT = useQT
 
-        self.__setAttribs(multiSampleLevel, maxContext)
+        if not useQT:
+            self.__setAttribs(multiSampleLevel, maxContext)
 
     def initialize(self, maxThreads=2):
         self.__createDummyWindowAndContext()
@@ -173,13 +176,24 @@ class Engine:
 
         self.events._announce(event)
 
-    def createWindow(self, title='', gameName='', size=None, FullScreenSize=None, parent=None, fullscreen=False,
+    def createWindow(self, title='', gameName='', size=None, FullScreenSize=None, fullscreen=False,
                      vSynch=True, iconPath=None):
         """
 
         :rtype: Window
         """
-        win = Window(self, title, gameName, size, FullScreenSize, parent, fullscreen, vSynch, iconPath)
+        win = Window(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
+        self._windows[id(win)] = win
+        return win
+
+    def createQTWidget(self, title='', gameName='', size=None, FullScreenSize=None, fullscreen=False,
+                     vSynch=True, iconPath=None):
+        """
+
+        :rtype: Window
+        """
+        from .window.qt_window import GLWidget
+        win = GLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
         self._windows[id(win)] = win
         return win
 
@@ -220,23 +234,57 @@ class Engine:
             logger.log(glGetStringi(GL_EXTENSIONS, e))
 
     def __createDummyWindowAndContext(self):
+        if not self._useQT:
+            self._dummySDL()
+        else:
+            self._dummyQT()
+
+    def _dummyQT(self):
+        from PySide.QtOpenGL import QGLWidget, QGLFormat
+        format = QGLFormat()
+        format.setRedBufferSize(8)
+        format.setGreenBufferSize(8)
+        format.setBlueBufferSize(8)
+        format.setDepthBufferSize(24)
+        format.setAlphaBufferSize(8)
+        format.setDoubleBuffer(True)
+        format.setDepth(True)
+        format.setAlpha(True)
+        format.setVersion(2, 1)
+        format.setProfile(QGLFormat.CoreProfile)
+
+        self._format = format
+        try:
+            self.globals.dummyWindow = QGLWidget(format)
+        except Exception as ex:
+            error = 'Error creating dummy window: ' + str(ex)
+            logger.log(error)
+            raise RuntimeError(error)
+
+        try:
+            _, self.globals.dummyContext = self._getNewContext()
+        except:
+            raise
+        self.globals.dummyWindow.makeCurrent()
+
+    def _dummySDL(self):
         flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN
 
         try:
-            self.globals.dummywindow = SDL_CreateWindow('', -1, -1, 0, 0, flags)
+            self.globals.dummyWindow = SDL_CreateWindow('', -1, -1, 0, 0, flags)
         except ArgumentError:
-            self.globals.dummywindow = SDL_CreateWindow(b'', -1, -1, 0, 0, flags)
+            self.globals.dummyWindow = SDL_CreateWindow(b'', -1, -1, 0, 0, flags)
         sdlerr = self.getSDLError()
-        if self.globals.dummywindow is None or sdlerr != '':
+        if self.globals.dummyWindow is None or sdlerr != '':
             error = 'Error creating dummy window: ' + sdlerr
             logger.log(error)
             raise RuntimeError(error)
 
         try:
-            _, self.globals.dummycontext = self._getNewContext()
+            _, self.globals.dummyContext = self._getNewContext()
         except:
             raise
-        SDL_GL_MakeCurrent(self.globals.dummywindow, self.globals.dummycontext)
+        SDL_GL_MakeCurrent(self.globals.dummyWindow, self.globals.dummyContext)
 
     def _getNewContext(self, window=None):
         """
@@ -244,13 +292,17 @@ class Engine:
         @rtype : (SDL_Window, SDL_GLContext)
         """
         if window is None:
-            window = self.globals.dummywindow
-        newContext = SDL_GL_CreateContext(window)
-        if not newContext:
-            sdlerr = self.getSDLError()
-            error = 'Error creating context: ' + sdlerr
-            logger.log(error)
-            raise RuntimeError(error)
+            window = self.globals.dummyWindow
+        if not self._useQT:
+            newContext = SDL_GL_CreateContext(window)
+            if not newContext:
+                sdlerr = self.getSDLError()
+                error = 'Error creating context: ' + sdlerr
+                logger.log(error)
+                raise RuntimeError(error)
+        else:
+            newContext = self.globals.dummyWindow.context()
+
         return window, newContext
 
     def _multisampleFallback(self, multisampleLevel, flags):
@@ -299,9 +351,13 @@ class Engine:
             self._terminateManagers()
         except Exception as ex:
             logger.log('Error in \'Engine.terminate\': ' + str(ex))
-        SDL_GL_DeleteContext(self.globals.dummycontext)
-        SDL_DestroyWindow(self.globals.dummywindow)
-        SDL_Quit()
+        if not self._useQT:
+            SDL_GL_DeleteContext(self.globals.dummyContext)
+            SDL_DestroyWindow(self.globals.dummyWindow)
+            SDL_Quit()
+        else:
+            self.globals.dummyWindow.doneCurrent()
+            self.globals.dummyWindow.deleteLater()
         logger.log('Engine Terminated. Logger closed.')
 
 

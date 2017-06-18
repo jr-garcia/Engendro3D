@@ -11,11 +11,16 @@ class Window(Window_Base):
     Class for starting an SDL2 based Engendro3D Window.
 
     """
-    def _createInternalWindow(self, engine, fullscreen):
+    def _createInternalWindow(self, title, engine, fullscreen):
         flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
         if fullscreen:
             flags = flags | SDL_WINDOW_FULLSCREEN
-        self._SDL_Window = SDL_CreateWindow(self.title, 0, 0, self._size[0], self._size[1], flags)
+
+        try:
+            title = title.encode()
+        except:
+            pass
+        self._SDL_Window = SDL_CreateWindow(title, 0, 0, self._size[0], self._size[1], flags)
         if not self._SDL_Window:
             sdlerr = SDL_GetError()
             msg = u'Error creating window for \'{}\': {}'.format(self.gameName, sdlerr)
@@ -57,13 +62,15 @@ class Window(Window_Base):
     def _getGamma(self):
         return SDL_GetWindowBrightness(self._SDL_Window)
 
-    def _getSize(self):
+    @property
+    def size(self):
         w = ct.pointer(ct.c_int(0))
         h = ct.pointer(ct.c_int(0))
         SDL_GetWindowSize(self._SDL_Window, w, h)
 
         return w.contents.value, h.contents.value
 
+    @size.setter
     def _setSize(self, val):
         w, h = val
         if not self._isFull:
@@ -74,7 +81,7 @@ class Window(Window_Base):
             self._fullscreenSize = [w, h]
         self._sizeChanged(w, h)
 
-    size = property(_getSize, _setSize, doc="""@type val: tuple""")
+    # size = property(_getSize, _setSize, doc="""@type val: tuple""")
 
     def _getTitle(self):
         """

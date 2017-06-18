@@ -9,7 +9,7 @@ from e3d.update_management.updateMethods import updateAll
 
 
 class Window_Base:
-    def __init__(self, engine, title, gameName, sizeAsList, FullScreenSize, parent, fullscreen, vSynch, iconPath):
+    def __init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath):
         """
 
 
@@ -69,12 +69,6 @@ class Window_Base:
         if title == '':
             title = self.gameName
 
-        self.title = title
-        try:
-            self.title.encode()
-        except:
-            pass
-
         if sizeAsList is not None and len(sizeAsList) == 2:
             self._size = sizeAsList
         else:
@@ -85,7 +79,7 @@ class Window_Base:
             self._fullscreenSize = self._size
         logger.log(u'Starting new window for: ' + self.gameName, 0)
 
-        self._createInternalWindow(engine, fullscreen)
+        self._createInternalWindow(title, engine, fullscreen)
         self._set_vsynch(vSynch)
 
         self.backend = engine.base_backend(engine, self)
@@ -103,7 +97,7 @@ class Window_Base:
 
         logger.log('Window created for: ' + self.gameName, 0)
 
-    def _createInternalWindow(self, engine, fullscreen):
+    def _createInternalWindow(self, title, engine, fullscreen):
         pass
 
     def setFullScreen(self, setfull):
@@ -204,13 +198,15 @@ class Window_Base:
     def onWindowEvent(self, event):
         pass
 
-    def _getSize(self):
+    @property
+    def size(self):
         pass
 
+    @size.setter
     def _setSize(self, val):
         pass
 
-    size = property(_getSize, _setSize, doc="""@type val: tuple""")
+    # size = property(_getSize, _setSize, doc="""@type val: tuple""")
 
     def _getIsRunning(self):
         return self._running
