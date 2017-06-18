@@ -320,9 +320,10 @@ class OGL3Backend(BaseBackend):
     def renderMeshes(self, drawingData):
         for mesh in drawingData.meshes:
             resetRequired = True
+            attribs = []
             meshid = mesh.ID
-            renderDataPerinstance = drawingData.instances.get(meshid)
-            if renderDataPerinstance is None or len(renderDataPerinstance) < 1:
+            renderDataPerInstance = drawingData.instances.get(meshid)
+            if renderDataPerInstance is None or len(renderDataPerInstance) < 1:
                 continue
             vertexBuffer = self.vertexBuffers.get(meshid)
             if vertexBuffer is None:
@@ -345,7 +346,7 @@ class OGL3Backend(BaseBackend):
             else:
                 currentShader = None
 
-            for currentMat, defaultObjectParams, transformations, modelID in renderDataPerinstance:
+            for currentMat, defaultObjectParams, transformations, modelID in renderDataPerInstance:
                 if not self._shaderOverride:
                     currentShader = self._engine.shaders._shadersCache[currentMat.shaderID]
                     if currentShader is None:
@@ -353,7 +354,7 @@ class OGL3Backend(BaseBackend):
                     if not currentShader._isSet:
                         currentShader.set()
                         _setSceneUniforms(currentShader, drawingData.defaultSceneParams)
-                        attribs = OGL3Backend.enableAttributes(mesh, currentShader)
+                        # attribs = OGL3Backend.enableAttributes(mesh, currentShader)
                     if resetRequired:
                         OGL3Backend.disableAttributes(attribs)
                         attribs = OGL3Backend.enableAttributes(mesh, currentShader)

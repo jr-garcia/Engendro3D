@@ -43,7 +43,7 @@ class ScenesManager(object):
 
         @rtype : Scene
         """
-        return self._scenes.get(id)
+        return self._scenes.get(id, self._defaultScene)
 
     def setCurrentSceneID(self, ID):
         if ID not in self._scenes.keys():
