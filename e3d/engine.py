@@ -194,7 +194,6 @@ class Engine:
         """
         from .window.qt_window import GLWidget
         win = GLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
-        self._windows[id(win)] = win
         return win
 
     def _fillGLInfo(self):
@@ -248,6 +247,7 @@ class Engine:
         format.setDepthBufferSize(24)
         format.setAlphaBufferSize(8)
         format.setDoubleBuffer(True)
+        format.setDirectRendering(True)
         format.setDepth(True)
         format.setAlpha(True)
         format.setVersion(2, 1)

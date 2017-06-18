@@ -11,6 +11,10 @@ class GLWidget(Window_Base, QGLWidget):
         QGLWidget.__init__(self, engine._format, None, shareWidget=engine.globals.dummyWindow)
         Window_Base.__init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath)
 
+    def _createInternalWindow(self, title, engine, fullscreen):
+        self.initializeGL()
+        self.makeCurrent()
+
     @property
     def size(self):
         return self.frameSize().toTuple()
