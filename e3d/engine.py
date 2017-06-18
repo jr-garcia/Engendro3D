@@ -11,7 +11,7 @@ from .backends.base_backend import BaseBackend
 from .events_processing.EventsManagerClass import Event, EventsManager
 from .scene_management.ScenesManagerClass import ScenesManager
 from .texture_management.TextureManagerClass import TexturesManager
-from .window import Window
+from .window.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
 
 
