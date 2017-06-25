@@ -8,7 +8,7 @@ from e3d.gui.GuiManagerClass import GuiManager
 from e3d.update_management.updateMethods import updateAll
 
 
-class Window_Base:
+class Window_Base(object):
     def __init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath):
         """
 
@@ -80,7 +80,8 @@ class Window_Base:
         logger.log(u'Starting new window for: ' + self.gameName, 0)
 
         self._createInternalWindow(title, engine, fullscreen)
-        self._set_vsynch(vSynch)
+
+        self.vsynch = vSynch
 
         self.backend = engine.base_backend(engine, self)
 
@@ -96,6 +97,9 @@ class Window_Base:
         self._startupTime = int(round(time() * float(1000)))
 
         logger.log('Window created for: ' + self.gameName, 0)
+
+    def __repr__(self):
+        return self.title
 
     def _createInternalWindow(self, title, engine, fullscreen):
         pass
@@ -170,6 +174,7 @@ class Window_Base:
     def _sizeChanged(self, w, h):
         """Reshape the OpenGL viewport based on the dimensions of the window."""
         self.engine.scenes.currentScene.currentCamera.updateFOV(w, h)
+        self._makeContextCurrent()
         self.backend.resize((w, h))
 
     def close(self):
@@ -206,30 +211,28 @@ class Window_Base:
     def _setSize(self, val):
         pass
 
-    # size = property(_getSize, _setSize, doc="""@type val: tuple""")
-
-    def _getIsRunning(self):
+    @property
+    def isRunning(self):
         return self._running
 
-    isRunning = property(fget=_getIsRunning)
-
-    def _getTitle(self):
+    @property
+    def title(self):
         """
 
         @rtype : str
         """
         pass
 
-    def _setTitle(self, value):
+    @title.setter
+    def title(self, value):
         """
 
         @type value: str
         """
         pass
 
-    title = property(fget=_getTitle, fset=_setTitle)
-
-    def _setGamma(self, value):
+    @property
+    def gamma(self):
         """
         Set int value for this window's gamma.
         @type vakue: int
@@ -237,18 +240,17 @@ class Window_Base:
         """
         pass
 
-    def _getGamma(self):
+    @gamma.setter
+    def gamma(self, value):
         pass
 
-    gamma = property(_getGamma, _setGamma)
-
-    def _get_vsynch(self):
+    @property
+    def vsynch(self):
         pass
 
-    def _set_vsynch(self, val):
+    @vsynch.setter
+    def vsynch(self, val):
         pass
-
-    vsynch = property(_get_vsynch, _set_vsynch)
 
 
 class winEvents(EventsListener):

@@ -6,7 +6,7 @@ from .ShaderParametersHelper import getActiveUniforms, getActiveAttribs
 from ....LoggerClass import logger, logLevelsEnum
 
 
-class Shader:
+class Shader(object):
     def _getisSet(self):
         return self._isSet
 

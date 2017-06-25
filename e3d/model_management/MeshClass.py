@@ -20,7 +20,7 @@ class NormalsCalculationTypeEnum(object):
     hard = 'hard'
 
 
-class Mesh:
+class Mesh(object):
     def __init__(self):
         self.boneOffsets = {}
         self.boneMinMax = {}

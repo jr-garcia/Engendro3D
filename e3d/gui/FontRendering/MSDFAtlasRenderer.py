@@ -135,18 +135,19 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
 
 
 class AtlasInfo:
-    def __init__(self, finalLocations, baseline, lineMargins, filePath, fontSize, lineHeight, lastUpper, size):
+    def __init__(self, finalLocations, baseline, lineMargins, filePath, fontSize, lineHeight, lastUpper, size
+                 , width=None, height=None, border=None, lowerMargin=None, upperMargin=None):
         self.fontSize = fontSize
         self.charDataDict = finalLocations
         self.baseline = baseline
-        self.upperMargin = lineMargins[0]
-        self.lowerMargin = lineMargins[1]
+        self.upperMargin = upperMargin or lineMargins[0]
+        self.lowerMargin = lowerMargin or lineMargins[1]
         self.filePath = filePath
         self.lineHeight = lineHeight
         self.lastUpper = lastUpper / fontSize
-        self.width = size[0]
-        self.height = size[1]
-        self.border = BORDER / (fontSize - (BORDER * 2))
+        self.width = width or size[0]
+        self.height = height or size[1]
+        self.border = border or (BORDER / (fontSize - (BORDER * 2)))
 
 
 class GlyphSize:
@@ -179,7 +180,9 @@ class ImData:
 
 
 class CharData:
-    def __init__(self, originX, originY, imData):
+    def __init__(self, originX=None, originY=None, imData=None):
+        if imData is None:
+            return
         self.atlasOriginX = originX
         self.atlasOriginY = originY
         self.top = imData.top

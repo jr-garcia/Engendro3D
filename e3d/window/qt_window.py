@@ -6,7 +6,7 @@ from PySide.QtCore import Qt
 from .base import Window_Base
 
 
-class GLWidget(Window_Base, QGLWidget):
+class e3DGLWidget(Window_Base, QGLWidget):
     def __init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath):
         QGLWidget.__init__(self, engine._format, None, shareWidget=engine.globals.dummyWindow)
         Window_Base.__init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath)
@@ -20,7 +20,7 @@ class GLWidget(Window_Base, QGLWidget):
         return self.frameSize().toTuple()
 
     @size.setter
-    def _setSize(self, val):
+    def size(self, val):
         self.frameSize = val
 
     def _performSwap(self):

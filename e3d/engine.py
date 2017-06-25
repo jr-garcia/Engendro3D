@@ -187,13 +187,13 @@ class Engine:
         return win
 
     def createQTWidget(self, title='', gameName='', size=None, FullScreenSize=None, fullscreen=False,
-                     vSynch=True, iconPath=None):
+                       vSynch=True, iconPath=None):
         """
 
-        :rtype: Window
+        :rtype: e3DGLWidget
         """
-        from .window.qt_window import GLWidget
-        win = GLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
+        from .window.qt_window import e3DGLWidget
+        win = e3DGLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
         return win
 
     def _fillGLInfo(self):

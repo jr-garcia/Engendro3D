@@ -10,7 +10,7 @@ class CompilationError(RuntimeError):
     pass
 
 
-class BaseBackend:
+class BaseBackend(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):

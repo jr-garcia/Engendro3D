@@ -7,7 +7,7 @@ from ....LoggerClass import logger, logLevelsEnum
 from ...base_backend import CompilationError
 
 
-class ShadersManager:
+class ShadersManager(object):
     class shaderTypesEnum(object):
         vertex = GL_VERTEX_SHADER
         fragment = GL_FRAGMENT_SHADER

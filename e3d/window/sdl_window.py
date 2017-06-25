@@ -48,7 +48,12 @@ class Window(Window_Base):
 
     mouseLock = property(_getMouseMode, _setMouseMode)
 
-    def _setGamma(self, value):
+    @property
+    def gamma(self):
+        return SDL_GetWindowBrightness(self._SDL_Window)
+
+    @gamma.setter
+    def gamma(self, value):
         """
         Set int value for this window's gamma.
         @type vakue: int
@@ -59,9 +64,6 @@ class Window(Window_Base):
         if SDL_SetWindowBrightness(self._SDL_Window, value) != 0:
             raise Exception('Error setting Gamma: ' + SDL_GetError())
 
-    def _getGamma(self):
-        return SDL_GetWindowBrightness(self._SDL_Window)
-
     @property
     def size(self):
         w = ct.pointer(ct.c_int(0))
@@ -71,7 +73,7 @@ class Window(Window_Base):
         return w.contents.value, h.contents.value
 
     @size.setter
-    def _setSize(self, val):
+    def size(self, val):
         w, h = val
         if not self._isFull:
             SDL_SetWindowSize(self._SDL_Window, ct.c_int(w), ct.c_int(h))
@@ -81,9 +83,8 @@ class Window(Window_Base):
             self._fullscreenSize = [w, h]
         self._sizeChanged(w, h)
 
-    # size = property(_getSize, _setSize, doc="""@type val: tuple""")
-
-    def _getTitle(self):
+    @property
+    def title(self):
         """
 
         @rtype : str
@@ -91,7 +92,8 @@ class Window(Window_Base):
         t = SDL_GetWindowTitle(self._SDL_Window)
         return t
 
-    def _setTitle(self, value):
+    @title.setter
+    def title(self, value):
         """
 
         @type value: str
@@ -102,14 +104,16 @@ class Window(Window_Base):
             pass
         SDL_SetWindowTitle(self._SDL_Window, value)
 
-    def _get_vsynch(self):
+    @property
+    def vsynch(self):
         ret = SDL_GL_GetSwapInterval()
         if ret != 0:
             return True
         else:
             return False
 
-    def _set_vsynch(self, val):
+    @vsynch.setter
+    def vsynch(self, val):
         if bool(val):
             if SDL_GL_SetSwapInterval(-1) == -1:
                 SDL_GL_SetSwapInterval(1)
@@ -154,11 +158,6 @@ class Window(Window_Base):
         print('Not implemented.')
         return -1
 
-    def _sizeChanged(self, w, h):
-        """Reshape the OpenGL viewport based on the dimensions of the window."""
-        SDL_GL_MakeCurrent(self._SDL_Window, self._context)
-        super(Window, self)._sizeChanged(w, h)
-
     def _pollEvents(self):
         event = SDL_Event()
         while SDL_PollEvent(event):
@@ -179,6 +178,6 @@ class Window(Window_Base):
         SDL_GL_SwapWindow(self._SDL_Window)
 
     def close(self):
-        super(Window, self).close()
         SDL_GL_DeleteContext(self._context)
         SDL_DestroyWindow(self._SDL_Window)
+        Window_Base.close(self)

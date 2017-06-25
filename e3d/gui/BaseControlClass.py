@@ -40,6 +40,8 @@ class BaseControl(Base3DObject):
         self.ID = ''
         self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
+        if not all(size):
+            raise ValueError('size of 0 not allowed: ' + str(size))
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)

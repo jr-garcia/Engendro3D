@@ -1,12 +1,13 @@
 import os
-from pickle import dump, load
+from json import dump, load
+from collections import OrderedDict
 import numpy as np
 from cycgkit.cgtypes import mat4, vec3
 
 from ..Base3DObjectClass import DefaultObjectParameters
 from .LayerClass import Layer
 from .FontRendering import CharRangesEnum
-from .FontRendering.MSDFAtlasRenderer import NAMEFORMATSTRING, render
+from .FontRendering.MSDFAtlasRenderer import NAMEFORMATSTRING, render, AtlasInfo, CharData
 from ..backends.base_backend import DrawingData, InstanceData
 from ..model_management.MeshClass import Mesh, NormalsCalculationTypeEnum, UVCalculationTypeEnum
 from ..scene_management.SceneClass import DefaultSceneParameters
@@ -170,6 +171,45 @@ class GuiManager:
             if c.visible:
                 self._buildLayerDrawingData(c, downTrans, layerDrawingData)
 
+    @staticmethod
+    def convertCharData(data):
+        d = OrderedDict()
+        for e, v in data.items():
+            f = dict()
+            u = dir(v)
+            for l in u:
+                if not l.startswith('_'):
+                    val = getattr(v, l)
+                    f[l] = val
+            d[int(e)] = f
+        return d
+
+    @staticmethod
+    def convertToJsonable(rangeInfo):
+        f = dir(rangeInfo)
+        dictio = dict()
+        for l in f:
+            if not l.startswith('_'):
+                if l == 'charDataDict':
+                    dictio['finalLocations'] = GuiManager.convertCharData(getattr(rangeInfo, l))
+                else:
+                    dictio[l] = getattr(rangeInfo, l)
+
+        dictio['size'] = (dictio['width'], dictio['height'])
+        dictio['lineMargins'] = (rangeInfo.upperMargin, rangeInfo.lowerMargin)
+        return dictio
+
+    @staticmethod
+    def convertFromJsoned(rangeInfoDict):
+        rangeInfo = AtlasInfo(**rangeInfoDict)
+        newCharData = OrderedDict()
+        for n, val in rangeInfo.charDataDict.items():
+            newCharData[int(n)] = CharData()
+            for k in val.keys():
+                setattr(newCharData[int(n)], k, val[k])
+        rangeInfo.charDataDict = newCharData
+        return rangeInfo
+
     def loadFont(self, ID, fontPath, baseSize=34, maxAtlasWidth=1024, charRange=CharRangesEnum.latin, force=False):
         destinationFolder = self.fontsCache
         fontName = os.path.splitext(os.path.basename(fontPath))[0]
@@ -177,16 +217,19 @@ class GuiManager:
         finalPath = os.path.join(fullDestPath,
                                  NAMEFORMATSTRING.format(fontName=fontName, rangeName=charRange[0], format=SAVEFORMAT))
         infoPath = os.path.splitext(finalPath)[0]
+        finalInfoPath = INFOFORMATSTRING.format(fontPath=infoPath)
         if not os.path.exists(finalPath) or force:
             fontRangeInfo = render(fontPath, baseSize, maxAtlasWidth, destinationFolder, SAVEFORMAT, charRange)
-            with open(INFOFORMATSTRING.format(fontPath=infoPath), 'wb') as dest:
-                dump(fontRangeInfo, dest, protocol=2)
+            try:
+                with open(finalInfoPath, 'w') as dest:
+                    dump(fontRangeInfo, dest, default=GuiManager.convertToJsonable)
+            except:
+                os.remove(finalInfoPath)
+                os.remove(finalPath)
+                raise
         else:
-            with open(INFOFORMATSTRING.format(fontPath=infoPath), 'rb') as dest:
-                try:
-                    fontRangeInfo = load(dest, encoding='bytes')
-                except TypeError:
-                    fontRangeInfo = load(dest)
+            with open(finalInfoPath, 'r') as dest:
+                fontRangeInfo = GuiManager.convertFromJsoned(load(dest))
 
         fontTextureName = FONTTEXTUREIDSTRING.format(ID)
         self.engine.textures.loadTexture(finalPath, fontTextureName, repeat=False, force=True)
