@@ -14,7 +14,7 @@ class BaseControl(Base3DObject):
     """
 
     @abstractmethod
-    def __init__(self, position, size, parent=None, color=None, imgID=None, rotation=None, borderSize=0):
+    def __init__(self, position, size, parent, color=None, imgID=None, rotation=None, borderSize=0):
         """
 
 
@@ -40,6 +40,8 @@ class BaseControl(Base3DObject):
         self.ID = ''
         self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
+        if not hasattr(size, '__getitem__'):
+            raise TypeError('size must be an object with 2 elements')
         if not all(size):
             raise ValueError('size of 0 not allowed: ' + str(size))
         self._setAbsoluteScale(size)

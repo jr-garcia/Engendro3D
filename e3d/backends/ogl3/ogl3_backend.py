@@ -6,7 +6,8 @@ from glaze.utils import sizeofArray
 from .RenderTarget_OGL3 import RenderTarget
 from .shader_management.ShadersManagerClass import ShadersManager
 from ..RenderTargetBase import attachmentTypeEnum, renderTextureTypeEnum
-from ..base_backend import BaseBackend, _setObjectUniforms, _setSceneUniforms, setMaterialValues, _setBoneTransformationsForMesh
+from ..base_backend import BaseBackend, _setObjectUniforms, _setSceneUniforms, setMaterialValues, \
+    _setBoneTransformationsForMesh
 from ...fse_management.FSEManagerClass import FSEManager, FullScreenEffect
 
 
@@ -16,7 +17,8 @@ class OGL3Backend(BaseBackend):
         self._engine = engine
         self._currentRenderTarget = None
         self.fullScreenEffects = FSEManager(engine,
-                                            self)  # todo: move FSEManager to engine?, so all fseffects are shared among windows
+                                            self)  # todo: move FSEManager to engine?, so all fseffects are shared
+        # among windows
         self._defaultClearColor = vec3(0.50, 0.50, 0.50)
         self._lastClearColor = None
         self._setClearColor(self._defaultClearColor)
@@ -327,14 +329,12 @@ class OGL3Backend(BaseBackend):
                 continue
             vertexBuffer = self.vertexBuffers.get(meshid)
             if vertexBuffer is None:
-                vertexBuffer = VBO(data=mesh._vertexBufferArray, target=GL_ARRAY_BUFFER,
-                                   usage=GL_STATIC_DRAW)
+                vertexBuffer = VBO(data=mesh._vertexBufferArray, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
                 self.vertexBuffers[meshid] = vertexBuffer
 
             indexBuffer = self.indexBuffers.get(meshid)
             if indexBuffer is None:
-                indexBuffer = VBO(data=mesh._indexBufferArray, target=GL_ELEMENT_ARRAY_BUFFER,
-                                  usage=GL_STATIC_DRAW)
+                indexBuffer = VBO(data=mesh._indexBufferArray, target=GL_ELEMENT_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
             self.indexBuffers[meshid] = indexBuffer
 
             vertexBuffer.bind()
@@ -383,8 +383,8 @@ class OGL3Backend(BaseBackend):
 
     @staticmethod
     def disableAttributes(used_attribs):
-        for att in used_attribs:
-            glDisableVertexAttribArray(att)
+        while len(used_attribs) > 0:
+            glDisableVertexAttribArray(used_attribs.pop())
 
     def renderMesh(self, mesh):
         self._poliCount += mesh.primitiveCount
@@ -519,6 +519,7 @@ class OGL3Backend(BaseBackend):
                 buff, vert = b._get_buff_vert_arr()
                 vbos.append(int(buff))
                 vaos.append(int(vert))
+
         vbos = []
         vaos = []
 
@@ -537,7 +538,7 @@ class OGL3Backend(BaseBackend):
         if len(vaoarr) > 0:
             glDeleteVertexArrays(len(vaoarr), vaoarr)
 
-        # todo: delete sky and fsq buffers
+            # todo: delete sky and fsq buffers
 
 
 class VBO:

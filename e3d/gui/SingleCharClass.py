@@ -10,8 +10,8 @@ class SingleChar(BaseControl):
        @rtype : Panel
     """
 
-    def __init__(self, position, size, char, fontID='default', fontBorder=.08, fontBorderColor=vec4(0, 0, 0, 1),
-                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, parent=None, color=None, imgID=None, rotation=None, borderSize=0.0):
+    def __init__(self, position, size, char, parent, fontID='default', fontBorder=.08, fontBorderColor=vec4(0, 0, 0, 1),
+                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, imgID=None, rotation=None, borderSize=0.0):
         super(SingleChar, self).__init__(position, size, parent, color, None, rotation, borderSize=borderSize)
         self._char = char
         self._fontBorder = fontBorder

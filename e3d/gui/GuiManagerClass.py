@@ -1,6 +1,6 @@
 import os
 from json import dump, load
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import numpy as np
 from cycgkit.cgtypes import mat4, vec3
 
@@ -146,7 +146,22 @@ class GuiManager:
                     if child.visible:
                         self._buildLayerDrawingData(child, None, newDrawingData)
 
+        # GuiManager.orderInstances(newDrawingData.instances)  # todo: implement GUI z-ordering to enable this
         return newDrawingData
+
+    @staticmethod
+    def orderInstances(instances):
+        orderedPerShader = defaultdict(list)
+        for key, appendable in instances.items():
+            for i in appendable:
+                orderedPerShader[i._stuff[0]._shaderID].append(i)
+
+            finals = []
+            for val in orderedPerShader.values():
+                finals.extend(val)
+
+            instances.clear()
+            instances[key].extend(finals)
 
     def _buildLayerDrawingData(self, child, trans, layerDrawingData):
         defaultObjectParams = DefaultObjectParameters()
