@@ -17,8 +17,6 @@ class BaseBackend(object):
         self.shaders = None
         self.textures = None
         self._poliCount = 0
-        # self._defaultCamera = SimpleCamera([0, 0, 0], [0, 0, 0])
-        # self._currentCamera = self._defaultCamera
 
     def renderMeshes(self, drawingData):
         pass

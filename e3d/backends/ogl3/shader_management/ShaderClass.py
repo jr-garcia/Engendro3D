@@ -79,10 +79,6 @@ class Shader(object):
             return False
         else:
             return a == b
-            # for i in range(len(a)):
-            #     if a[i] != b[i]:
-            #         return False
-            # return True
 
     def isSame(self, handle, newValue):
         isequal = False
@@ -118,10 +114,12 @@ class Shader(object):
         paramHandle = self._uniformsHandlesCache.get(paramName, -1)
         if paramHandle == -1:
             if self._reportInactive:
-                print('Parameter \'{}\' not active or not defined in shader \'{}\'.'.format(paramName, self._iID))
+                logger.log('Parameter \'{}\' not active or not defined in shader \'{}\'.'.format(paramName, self._iID),
+                           logLevelsEnum.debug)
             return
         if paramValue is None:
-            print('{} value is \'None\'. Ignored for shader \'{}\'.'.format(paramName, self._iID))
+            logger.log('{} value is \'None\'. Ignored for shader \'{}\'.'.format(paramName, self._iID),
+                       logLevelsEnum.debug)
             return
         try:
             if not self.isSame(paramHandle, paramValue):
@@ -161,7 +159,6 @@ class Shader(object):
             raise
 
     def setMultipleValues(self, paramHandle, paramValuesArray):
-        print('setmulti in ')
         if paramValuesArray is not None and (paramHandle != -1):
             try:
                 if len(paramValuesArray[0]) == 16:
@@ -177,7 +174,6 @@ class Shader(object):
                         setValueVec4L(paramHandle, val)
             except Exception as ex:
                 logger.log('EffectClass "SeMultipletValues" error: ' + ex.message)
-        print('setmulti out')
 
     def _getUniformHandle(self, paramName):
         """
@@ -212,7 +208,6 @@ class Shader(object):
                 if unit != self._lastActiveUnit:
                     glActiveTexture(self._unitsCache[unit])
                     self._lastActiveUnit = unit
-                # with nogil:
                 glBindTexture(GL_TEXTURE_2D, value)
                 glUniform1i(handle, unit)
                 self._textureLastValues[handle] = value
