@@ -289,6 +289,9 @@ def ewDiv(a, b):
 class Material2D(Material):
     def __init__(self):
         Material.__init__(self)
+        self.diffuseColor = vec4(0)
+        self.emissiveColor = vec4(0)
+        self.specularColor = vec4(0)
 
     def _checkColor(self, value):
         if isinstance(value, vec4):
