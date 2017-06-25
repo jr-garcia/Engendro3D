@@ -62,15 +62,15 @@ class game:
         #         print(self.char.fontWeight)
         if e.eventName == 'keyDown':
             if e.keyName == 'up':
-                self.label.borderSize = min(20, self.label.borderSize + 1)
+                self.label2.borderSize = min(20, self.label2.borderSize + 1)
             elif e.keyName == 'down':
-                self.label.borderSize = max(0, self.label.borderSize - 1)
+                self.label2.borderSize = max(0, self.label2.borderSize - 1)
             if e.keyName == 'backspace':
-                self.label.text = self.label.text[:len(self.label.text) - 1]
+                self.label3.text = self.label3.text[:len(self.label3.text) - 1]
                 return
             try:
                 if chr(e.keyCode).isprintable():
-                    self.label.text += chr(e.keyCode)
+                    self.label3.text += chr(e.keyCode)
             except ValueError:
                 pass
             return
@@ -133,8 +133,6 @@ class game:
             engine.models.loadModel(_model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
             self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 5, 5), vec3(0), 1.5)
             mat = self.triangle.getMaterialByIndex(0)
-            # mat.shaderID = 'normals'
-            # mat.isLightAffected = False
             mat.useDiffuseTexture = True
 
         except Exception as ex:
@@ -169,18 +167,20 @@ class game:
             panel.opacity = .7
             panel.borderSize = 0
 
-        # self.char = SingleChar([.12, .12], .6, self.onelayer, '?')
-        # self.char.fontBorderColor = vec4(1, 0, 0, 1)
-        # self.char.fontBorder = 0.1
-        # self.char.fontWeight = .5
+        self.char = SingleChar([.12, .12], [.6, .6], '?', self.onelayer)
+        self.char.fontBorderColor = vec4(1, 0, 0, 1)
+        self.char.fontBorder = 0.1
+        self.char.fontWeight = .5
 
-        self.label1 = Label([.02, .09], [.8, .08], 'Gui is not yet ready. '
-                                                   'It needs a lot of work.', parent=textLayer,
+        self.label1 = Label([.02, .09], [.8, .08], 'Gui needs a lot of work.', parent=textLayer,
                             fontID='default')
         self.label2 = Label([.05, .4], [.8, .2], '%#@%^%(*)!', parent=textLayer, fontID='auto',
-                           fontColor=[.5, .5,0, .8], fontBorder=.01, fontBorderColor=[0, 1, 0, 1])
+                            fontColor=[.5, .5,0, .8], fontBorder=.01, fontBorderColor=[0, 1, 0, 1])
+
+        self.label3 = Label([.02, .8], [.97, .05], 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
 
         self.label1.color = [1, 0, 0, 1]
+        self.label2.color = [0, 1, 0, .5]
         self.label2.borderSize = 3
         self.label2.borderColor = vec4(1)
 
