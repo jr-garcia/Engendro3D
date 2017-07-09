@@ -1,10 +1,13 @@
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s - %(name)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.getLogger('PIL').setLevel(logging.ERROR)
 from cycgkit.cgtypes import vec3
 
 from _do_import import resolve_import
 resolve_import()
 
-from e3d import Engine, __version__
-from e3d.LoggerClass import logLevelsEnum, logger
+from e3d import Engine, __version__, logLevelsEnum
 from e3d.backends import OGL3Backend
 from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
@@ -28,7 +31,7 @@ class game:
         self.plane = None
         self.dlight = None
         self.lastspeed = 0
-        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], logLevel=logLevelsEnum.debug)
+        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1])
         self.window = None
         self.firstRun = False
         self.pendingTex = 0
@@ -62,7 +65,7 @@ class game:
 
     def defUpdate(self, e):
         if self.pendingTex == 0:
-            logger.log('All Textures Loaded.', logLevelsEnum.warning)
+            self.engine.log('All Textures Loaded.')
             self.buildGui()
             self.prepareScene()
             self.window.onKeyEvent = self.keydown
@@ -95,7 +98,7 @@ class game:
             # self.isWaitingTex = True
             self.engine.textures.loadTexture(args[0], args[1], args[2])
 
-        logger.log('Loading Textures.', logLevelsEnum.info)
+        self.engine.log('Loading Textures.', logLevelsEnum.info)
         list(map(loadTexture, self.texturesToLoad))
 
     def prepareScene(self):
@@ -112,7 +115,7 @@ class game:
 
         self.camera.position = [0, 10, 230]
 
-        logger.log('Switch scene 0 >> 1', logLevelsEnum.debug)
+        self.engine.log('Switch scene 0 >> 1', logLevelsEnum.debug)
         engine.scenes.setCurrentSceneID('scene1')
         self.loadModels()
         self.addLights()
@@ -145,7 +148,7 @@ class game:
 
     def textLoadedCallback(self, ev):
         self.pendingTex -= 1
-        logger.log('Texture \'{}\' Loaded.'.format(ev.textureID), logLevelsEnum.warning)
+        self._engine.log('Texture \'{}\' Loaded.'.format(ev.textureID), logLevelsEnum.warning)
         if self.pendingTex == 0:
             self.isWaitingTex = False
 

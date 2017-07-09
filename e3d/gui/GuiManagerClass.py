@@ -36,7 +36,7 @@ class GuiManager:
         self.resizeListener = EventsListener()
         self.resizeListener.onWindowEvent = self._onWindowEventCallback
 
-        from ..engine import PathPiece
+        from .._engine import PathPiece
         self.fontsCache = PathPiece((os.path.dirname(__file__), 'cache'))
         if not os.path.exists(self.fontsCache):
             os.mkdir(self.fontsCache)

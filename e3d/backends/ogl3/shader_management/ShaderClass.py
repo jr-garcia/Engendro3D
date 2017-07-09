@@ -3,7 +3,6 @@ from glaze.GL import *
 
 from ...base_backend import ShaderStruct
 from .ShaderParametersHelper import getActiveUniforms, getActiveAttribs
-from ....LoggerClass import logger, logLevelsEnum
 
 
 class Shader(object):
@@ -114,11 +113,11 @@ class Shader(object):
         paramHandle = self._uniformsHandlesCache.get(paramName, -1)
         if paramHandle == -1:
             if self._reportInactive:
-                logger.log('Parameter \'{}\' not active or not defined in shader \'{}\'.'.format(paramName, self._iID),
+                self._engine.log('Parameter \'{}\' not active or not defined in shader \'{}\'.'.format(paramName, self._iID),
                            logLevelsEnum.debug)
             return
         if paramValue is None:
-            logger.log('{} value is \'None\'. Ignored for shader \'{}\'.'.format(paramName, self._iID),
+            self._engine.log('{} value is \'None\'. Ignored for shader \'{}\'.'.format(paramName, self._iID),
                        logLevelsEnum.debug)
             return
         try:
@@ -153,7 +152,7 @@ class Shader(object):
                             else:
                                 glUniform1fv(paramHandle, veclen, vecVal)
         except Exception as ex:
-            logger.log('Error: ' + ex.args[0] +
+            self._engine.log('Error: ' + ex.args[0] +
                        ' -> shader ID={} param:{} value:{}'.format(self._iID, paramName, str(type(paramValue))),
                         logLevelsEnum.error)
             raise
@@ -173,7 +172,7 @@ class Shader(object):
                     else:
                         setValueVec4L(paramHandle, val)
             except Exception as ex:
-                logger.log('EffectClass "SeMultipletValues" error: ' + ex.message)
+                self._engine.log('EffectClass "SeMultipletValues" error: ' + ex.message)
 
     def _getUniformHandle(self, paramName):
         """
@@ -212,7 +211,7 @@ class Shader(object):
                 glUniform1i(handle, unit)
                 self._textureLastValues[handle] = value
         else:
-            logger.log('Error: Max fragment textures units reached ({0})'.format(str(self._maxTextureUnits)),
+            self._engine.log('Error: Max fragment textures units reached ({0})'.format(str(self._maxTextureUnits)),
                        logLevelsEnum.warning)
 
     def setStruct(self, structParamName, struct):

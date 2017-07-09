@@ -2,7 +2,7 @@ from _BaseDemo import game, runDemo, tubeMODEL, dwarfMODEL
 
 from math import sin
 from cycgkit.cgtypes import vec3
-from e3d.LoggerClass import logger, logLevelsEnum
+
 
 
 class Demo(game):
@@ -63,8 +63,8 @@ class Demo(game):
             self.dorot = not self.dorot
         if e.keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            logger.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            logger.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
+            self._engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
+            self._engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
                        logLevelsEnum.info)
         if e.keyName == 'g':
             val = self.window.gamma

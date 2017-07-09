@@ -3,12 +3,13 @@ from multiprocessing import Process, cpu_count, Queue
 from multiprocessing.queues import Empty
 from time import sleep
 
-from ..LoggerClass import logger, logLevelsEnum
+
 from .CubeTextureClass import CubeTexture
 from ..events_processing.eventClasses import Event, EventType
 from .TextureManagerServer import serve, TexturesManagerServer
 # from ThreadedSystemClass import ThreadedSystem
 # from ParalellServiceClass import messageType
+from ..Logging import logLevelsEnum
 
 
 class textureLoadedEvent(Event):
@@ -73,7 +74,7 @@ class TexturesManager():
             pass
 
     def createEmpty2DTexture(self, ID, mipmapsNumber, width, height,):
-        logger.log('Using untested createEmpty2DTexture', logLevelsEnum.warning)
+        self._engine.log('Using untested createEmpty2DTexture', logLevelsEnum.warning)
         self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, None, width, height, GL_RGBA8, GL_RGBA)
 
     def _fillTexture(self, args):
@@ -83,7 +84,7 @@ class TexturesManager():
             tex = self._engine.base_backend.createOGL2DTexture(ID, mipmapsNumber, pix, w, h, mode1, mode2, repeat)
             self._textureCache[ID] = tex
         except Exception as ex:
-            logger.log('Error loading texture \'{0}\':\n\t{1}\n'
+            self._engine.log('Error loading texture \'{0}\':\n\t{1}\n'
                        'Using default texture.'.format(ID, str(ex)))
             if self._defaultTexture is None:
                 raise
@@ -119,10 +120,10 @@ class TexturesManager():
                     if raiseOnError:
                         raise RuntimeError('File not Found', filePath)
                     else:
-                        logger.log('Error loading texture \'{0}\'\n'
+                        self._engine.log('Error loading texture \'{0}\'\n'
                                    '\tUsing default texture.'.format(filePath), logLevelsEnum.error)
                 else:
-                    logger.log('Error loading texture \'{0}\'\n'
+                    self._engine.log('Error loading texture \'{0}\'\n'
                                '\tUsing texture found at: {1}'.format(filePath, defaultedpath), logLevelsEnum.error)
                     filePath = defaultedpath
 
@@ -155,7 +156,7 @@ class TexturesManager():
             if not os.path.exists(folderPath):
             #     folderPath = self._engine.io.findPath(folderPath)
             # if not folderPath:
-                logger.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), 1)
+                self._engine.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), logLevelsEnum.error)
 
             cube = CubeTexture(self._engine, ID)
             cube.loadFromFolder(folderPath, TexturesManagerServer.getPILpixels)

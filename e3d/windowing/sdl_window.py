@@ -2,8 +2,9 @@ import ctypes as ct
 import os
 from sdl2 import *
 
-from e3d.LoggerClass import logger
-from e3d.window import Window_Base
+
+from . import Window_Base
+from ..Logging import logLevelsEnum
 
 
 class Window(Window_Base):
@@ -24,7 +25,7 @@ class Window(Window_Base):
         if not self._SDL_Window:
             sdlerr = SDL_GetError()
             msg = u'Error creating window for \'{}\': {}'.format(self.gameName, sdlerr)
-            logger.log(msg)
+            self._engine.log(msg, log)
             raise Exception(msg)
         _, self._context = engine._getNewContext(self._SDL_Window)
         SDL_GL_MakeCurrent(self._SDL_Window, self._context)
@@ -123,7 +124,7 @@ class Window(Window_Base):
     def setIcon(self, path):
         aPath = os.path.abspath(path)
         if not os.path.exists(aPath):
-            logger.log('Window.setIcon error: File {} not found. Skipping.'.format(aPath))
+            self._engine.log('Window.setIcon error: File {} not found. Skipping.'.format(aPath))
             return
         try:
             from PIL import Image
@@ -146,7 +147,7 @@ class Window(Window_Base):
             SDL_FreeSurface(surface)
 
         except Exception as ex:
-            logger.log('Window.setIcon error: ' + str(ex), logLevelsEnum.debug)
+            self._engine.log('Window.setIcon error: ' + str(ex), logLevelsEnum.debug)
             raise
 
     def getMultiSampleNumber(self):

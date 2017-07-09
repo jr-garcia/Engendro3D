@@ -2,7 +2,7 @@ from _do_import import resolve_import
 
 resolve_import()
 
-from e3d.engine import Engine
+from e3d import Engine
 from e3d.backends import OGL3Backend
 from e3d.cameras import SimpleCamera
 from cycgkit.cgtypes import vec3

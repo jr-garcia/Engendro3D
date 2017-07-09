@@ -112,9 +112,8 @@ class Sound(object):
         else:
             self._stop()
 
-
     def terminate(self):
-        print('Urgent Todo: Reimplement Sound system')
+        # Todo: Reimplement Sound system'
         self.stop()
         self.internalSound.deleteSources(self.soundSource)
         # self.internalSound.deleteBuffers(self.soundSource)

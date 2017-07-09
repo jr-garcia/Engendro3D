@@ -2,7 +2,7 @@ from _BaseDemo import game, runDemo, tubeMODEL
 
 from math import sin
 from cycgkit.cgtypes import vec3
-from e3d.LoggerClass import logger, logLevelsEnum
+
 
 
 class Demo(game):
@@ -20,7 +20,6 @@ class Demo(game):
         
     def loadModels(self):
         engine = self.engine
-
         self.scene1.ambientColor = vec3(.004, .006, .009)
         self.scene1.bgColor = vec3(.04, .06, .09)
         # self.camera.rotateX(30)
@@ -28,13 +27,7 @@ class Demo(game):
         self.camera.position = vec3(0, 90, 350)
         
         engine.models.loadSphere("bigspheremodel", 32, radius=1)
-        engine.models.loadSphere("spheremodel", 12)
-        engine.models.loadBox("boxmodel", [6], 1)
-        engine.models.loadBox("pushboxmodel", [50, 10, 10], 1)
         engine.models.loadPlane("floorplane", 1,1,2,2)
-        engine.models.loadPlane("planemodelWalls", 600, 300, 20)
-
-        engine.models.loadModel(tubeMODEL, "tubemodel")
 
         self.ballcount = 0
         self.boxcount = 1
@@ -101,11 +94,11 @@ class Demo(game):
             self.dorot = not self.dorot
         if e.keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            logger.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            logger.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
+            self._engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
+            self._engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
                        logLevelsEnum.info)
-            logger.log('Boxes: ' + str(self.boxcount), logLevelsEnum.debug)
-            logger.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
+            self._engine.log('Boxes: ' + str(self.boxcount), logLevelsEnum.debug)
+            self._engine.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
         if e.keyName == 'g':
             val = self.window.gamma
             print ('old gamma:' + str(val))

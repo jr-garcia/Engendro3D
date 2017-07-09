@@ -1,7 +1,7 @@
 from __future__ import print_function
 from ..commonValues import *
 from bullet.bullet import *
-from ..LoggerClass import logger, logLevelsEnum
+
 
 
 class ScenePhysics(object):
@@ -267,7 +267,7 @@ class e3dMotionState(overridableMotionState):
     #         ob = self.bObject
     #         ob._dirtyP = True
     #     except Exception as ex:
-    #         logger.log('e3dMotionState/setWorldTransform error: ' + ex.message)
+    #         self._engine.log('e3dMotionState/setWorldTransform error: ' + ex.message)
 
     def _setKinematicState(self, pos, rotMat):
         # todo: add offset

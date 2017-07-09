@@ -6,7 +6,7 @@ from copy import deepcopy
 from collections import OrderedDict
 
 from .AnimationModule import Animation, transformationValues
-from ..LoggerClass import logger, logLevelsEnum
+
 from .NodeClass import Node
 from .MeshClass import Mesh, UVCalculationTypeEnum, NormalsCalculationTypeEnum
 from .MaterialClass import Material
@@ -71,9 +71,6 @@ class Skeleton(object):
                         if transformationInfo.position is None:
                             a, b, t = getClosest(keys, time, 'p', sortedKeys)
                             if b is None:
-                                # if a is None:
-                                #     print('pos is none')
-                                #     a = array([0, 0, 0])
                                 transformationInfo.position = a
                             else:
                                 if self.isEqual(a, b):
@@ -84,9 +81,6 @@ class Skeleton(object):
                         if transformationInfo.scale is None:
                             a, b, t = getClosest(keys, time, 's', sortedKeys)
                             if b is None:
-                                # if a is None:
-                                #     print('scale is none')
-                                #     a = [1, 1, 1]
                                 transformationInfo.scale = a
                             else:
                                 if self.isEqual(a, b):
@@ -97,9 +91,6 @@ class Skeleton(object):
                         if transformationInfo.rotation is None:
                             a, b, t = getClosest(keys, time, 'r', sortedKeys)
                             if b is None:
-                                # if a is None:
-                                # print('rot is none')
-                                # a = array([1, 0, 0, 0])
                                 transformationInfo.rotation = a
                             else:
                                 if self.isEqual(a, b):
@@ -205,27 +196,27 @@ class Model:
                   | pp.aiProcess_OptimizeMeshes | pp.aiProcess_GenUVCoords | pp.aiProcess_ImproveCacheLocality | \
                   pp.aiProcess_OptimizeGraph
 
-        logger.meassure('starts assimp scene loading')
+
 
         try:
             scene = aiImportFile(filepath, ppsteps)
         except Exception as ex:
-            logger.log("Pyassimp load exception: " + str(ex))
+            self._engine.log("Pyassimp load exception: " + str(ex))
             raise
 
-        logger.meassure('finished pure loading. Starts nodes check and extraction')
+
 
         if scene is None:
-            logger.log("The scene failed to import.")
+            self._engine.log("The scene failed to import.")
             raise Exception("The scene failed to import.")
 
         if scene.mNumMeshes == 0:
-            logger.log("The imported scene has no meshes.")
+            self._engine.log("The imported scene has no meshes.")
             raise Exception("The imported scene has no meshes.")
 
         cnode = scene.mRootNode
         if cnode.mNumMeshes == 0 and cnode.mNumChildren == 0:
-            logger.log("The root node has nothing readable.")
+            self._engine.log("The root node has nothing readable.")
             raise Exception("The root node has nothing readable.")
 
         newModel._directory = path.dirname(filepath)
@@ -233,7 +224,7 @@ class Model:
         try:
             newModel.cacheMaterials(scene.mMaterials)
         except Exception as ex:
-            logger.log('Error caching materials: ' + str(ex))
+            self._engine.log('Error caching materials: ' + str(ex))
             raise
 
         if scene.mNumAnimations > 0 and not forceStatic:
@@ -241,7 +232,7 @@ class Model:
                 newModel._getAnimations(scene.mAnimations)
             except Exception as ex:
                 ex.message = 'Error extracting animations: ' + ex.message
-                logger.log(ex.message)
+                self._engine.log(ex.message)
                 raise
             try:
                 # bnode = newModel.__getSkeletonRoot(scene.rootnode)
@@ -250,7 +241,7 @@ class Model:
                 newModel.hasBones = True
             except Exception as ex:
                 ex.message = 'Error building model\'s skeleton: ' + ex.message
-                logger.log(ex.message)
+                self._engine.log(ex.message)
                 raise
 
         world = mat4.identity()
@@ -260,7 +251,7 @@ class Model:
                                                     lastUVs, uvsFilled, newModel.boneDict, forceStatic, scene.mMeshes)
 
             if pretransformAccuracy >= 0:
-                logger.meassure('Pre calculating animation frames')
+
                 for a in newModel.animations.values():
                     newModel.__preTransformNode(newModel.rootNode, a, pretransformAccuracy)
 
@@ -269,10 +260,10 @@ class Model:
 
         except Exception as ex:
             ex.args = ('ModelClass - Error creating root node: ' + str(ex),)
-            logger.log(str(ex))
+            self._engine.log(str(ex))
             raise
 
-        logger.meassure('Model import finished.')
+
         return newModel
 
     def __get_bounding_box(self, bb):
@@ -315,7 +306,7 @@ class Model:
                     bb += 1
 
     def cacheMaterials(self, materialsList):
-        logger.meassure('material caching starts({0} materials)'.format(str(len(materialsList))))
+
 
         def tryDecode(properties):
             newDict = {}
@@ -354,21 +345,21 @@ class Model:
                     if not path.exists(tp):
                         tp = path.join(self._directory, path.basename(val))
                     if not path.exists(tp):
-                        logger.log('Material error in {0}:\n{1}'.format(tp, 'File not found.'), 1)
+                        self._engine.log('Material error in {0}:\n{1}'.format(tp, 'File not found.'), 1)
                         glMaterial.diffuseTextureID = "default"
                         glMaterial.useDiffuseTexture = True
                     try:
                         self._textures.loadTexture(tp, tp)
                         glMaterial.diffuseTextureID = tp
                     except Exception as ex:
-                        logger.log('Material error in {0}:\n{1}'.format(val, ex.message), 1)
+                        self._engine.log('Material error in {0}:\n{1}'.format(val, ex.message), 1)
                         glMaterial.diffuseTextureID = "default"
                     finally:
                         glMaterial.useDiffuseTexture = True
 
             self.materials.append(glMaterial)
 
-        logger.meassure('material caching ends')
+
 
     @staticmethod
     def checkcolor(col):

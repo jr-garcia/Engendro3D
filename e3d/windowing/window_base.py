@@ -1,11 +1,12 @@
 from time import time
 import os
 
-from e3d.LoggerClass import logger, logLevelsEnum
+
 from e3d.events_processing.EventsListenerClass import EventsListener
 from e3d.events_processing.EventsManagerClass import EventsManager
 from e3d.gui.GuiManagerClass import GuiManager
 from e3d.update_management.updateMethods import updateAll
+from e3d.Logging import logLevelsEnum
 
 
 class Window_Base(object):
@@ -35,7 +36,7 @@ class Window_Base(object):
             @param gameName: Used fro automatic functions, like Screenshot saving
             @type parent: long
             """
-        self.engine = engine
+        self._engine = engine
         self.firstRunCallback = None
         self.renderBeginCallback = None
         self.renderEndCallback = None
@@ -77,7 +78,7 @@ class Window_Base(object):
             self._fullscreenSize = FullScreenSize
         else:
             self._fullscreenSize = self._size
-        logger.log(u'Starting new window for: ' + self.gameName, 0)
+        self._engine.log(u'Starting new window for: ' + self.gameName, 0)
 
         self._createInternalWindow(title, engine, fullscreen)
 
@@ -90,13 +91,13 @@ class Window_Base(object):
         if iconPath:
             self.setIcon(iconPath)
         else:
-            self.setIcon(os.path.join(self.engine.path.defaults.textures, 'e3dlogo.png'))
+            self.setIcon(os.path.join(self._engine.path.defaults.textures, 'e3dlogo.png'))
 
-        self.gui.initialize(self.engine, self.backend, self.engine.textures.getDefaultTexture(), self)
+        self.gui.initialize(self._engine, self.backend, self._engine.textures.getDefaultTexture(), self)
 
         self._startupTime = int(round(time() * float(1000)))
 
-        logger.log('Window created for: ' + self.gameName, 0)
+        self._engine.log('Window created for: ' + self.gameName, 0)
 
     def __repr__(self):
         return self.title
@@ -138,7 +139,7 @@ class Window_Base(object):
             lastFPSCalcElapsed = self._netTime - self._lastTime
             self._calculateFPS(lastFPSCalcElapsed)
         except KeyboardInterrupt:
-            logger.log('KeyboardInterrupt.', logLevelsEnum.info)
+            self._engine.log('KeyboardInterrupt.', logLevelsEnum.info)
             self.close()
 
     def _performSwap(self):
@@ -173,7 +174,7 @@ class Window_Base(object):
 
     def _sizeChanged(self, w, h):
         """Reshape the OpenGL viewport based on the dimensions of the window."""
-        self.engine.scenes.currentScene.currentCamera.updateFOV(w, h)
+        self._engine.scenes.currentScene.currentCamera.updateFOV(w, h)
         self._makeContextCurrent()
         self.backend.resize((w, h))
 
@@ -183,7 +184,7 @@ class Window_Base(object):
         self.setFullScreen(False)
         self.backend.terminate()
 
-        logger.log(u'Window for {} closed.'.format(self.gameName))
+        self._engine.log(u'Window for {} closed.'.format(self.gameName), logLevelsEnum.info)
 
     def hasFocus(self):
         return self._isFocused

@@ -3,7 +3,7 @@ from os import stat, path, listdir
 from glaze.GL import *
 
 from .ShaderClass import Shader
-from ....LoggerClass import logger, logLevelsEnum
+from ....Logging import logLevelsEnum
 from ...base_backend import CompilationError
 
 
@@ -63,7 +63,7 @@ class ShadersManager(object):
         self._maxTextureUnits = ret[0]
         # GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS  ->   for all shader stages
         # GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS    ->   for vertex shader stage
-        logger.log('Max Texture Units per fragment shader: ' + str(self._maxTextureUnits), logLevelsEnum.debug)
+        self._engine.log('Max Texture Units per fragment shader: ' + str(self._maxTextureUnits), logLevelsEnum.debug)
         dire = path.join(self._engine.path, 'defaults', 'shaders')
         vs = path.join(dire, "defaultVS.glsl")
         fs = path.join(dire, "defaultFS.glsl")
@@ -94,14 +94,14 @@ class ShadersManager(object):
             try:
                 absVSfilename = path.abspath(VSfilename)
                 if not path.exists(absVSfilename):
-                    logger.log(absVSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
+                    self._engine.log(absVSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
                     absVSfilename = path.join(self._engine.path, 'defaults', 'shaders', VSfilename)
                 with open(absVSfilename, 'r') as vs:
                     vertexSource = str.join("", vs.readlines())
 
                 absFSfilename = path.abspath(FSfilename)
                 if not path.exists(absFSfilename):
-                    logger.log(absFSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
+                    self._engine.log(absFSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
                     absFSfilename = path.join(self._engine.path, 'defaults', 'shaders', FSfilename)
                 with open(absFSfilename, 'r') as fs:
                     fragmentSource = str.join("", fs.readlines())
@@ -136,11 +136,11 @@ class ShadersManager(object):
             self._shadersCache[ID].terminate()
             self._shadersCache[ID] = newEffect
             vsfs = "shader \'{}\' refreshed".format(ID)
-            logger.log(vsfs, logLevelsEnum.info)
+            self._engine.log(vsfs, logLevelsEnum.info)
         except CompilationError as ex:
             parsed = _dissectShaderCompilingErrors(ex.args[1], self._engine.globals.oglversionraw)
             vsfs = "Error refreshing \'{}\' {} SHADER: \n".format(ID, ex.args[0].upper()) + parsed
-            logger.log(CompilationError(vsfs), logLevelsEnum.error)
+            self._engine.log(CompilationError(vsfs), logLevelsEnum.error)
 
     @staticmethod
     def checkAndCompile(source, shaderType):

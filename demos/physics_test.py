@@ -1,8 +1,8 @@
-from _physics_base import Demo as game, runDemo
+from _physics_base import Demo as game, runDemo, tubeMODEL
 
 from math import sin
 from cycgkit.cgtypes import vec3
-from e3d.LoggerClass import logger, logLevelsEnum
+
 
 
 class Demo(game):
@@ -10,7 +10,14 @@ class Demo(game):
         game.__init__(self)
 
     def loadModels(self):
+        engine = self.engine
         game.loadModels(self)
+        engine.models.loadSphere("spheremodel", 12)
+        engine.models.loadBox("boxmodel", [6], 1)
+        engine.models.loadBox("pushboxmodel", [50, 10, 10], 1)
+        engine.models.loadPlane("planemodelWalls", 600, 300, 20)
+
+        engine.models.loadModel(tubeMODEL, "tubemodel")
         self.camera.position = vec3(0, 90, 350)
 
         self.bigSphere = self.scene1.addModel('bigspheremodel', 'bigSphere', [0, 10, 0], [0, 0, 0], 25, mass=8)

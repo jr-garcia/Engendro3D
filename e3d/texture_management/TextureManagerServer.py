@@ -82,7 +82,7 @@ class TexturesManagerServer():
             if not os.path.exists(folderPath):
                 folderPath = self.manfred.io.findPath(folderPath)
             if not folderPath:
-                logger.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), 1)
+                self._engine.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), 1)
 
             cube = CubeTexture(self.manfred, ID)
             cube.loadFromFolder(folderPath, TexturesManagerServer.getPILpixels)

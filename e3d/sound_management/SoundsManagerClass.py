@@ -50,7 +50,7 @@ class SoundsManager(object):
         """
         sn = self._buffers.get(ID)
         if self._used.get(ID, False):
-            logger.log('The sound buffer is in use. Remove first all sounds that use it.')
+            self._engine.log('The sound buffer is in use. Remove first all sounds that use it.')
             return False
         if sn is not None:
             b = self._buffers.pop(ID)

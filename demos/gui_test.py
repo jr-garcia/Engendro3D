@@ -2,7 +2,7 @@ from _do_import import resolve_import
 
 resolve_import()
 
-from e3d.engine import Engine, logLevelsEnum
+from e3d import Engine, logLevelsEnum
 from e3d.backends import OGL3Backend
 from e3d.cameras import SimpleCamera
 from e3d.gui import *
@@ -25,7 +25,7 @@ class game:
         nsize = [640, 480]
 
         # Initialize the Engine
-        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], logLevel=logLevelsEnum.debug)
+        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1])
         self.engine.initialize()
 
         # Create the Engendro3D.Window

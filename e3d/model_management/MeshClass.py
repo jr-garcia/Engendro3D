@@ -4,7 +4,7 @@ from cycgkit.cgtypes import *
 from cycgkit.boundingbox import BoundingBox
 from numpy import arccos, arctan2, array, float32, ndarray, pi, sqrt, uint32
 
-from ..LoggerClass import logger
+
 from ..commonValues import scaleNumber
 
 
@@ -70,9 +70,11 @@ class Mesh(object):
         @param useChannel0AsUVChannel:
         @param lastUVs:
         @rtype : Mesh
+        @param boneDict:
+        @type boneDict: dict
         """
 
-        logger.meassure('check for uv\'s presence')
+
         newMesh_hasTexCoords = mesh.HasTextureCoords
         if isinstance(useChannel0AsUVChannel, int) and useChannel0AsUVChannel > 0:
             newMesh_hasTexCoords[useChannel0AsUVChannel] = True
@@ -100,12 +102,10 @@ class Mesh(object):
         try:
             if len(lastUVs) > 0:
                 lastind = int(lastUVs[0][2])
-                # print('lastind start: ' + str(lastind))
                 v = 0
                 while v <= mesh.mNumVertices - 1:
                     texCoords[useChannel0AsUVChannel].append(lastUVs[lastind])
                     lastind += 1
-                    # print('next lastind: ' + str(lastind))
                     v += 1
                 lastUVs[0][2] += float(v)
         except Exception as ex:
@@ -116,7 +116,6 @@ class Mesh(object):
         nMesh = Mesh.fromObjectInfo(vertices, mesh.mFaces, None, texCoords, normals, tangents, bitangents, transform,
                                     bones, colours, mesh.mMaterialIndex, boneDict)
 
-        # return Mesh.fromAssimpMesh2(mesh, transform, useChannel0AsUVChannel, lastUVs, boneDict, forceStatic)
         return nMesh
 
     @staticmethod
@@ -149,7 +148,7 @@ class Mesh(object):
         if normals is None:
             normals = NormalsCalculationTypeEnum.hard
         if len(normals) < len(vertices) or isinstance(normals, type(NormalsCalculationTypeEnum.smooth)):
-            logger.meassure('calculate normals')
+
             if normals == NormalsCalculationTypeEnum.hard:
                 normals, vertices, faces = Mesh.calculateHardNormals(vertices, faces)
                 reindexingRequired = True
@@ -158,7 +157,7 @@ class Mesh(object):
 
         hasNormals = True
 
-        logger.meassure('calculate UVs')
+
         uvsTypes = [list, ndarray]
         hasAnyTex = False
         if type(UVsOrCalculationType) in uvsTypes:
@@ -195,7 +194,7 @@ class Mesh(object):
             newMesh._hasTexCoords[0] = True
 
         if newMesh._hasTexCoords[0] and (tangents is None and bitangents is None):
-            logger.meassure('Creating Tangents/Bitangents')
+
             tangents, bitangents = Mesh.calculateTanBitan(vertices, faces, texCoords[0], normals)
             hasTangents = True
             # hasBiTangents = True
@@ -204,7 +203,7 @@ class Mesh(object):
         bitangents = [list(b) for b in bitangents]
 
         if reindexingRequired:
-            logger.meassure('Re-indexing')
+
             res = Mesh.reIndexMesh(vertices, faces, normals, tangents, bitangents, texCoords[0])
             vertices, faces, normals, tangents, bitangents, texCoords[0] = res
             # TODO: Properly fix all present texcoord channels
@@ -213,7 +212,7 @@ class Mesh(object):
         # _4intStride = np.empty((1,), np.int).strides[0] * 4
         newMesh._stride = _3floatStride
 
-        logger.meassure('"Declarations" creation')
+
         newMesh._declaration = [VertexDeclaration("position", 0)]
         if hasColors:
             newMesh._declaration.append(VertexDeclaration("color", newMesh._stride))
@@ -239,13 +238,13 @@ class Mesh(object):
                 newMesh.boneOffsets[b.mName] = mat4(b.mOffsetMatrix.tolist())
 
         # if baketrans and transform != mat4.identity():
-        logger.meassure('baking transformations')
+
         vertices = transformVec(transform, vertices, baketrans)
         normals = transformVec(invTranspose, normals, baketrans)
         tangents = transformVec(invTranspose, tangents, baketrans)
         bitangents = transformVec(invTranspose, bitangents, baketrans)
 
-        logger.meassure('create new vertex buffer')
+
         vertexStream = []
         if minmax:
             newMesh._minmax = minmax
@@ -311,7 +310,7 @@ class Mesh(object):
                                         newMesh.boneMinMax[bName] = [vl, vl]
                                 bb += 1
                             else:
-                                logger.log('Vertex {} is affected by more than 4 bones.'.format(currentVertexN))
+                                self._engine.log('Vertex {} is affected by more than 4 bones.'.format(currentVertexN))
                             b.mWeights.remove(w)
                             break
                 vertexStream.extend(bonewl)
@@ -319,7 +318,7 @@ class Mesh(object):
 
             currentVertexN += 1
 
-        logger.meassure('Create VBOs')
+
 
         newMesh._vertexBufferArray = array(vertexStream, float32)
         newMesh._indexBufferArray = array(faces, dtype=uint32).flatten()
@@ -327,7 +326,7 @@ class Mesh(object):
         newMesh._VertexCount = len(vertices)
         newMesh._PrimitiveCount = len(faces)
         newMesh._IndexCount = len(faces) * 3
-        logger.meassure('done mesh')
+
 
         return newMesh
 

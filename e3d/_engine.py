@@ -6,12 +6,12 @@ from glaze.GL import loadGL, glGetIntegerv, glGetStringi, glGetString, GL_NUM_SH
     GL_SHADING_LANGUAGE_VERSION, \
     GL_VERSION, GL_NUM_EXTENSIONS, GL_EXTENSIONS, glEnable, GL_MULTISAMPLE
 
-from .LoggerClass import logger, logLevelsEnum
+from .Logging import _Logger, logLevelsEnum
 from .backends.base_backend import BaseBackend
 from .events_processing.EventsManagerClass import Event, EventsManager
 from .scene_management.ScenesManagerClass import ScenesManager
 from .texture_management.TextureManagerClass import TexturesManager
-from .window.sdl_window import Window
+from .windowing.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
 
 
@@ -28,13 +28,13 @@ class globalsStruct:
 
 
 class Engine:
-    def __init__(self, backend, multiSampleLevel, maxContext=(2, 1), logLevel=logLevelsEnum.error, useQT=False):
-        logger.logLevel = logLevel
+    def __init__(self, backend, multiSampleLevel=0, maxContext=(2, 1), useQT=False):
+        self._logger = _Logger()
         if not useQT:
             # Init SDL>>>>>>>>>>>>>>>>>>>>>>>>>
             if SDL_Init(SDL_INIT_EVERYTHING) != 0:
                 sdlerr = self.getSDLError()
-                logger.log('Error on SDL init: ' + sdlerr)
+                self.log('Error on SDL init: ' + sdlerr, logLevelsEnum.error)
                 raise Exception('Error on SDL init: ' + sdlerr)
 
         self.maxContext = maxContext
@@ -68,32 +68,32 @@ class Engine:
     def _initializeManagers(self, maxThreads):
         # self.localqueue = Queue()
 
-        logger.log('Initializing systems...')
+        self.log('Initializing systems...', logLevelsEnum.debug)
 
-        print('\t Shaders...')
+        self.log('\t Shaders...', logLevelsEnum.debug)
         self.shaders = self.base_backend.getShadersManager()()
         self.shaders.initialize(self)
 
-        print('\t Textures...')
+        self.log('\t Textures...', logLevelsEnum.debug)
         self.textures.initialize(self, (None, None))
 
-        print('\t Models...')
+        self.log('\t Models...', logLevelsEnum.debug)
         from .model_management.ModelsManagerClass import ModelsManager
         self.models = ModelsManager()
         self.models.initialize(self)
 
-        print('\t Sounds...')
+        self.log('\t Sounds...', logLevelsEnum.debug)
         from .sound_management.SoundsManagerClass import SoundsManager
         self.sounds = SoundsManager()
 
-        # print('\t IOHelper...')
+        # self.log('\t IOHelper...', logLevelsEnum.debug)
         # from .IOHelperClass import IOHelper
         # self.io = IOHelper()
 
-        print('\t Threading...')
+        self.log('\t Threading...', logLevelsEnum.debug)
         self.threading.initialize(maxThreads)
 
-        print('\t Scenes...')
+        self.log('\t Scenes...', logLevelsEnum.debug)
         self.scenes.initialize(self)
 
     def __setAttribs(self, multiSampleLevel, restrictContextTo):
@@ -109,7 +109,7 @@ class Engine:
             else:
                 if depth == 16:
                     error = 'Error setting depth size: ' + self.getSDLError()
-                    logger.log(error)
+                    self.log(error)
                     raise RuntimeError(error)
 
         if restrictContextTo:
@@ -122,13 +122,13 @@ class Engine:
 
         if SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1) != 0:
             error = 'Error setting SDL shared context flag: ' + self.getSDLError()
-            logger.log(error)
+            self.log(error)
             raise RuntimeError(error)
 
         isDOubleBuffered = not SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
         if not isDOubleBuffered:
-            logger.log('Error setting SDL double buffer flag: ' + self.getSDLError(), logLevelsEnum.info)
+            self.log('Error setting SDL double buffer flag: ' + self.getSDLError(), logLevelsEnum.info)
 
         if multiSampleLevel is not None and multiSampleLevel > 0:
             self._multisampleFallback(multiSampleLevel, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN)
@@ -136,7 +136,7 @@ class Engine:
         # Next causes multisample to fail.
         # if SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) != 0:
         #     error = 'Error setting SDL hw acceleration flag: ' + self.getSDLError()
-        #     logger.log(error)
+        #     self.log(error)
         #     raise RuntimeError(error)
 
     def updateLoop(self):
@@ -160,7 +160,7 @@ class Engine:
                 pass
 
     def _terminateManagers(self):
-        logger.log('Terminating systems...')
+        self.log('Terminating systems...', logLevelsEnum.debug)
         self.textures.terminate()
         self.shaders.terminate()
         self.sounds.terminate()
@@ -192,7 +192,7 @@ class Engine:
 
         :rtype: e3DGLWidget
         """
-        from .window.qt_window import e3DGLWidget
+        from .windowing.qt_window import e3DGLWidget
         win = e3DGLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
         return win
 
@@ -211,12 +211,12 @@ class Engine:
             self._fillSuportedGLSLVersions()
         except:
             pass
-        logger.log('OpenGL version: ' + str(self.globals.oglversionraw), logLevelsEnum.info)
-        logger.log('GLSL version: {}.{}'.format(self.globals.glslmajor, self.globals.glslminor), logLevelsEnum.info)
+        self.log('OpenGL version: ' + str(self.globals.oglversionraw), logLevelsEnum.info)
+        self.log('GLSL version: {}.{}'.format(self.globals.glslmajor, self.globals.glslminor), logLevelsEnum.info)
         if len(self.globals.glslall) > 0:
-            logger.log('{} GLSL supported versions'.format(len(self.globals.glslall)), logLevelsEnum.debug)
+            self.log('{} GLSL supported versions'.format(len(self.globals.glslall)), logLevelsEnum.debug)
             for ver in self.globals.glslall:
-                logger.log('{} GLSL supported'.format(ver))
+                self.log('{} GLSL supported'.format(ver))
 
     def _fillSuportedGLSLVersions(self):
         import numpy as np
@@ -230,7 +230,7 @@ class Engine:
     def logSupportedExtensions(self):
         num = glGetIntegerv(GL_NUM_EXTENSIONS)
         for e in range(num):
-            logger.log(glGetStringi(GL_EXTENSIONS, e))
+            self.log(glGetStringi(GL_EXTENSIONS, e), logLevelsEnum.info)
 
     def __createDummyWindowAndContext(self):
         if not self._useQT:
@@ -258,7 +258,7 @@ class Engine:
             self.globals.dummyWindow = QGLWidget(format)
         except Exception as ex:
             error = 'Error creating dummy window: ' + str(ex)
-            logger.log(error)
+            self.log(error, logLevelsEnum.error)
             raise RuntimeError(error)
 
         try:
@@ -277,7 +277,7 @@ class Engine:
         sdlerr = self.getSDLError()
         if self.globals.dummyWindow is None or sdlerr != '':
             error = 'Error creating dummy window: ' + sdlerr
-            logger.log(error)
+            self.log(error, logLevelsEnum.error)
             raise RuntimeError(error)
 
         try:
@@ -298,7 +298,7 @@ class Engine:
             if not newContext:
                 sdlerr = self.getSDLError()
                 error = 'Error creating context: ' + sdlerr
-                logger.log(error)
+                self.log(error, logLevelsEnum.error)
                 raise RuntimeError(error)
         else:
             newContext = self.globals.dummyWindow.context()
@@ -309,7 +309,7 @@ class Engine:
         window = None
         ms = SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1)
         if ms < 0:
-            logger.log('Error setting multisample: ' + self.getSDLError())
+            self.log('Error setting multisample: ' + self.getSDLError(), logLevelsEnum.warning)
             self.globals.multisample = False
         else:
             self.globals.multisample = True
@@ -327,10 +327,10 @@ class Engine:
 
             level -= 1
             if level > 0:
-                logger.log('Error setting multisample level {}. Trying {}'.format(level + 1, level), logLevelsEnum.info)
+                self.log('Error setting multisample level {}. Trying {}'.format(level + 1, level), logLevelsEnum.info)
 
         if level == 0:
-            logger.log('Multisample disabled: ' + self.getSDLError() + ".")
+            self.log('Multisample disabled: ' + self.getSDLError() + ".")
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0)
 
         if window:
@@ -350,7 +350,7 @@ class Engine:
         try:
             self._terminateManagers()
         except Exception as ex:
-            logger.log('Error in \'Engine.terminate\': ' + str(ex))
+            self.log('Error in \'Engine.terminate\': ' + str(ex), logLevelsEnum.error)
         if not self._useQT:
             SDL_GL_DeleteContext(self.globals.dummyContext)
             SDL_DestroyWindow(self.globals.dummyWindow)
@@ -358,7 +358,10 @@ class Engine:
         else:
             self.globals.dummyWindow.doneCurrent()
             self.globals.dummyWindow.deleteLater()
-        logger.log('Engine Terminated. Logger closed.')
+        self.log('Engine Terminated. Logger closed.', logLevelsEnum.info)
+
+    def log(self, message, messageType=logLevelsEnum.debug):
+        self._logger.log(message, messageType)
 
 
 class PathPiece(str):

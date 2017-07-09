@@ -3,7 +3,7 @@ from PySide import QtGui
 from PySide.QtCore import Qt
 
 
-from .base import Window_Base
+from .window_base import Window_Base
 
 
 class e3DGLWidget(Window_Base, QGLWidget):

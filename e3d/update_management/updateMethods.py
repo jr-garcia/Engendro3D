@@ -1,5 +1,5 @@
 def updateAll(window, netElapsedTime):
-    engine = window.engine
+    engine = window._engine
     winSize = window.size
     engine.shaders.update()
 

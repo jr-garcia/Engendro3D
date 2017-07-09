@@ -413,6 +413,7 @@ class OGL3Backend(BaseBackend):
 
     @staticmethod
     def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, mode1, mode2, repeat=True):
+        glGetError()
         tex = np.array([0], np.uint32)
         glGenTextures(1, tex)
         glerr = glGetError()
@@ -423,7 +424,7 @@ class OGL3Backend(BaseBackend):
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         if mipmapsNumber < 0:
             mipmapsNumber = 0
-        print(glGetError(), "textures load")
+
         # MANDATORY  >>>>>>>>>>>
         if repeat:
             edgeMode = GL_REPEAT
@@ -448,12 +449,16 @@ class OGL3Backend(BaseBackend):
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
 
         glTexImage2D(GL_TEXTURE_2D, 0, mode1, w, h, 0, mode2, GL_UNSIGNED_BYTE, pix)
+        glerr = glGetError()
+        if glerr:
+            raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
+
         if mipmapsNumber > 0 and repeat:
             try:
                 glEnable(GL_TEXTURE_2D)
                 glGenerateMipmap(GL_TEXTURE_2D)
             except Exception:
-                logger.log('Error generating mipmaps for {}: glerror {}'.format(ID, glGetError()),
+                self._engine.log('Error generating mipmaps for {}: glerror {}'.format(ID, glGetError()),
                            logLevelsEnum.warning)
                 # glBindTexture(GL_TEXTURE_2D, 0) #Raises shader compiling error on intel GMA 965 + Windows
         # glFlush()

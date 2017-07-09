@@ -1,6 +1,6 @@
 from .FullScreenEffectClass import FullScreenEffect
 from ..backends.RenderTargetBase import attachmentTypeEnum, renderTextureTypeEnum
-from ..LoggerClass import logger, logLevelsEnum
+
 from ..backends.base_backend import CompilationError, BaseBackend
 
 from glaze.GL import glDetachShader
@@ -79,7 +79,7 @@ class FSEManager(object):
                 self._buildTechnique(fse)
                 self._buildRenderTarget(fse)
         except Exception as ex:
-            logger.log('Error adding effect \'{}\' {}'.format(ID, str(ex)))
+            self._engine.log('Error adding effect \'{}\' {}'.format(ID, str(ex)))
             raise
         return fse
 

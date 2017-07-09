@@ -231,7 +231,7 @@ cdef class Shader:
                     else:
                         setValueVec4L(paramHandle, val)
             except Exception, ex:
-                logger.log('EffectClass "SeMultipletValues" error: ' + ex.message)
+                self._engine.log('EffectClass "SeMultipletValues" error: ' + ex.message)
         print('setmulti out')
 
     def _getUniformHandle(self, paramName):
@@ -276,7 +276,7 @@ cdef class Shader:
                 glUniform1i(handle, unit)
                 self._textureLastValues[handle] = value
         else:
-            logger.log('Error: Max fragment textures units reached ({0})'.format(str(self._maxTextureUnits)),
+            self._engine.log('Error: Max fragment textures units reached ({0})'.format(str(self._maxTextureUnits)),
                        logLevelsEnum.warning)
 
     def setStruct(self, structParamName, struct):

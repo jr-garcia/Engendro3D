@@ -1,7 +1,7 @@
 from _physics_base import Demo as game, runDemo
 
 from cycgkit.cgtypes import vec3
-from e3d.LoggerClass import logger, logLevelsEnum
+
 
 
 class Demo(game):
@@ -9,6 +9,7 @@ class Demo(game):
         game.__init__(self)
 
     def loadModels(self):
+        engine = self.engine
         game.loadModels(self)
         self.camera.position = vec3(0, 10, 250)
 

@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 
-from ..LoggerClass import logger, logLevelsEnum
+
 from .ModelClass import Model
 from .geomModelsModule import geomTypeEnum
 import math
@@ -27,8 +27,6 @@ class ModelsManager(object):
         @param engine:
         @type engine:
         """
-        from glaze.GL import glGetError
-        print(glGetError(), "models")
         self._engine = engine
         self.textures = engine.textures
         self._shaders = engine.shaders
@@ -62,7 +60,7 @@ class ModelsManager(object):
            increase performance since the start of the animations. Recomended to set to -1 only when debugging.
         """
 
-        logger.meassure('starts load model')
+
 
         if useChannel0AsUVChannel > 0:
             try:
