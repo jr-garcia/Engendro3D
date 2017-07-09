@@ -12,7 +12,7 @@ uniform vec4 fontBorderColor = vec4(0, 0 ,0 , 1.0);
 uniform float fontWeight = .5;
 uniform float f_gamma = 0.1;
 uniform float fb_gamma = 0.2;
-uniform bool showSDF=False;
+uniform bool showSDF=false;
 
 uniform vec3 realScale;
 uniform vec3 realSize;
@@ -38,7 +38,7 @@ void main()
         vec4 sampled = vec4(texture2D(DiffuseTexture, f_texcoord));
         float dist = median(sampled.r, sampled.g, sampled.b);
        	float nweight = 1.0 - fontWeight;
-       	float nborder = .2;//1.0 - (fontBorder - fontWeight);
+       	float nborder = 1.0 - (fontBorder - fontWeight);
         float falpha = smoothstep(nweight - f_gamma, nweight + f_gamma, dist);
         float balpha = smoothstep(nborder - fb_gamma, nborder + fb_gamma, dist);
         float fbalpha = smoothstep(nweight - fb_gamma, nweight + fb_gamma, dist);

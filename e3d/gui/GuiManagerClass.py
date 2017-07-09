@@ -225,7 +225,7 @@ class GuiManager:
         rangeInfo.charDataDict = newCharData
         return rangeInfo
 
-    def loadFont(self, ID, fontPath, baseSize=34, maxAtlasWidth=1024, charRange=CharRangesEnum.latin, force=False):
+    def loadFont(self, ID, fontPath, baseSize=32, maxAtlasWidth=1024, charRange=CharRangesEnum.latin, force=False):
         destinationFolder = self.fontsCache
         fontName = os.path.splitext(os.path.basename(fontPath))[0]
         fullDestPath = os.path.abspath(destinationFolder)

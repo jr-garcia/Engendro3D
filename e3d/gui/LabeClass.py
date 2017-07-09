@@ -52,7 +52,7 @@ class Label(BaseControl):
         self._children.clear()
         for c in self._text:
             newChar = SingleChar(vec3(0, 0, 1), [1, 1], c, self, self._fontID, self._fontBorder, self._fontBorderColor,
-                                 self._fontColor, self._fontWeight, borderSize=0,  # color=[1.0, 0, 0, .5]
+                                 self._fontColor, self._fontWeight, borderSize=0,
                                  color=[0, 0, 0, 0])
             self._chars.append(newChar)
         self._setCharsRatio()

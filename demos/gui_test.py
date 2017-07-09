@@ -169,13 +169,13 @@ class game:
 
         self.char = SingleChar([.12, .12], [.6, .6], '?', self.onelayer)
         self.char.fontBorderColor = vec4(1, 0, 0, 1)
-        self.char.fontBorder = 0.1
+        self.char.fontBorder = 0.2
         self.char.fontWeight = .5
 
         self.label1 = Label([.02, .09], [.8, .08], 'Gui needs a lot of work.', parent=textLayer,
                             fontID='default')
         self.label2 = Label([.05, .4], [.8, .2], '%#@%^%(*)!', parent=textLayer, fontID='auto',
-                            fontColor=[.5, .5,0, .8], fontBorder=.01, fontBorderColor=[0, 1, 0, 1])
+                            fontColor=[.5, .5, 0, .8], fontBorder=1.1, fontBorderColor=[0, 1, 0, 1])
 
         self.label3 = Label([.02, .8], [.97, .05], 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
 
