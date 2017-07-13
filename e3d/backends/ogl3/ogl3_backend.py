@@ -2,6 +2,7 @@ import numpy as np
 from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
+from os import path
 
 from .RenderTarget_OGL3 import RenderTarget
 from .shader_management.ShadersManagerClass import ShadersManager
@@ -317,7 +318,10 @@ class OGL3Backend(BaseBackend):
 
     def __createScreenQuadStuff(self):
         self._screenQuadVBO = VBO(data=self.screenQuad_array, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
-        self.screenQuadShader = self.shaders.loadShader('default_sq_VS.vs', 'default_sq_FS.fs', 'default_sqShader')
+        shadersPath = self._engine.path.defaults.shaders
+        vs = path.join(shadersPath, 'default_sq_VS.vs')
+        fs = path.join(shadersPath, 'default_sq_FS.fs')
+        self.screenQuadShader = self.shaders.loadShader(vs, fs, 'default_sqShader')
 
     def renderMeshes(self, drawingData):
         for mesh in drawingData.meshes:

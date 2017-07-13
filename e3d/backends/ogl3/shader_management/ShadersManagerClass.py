@@ -94,15 +94,17 @@ class ShadersManager(object):
             try:
                 absVSfilename = path.abspath(VSfilename)
                 if not path.exists(absVSfilename):
-                    self._engine.log(absVSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
-                    absVSfilename = path.join(self._engine.path, 'defaults', 'shaders', VSfilename)
+                    self._engine.log(absVSfilename + ' not found. Searching in default location.',
+                                     logLevelsEnum.warning)
+                    absVSfilename = path.join(self._engine.path.defaults.shaders, VSfilename)
                 with open(absVSfilename, 'r') as vs:
                     vertexSource = str.join("", vs.readlines())
 
                 absFSfilename = path.abspath(FSfilename)
                 if not path.exists(absFSfilename):
-                    self._engine.log(absFSfilename + ' not found. Searching in default location.', logLevelsEnum.info)
-                    absFSfilename = path.join(self._engine.path, 'defaults', 'shaders', FSfilename)
+                    self._engine.log(absFSfilename + ' not found. Searching in default location.',
+                                     logLevelsEnum.warning)
+                    absFSfilename = path.join(self._engine.path.defaults.shaders, FSfilename)
                 with open(absFSfilename, 'r') as fs:
                     fragmentSource = str.join("", fs.readlines())
 
