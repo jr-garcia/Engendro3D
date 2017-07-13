@@ -38,12 +38,15 @@ class Animation(object):
             keysDict[time] = transformationValues()
 
     def printIt(self):
-        print('Animation Name   : {}\n'
-              'Duration seconds : {}\n'
-              'Bone count       : {}'.format(self.name, round(float(self.duration) / self.ticks, 2),
-                                             len(self.boneKeys))
-              )
+        import logging
+        logger = logging.getLogger(__name__)
+        data = '\n' \
+               '\tAnimation Name   : {}\n' \
+               '\tDuration seconds : {}\n' \
+               '\tBone count       : {}'.format(self.name, round(float(self.duration) / self.ticks, 2), len(self.boneKeys))
 
+        logger.debug(data)
+        
 
 class transformationValues(object):
     def __init__(self):

@@ -78,7 +78,7 @@ class Window_Base(object):
             self._fullscreenSize = FullScreenSize
         else:
             self._fullscreenSize = self._size
-        self._engine.log(u'Starting new window for: ' + self.gameName, 0)
+        self._engine.log(u'Starting new window for: ' + self.gameName, logLevelsEnum.info)
 
         self._createInternalWindow(title, engine, fullscreen)
 
