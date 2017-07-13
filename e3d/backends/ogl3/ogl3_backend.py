@@ -215,7 +215,7 @@ class OGL3Backend(BaseBackend):
                             indexes.append(ind)
                             targetsIDs.append(outID)
 
-                if indexes.__len__() > 0:
+                if len(indexes) > 0:
                     rt._activate(aTypes, indexes)
 
                 for txID in passOb.members['in']:
@@ -355,15 +355,15 @@ class OGL3Backend(BaseBackend):
                     currentShader = self._engine.shaders._shadersCache[currentMat.shaderID]
                     if currentShader is None:
                         raise RuntimeError('Shader {} not found'.format(currentMat.shaderID))
-                    if not currentShader._isSet:
-                        currentShader.set()
-                        _setSceneUniforms(currentShader, drawingData.defaultSceneParams)
-                        # attribs = OGL3Backend.enableAttributes(mesh, currentShader)
-                    if resetRequired:
-                        OGL3Backend.disableAttributes(attribs)
-                        attribs = OGL3Backend.enableAttributes(mesh, currentShader)
-                        currentShader.reset()
-                        resetRequired = False
+                if not currentShader._isSet:
+                    currentShader.set()
+                    _setSceneUniforms(currentShader, drawingData.defaultSceneParams)
+                    # attribs = OGL3Backend.enableAttributes(mesh, currentShader)
+                if resetRequired:
+                    OGL3Backend.disableAttributes(attribs)
+                    attribs = OGL3Backend.enableAttributes(mesh, currentShader)
+                    currentShader.reset()
+                    resetRequired = False
 
                 _setObjectUniforms(currentShader, defaultObjectParams)
                 if transformations:
@@ -548,6 +548,12 @@ class OGL3Backend(BaseBackend):
             glDeleteVertexArrays(len(vaoarr), vaoarr)
 
             # todo: delete sky and fsq buffers
+
+    @staticmethod
+    def _getMaxColorAttachments():
+        ret = np.empty((1,), np.int32)
+        glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, ret)
+        return int(ret)
 
 
 class VBO:

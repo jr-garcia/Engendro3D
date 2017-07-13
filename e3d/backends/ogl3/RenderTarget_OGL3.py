@@ -19,12 +19,15 @@ class RenderTarget(RTBase):
         # ftype = GL_BYTE # GL_FLOAT
         comp = GL_DEPTH_COMPONENT
         ftype = GL_FLOAT
-        texture = np.empty((1,), np.uint32)
-        glGenTextures(1, texture)
+
         if '_depth' not in self._textures._textureCache:
+            texture = np.empty((1,), np.uint32)
+            glGenTextures(1, texture)
             self._textures._textureCache['_depth'] = texture
-        #  GL_DEPTH_ATTACHMENT                                               GL_DEPTH_STENCIL_ATTACHMENT
-        self.__addAtachmentToFrameBuffer(self.textureType, size, comp, ftype, GL_DEPTH_ATTACHMENT, texture)
+        else:
+            texture = self._textures._textureCache['_depth']
+
+        self._addAtachmentToFrameBuffer(self.textureType, size, comp, ftype, GL_DEPTH_ATTACHMENT, texture)
         res = self._isStatusWrong()
         # glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0)
         if not res:
@@ -52,7 +55,7 @@ class RenderTarget(RTBase):
         # if hasStencil:
         #     comp = GL_DEPTH_COMPONENT
         #     type = GL_FLOAT
-        #     self.__addAtachmentToFrameBuffer(textureType, comp, type, GL_STENCIL_ATTACHMENT, textures)
+        #     self._addAtachmentToFrameBuffer(textureType, comp, type, GL_STENCIL_ATTACHMENT, textures)
         res = self._isStatusWrong()
         if res:
             raise RuntimeError("Error creating the RenderTarget: " + res)
@@ -66,7 +69,7 @@ class RenderTarget(RTBase):
         else:
             return None
 
-    def __addAtachmentToFrameBuffer(self, textureType, size, comp, type, atachType, texture):
+    def _addAtachmentToFrameBuffer(self, textureType, size, comp, type, atachType, texture):
         width, height = size
         if textureType == renderTextureTypeEnum.t2D:
             glBindTexture(GL_TEXTURE_2D, texture)
@@ -108,7 +111,7 @@ class RenderTarget(RTBase):
         @param colorIndexes: Set to -1 to activate all color atachments
         @type colorIndexes:  list
         """
-        # Todo:make this process dependent of renderMan to avoid confusion
+        # Todo:make this process dependent of backend to avoid confusion
         if not isinstance(atachmentTypes, list):
             atachmentTypes = [atachmentTypes]
 
@@ -195,11 +198,8 @@ class RenderTarget(RTBase):
             attachType = getattr(GL, 'GL_COLOR_ATTACHMENT' + str(unit))
             comp = GL_RGBA
             ttype = GL_UNSIGNED_BYTE
-            if texturesSize == 1:
-                texun = textures
-            else:
-                texun = textures[unit]
-            self.__addAtachmentToFrameBuffer(self.textureType, size, comp, ttype, attachType, texun)
+            texun = textures[unit]
+            self._addAtachmentToFrameBuffer(self.textureType, size, comp, ttype, attachType, texun)
             tIDs.append((ID, texun))
 
         self._textures._addTextureIDs(tIDs)

@@ -27,7 +27,7 @@ class FSEManager(object):
         self._e3dShaders = {}
         self._builtRenderTargets = {}
         self._engine = engine
-        # self.__maxColorAtachments = ? # todo:get this from backend with: glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS)
+        self._maxColorAtachments = engine.base_backend._getMaxColorAttachments()
         self._sceneRT = None
         self.renderTarget = engine.base_backend.getRenderTarget()
         self._backend = backend
@@ -44,7 +44,7 @@ class FSEManager(object):
         return rt
 
     def _getMaxColorAtachments(self):
-        return self.__maxColorAtachments
+        return self._maxColorAtachments
 
     maxColorAtachments = property(_getMaxColorAtachments)
 

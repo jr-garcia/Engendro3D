@@ -18,7 +18,7 @@ class RTBase:
         Object that allows render to texture.
 
         @type textureType: renderTextureTypeEnum
-        @type engine: engine
+        @type engine: Engine
         @rtype : RTBase
         """
         self._attachments = {}
@@ -31,7 +31,11 @@ class RTBase:
 
         self._texturesDict = {}
 
-    def __addAtachmentToFrameBuffer(self, textureType, size, comp, type, atachType, texture):
+    def __repr__(self):
+        return 'colors={}, depth={}, active={}'.format(len(self._attachments), self._hasDepth,
+                                                       str(self._isActive).upper())
+
+    def _addAtachmentToFrameBuffer(self, textureType, size, comp, type, atachType, texture):
         pass
 
     def getSizeAsList(self):

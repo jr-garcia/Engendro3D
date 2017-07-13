@@ -113,6 +113,7 @@ class Demo(_Demo_Base):
         engine.scenes.currentSceneID = 'scene1'
 
     def loadModels(self):
+        engine = self.engine
         engine.models.loadModel(duckMODEL, "duckmodel", forceStatic=True)
         self.duck = self.scene1.addModel('duckmodel', 'duck1', vec3(0, -20, -10), vec3(0), 1)
         # mat = self.duck.getMaterialByIndex(0)

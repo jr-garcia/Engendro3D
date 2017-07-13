@@ -51,16 +51,18 @@ class _Demo_Base:
         self.window.FPS_UpdatedCallback = self.updateTitle
 
         self.window.firstRunCallback = self.onFirstRun
+
+        self.scene0 = self.engine.scenes.addScene('scene0')
+        self.scene0.beforeUpdateCallback = self.defUpdate
+        self.scene0.ambientColor = vec3(.2, .0, .05)
+        self.engine.scenes.currentSceneID = 'scene0'
         self.engine.updateLoop()
 
     def onFirstRun(self, e):
         listener = EventsListener()
         listener.onCustomEvent = self.customEvent
         self.window.events.addListener('main', listener)
-        self.scene0 = self.engine.scenes.addScene('scene0')
-        self.scene0.beforeUpdateCallback = self.defUpdate
-        self.scene0.ambientColor = vec3(.2, .0, .05)
-        self.engine.scenes.currentSceneID = 'scene0'
+
         self.loadTextures()
 
     def defUpdate(self, e):
@@ -68,6 +70,7 @@ class _Demo_Base:
             self.engine.log('All Textures Loaded.')
             self.prepareScene()
             self.loadModels()
+            self.addLights()
             self.buildGui()
             self.window.onKeyEvent = self.keydown
             self.window.onMouseEvent = self.mouseMove
@@ -118,8 +121,7 @@ class _Demo_Base:
 
         self.engine.log('Switch scene 0 >> 1', logLevelsEnum.debug)
         engine.scenes.setCurrentSceneID('scene1')
-        self.loadModels()
-        self.addLights()
+
 
     def loadModels(self):
         pass

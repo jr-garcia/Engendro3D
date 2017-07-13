@@ -64,7 +64,7 @@ class Shader(object):
         return self._activeUniforms
 
     def __repr__(self):
-        return self._iID
+        return 'ID={} active={}'.format(self._iID, self._isSet)
 
     def __int__(self):
         return self._program

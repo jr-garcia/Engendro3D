@@ -49,6 +49,10 @@ class BaseBackend(object):
 
     poligonsDrawnThisUpdate = property(_getPoliCount)
 
+    @staticmethod
+    def _getMaxColorAttachments():
+        pass
+
 
 class ShaderStruct(OrderedDict):
     def __init__(self, *args, **kwds):
