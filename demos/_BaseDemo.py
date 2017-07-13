@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s - %(name)s',
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 logging.getLogger('PIL').setLevel(logging.ERROR)
 from cycgkit.cgtypes import vec3
@@ -17,7 +17,7 @@ from _model_paths import *
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
 
-class game:
+class _Demo_Base:
 
     camera = None
 
@@ -66,8 +66,8 @@ class game:
     def defUpdate(self, e):
         if self.pendingTex == 0:
             self.engine.log('All Textures Loaded.')
-            self.buildGui()
             self.prepareScene()
+            self.buildGui()
             self.window.onKeyEvent = self.keydown
             self.window.onMouseEvent = self.mouseMove
             self.scene0.beforeUpdateCallback = None

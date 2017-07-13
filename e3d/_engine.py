@@ -42,19 +42,20 @@ class Engine:
         self.base_backend = backend
         self.path = EngineRoot((path.dirname(__file__),))
 
-        self.models = None
         self.events = EventsManager()
-        self.shaders = None
         self.textures = TexturesManager()
         self.scenes = ScenesManager()
-        self.sounds = None
-        self.io = None
         self.threading = ThreadingManager()
         self.globals = globalsStruct()
+        self.models = None
+        self.shaders = None
+        self.sounds = None
+        self.io = None
         self.localqueue = None
         self._running = False
         self._windows = {}
         self._useQT = useQT
+        self._isInitialized = False
 
         if not useQT:
             self.__setAttribs(multiSampleLevel, maxContext)
@@ -64,6 +65,7 @@ class Engine:
         loadGL()
         self._fillGLInfo()
         self._initializeManagers(maxThreads)
+        self._isInitialized = True
 
     def _initializeManagers(self, maxThreads):
         # self.localqueue = Queue()
@@ -160,14 +162,15 @@ class Engine:
                 pass
 
     def _terminateManagers(self):
-        self.log('Terminating systems...', logLevelsEnum.debug)
-        self.textures.terminate()
-        self.shaders.terminate()
-        self.sounds.terminate()
-        self.scenes.terminate()
-        self.threading.terminate()
+        if self._isInitialized:
+            self.log('Terminating systems...', logLevelsEnum.debug)
+            self.textures.terminate()
+            self.shaders.terminate()
+            self.sounds.terminate()
+            self.scenes.terminate()
+            self.threading.terminate()
 
-        # self.localqueue.close()
+            # self.localqueue.close()
 
     def postEvent(self, event):
         if not issubclass(type(event), Event) or not isinstance(event, Event):
@@ -182,6 +185,8 @@ class Engine:
 
         :rtype: Window
         """
+        if not self._isInitialized:
+            raise RuntimeError('engine is not initialized')
         win = Window(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
         self._windows[id(win)] = win
         return win
@@ -192,6 +197,9 @@ class Engine:
 
         :rtype: e3DGLWidget
         """
+
+        if not self._isInitialized:
+            raise RuntimeError('engine is not initialized')
         from .windowing.qt_window import e3DGLWidget
         win = e3DGLWidget(self, title, gameName, size, FullScreenSize, fullscreen, vSynch, iconPath)
         return win
@@ -206,7 +214,7 @@ class Engine:
         ss3 = ssb[0].split('.')
         self.globals.glslmajor = int(ss3[0])
         self.globals.glslminor = int(ss3[1])
-        # if ss3[0] == '4' and int(ss3[1]) >= 30:
+
         try:
             self._fillSuportedGLSLVersions()
         except:
@@ -352,13 +360,15 @@ class Engine:
         except Exception as ex:
             self.log('Error in \'Engine.terminate\': ' + str(ex), logLevelsEnum.error)
         if not self._useQT:
-            SDL_GL_DeleteContext(self.globals.dummyContext)
-            SDL_DestroyWindow(self.globals.dummyWindow)
+            if self._isInitialized:
+                SDL_GL_DeleteContext(self.globals.dummyContext)
+                SDL_DestroyWindow(self.globals.dummyWindow)
             SDL_Quit()
         else:
-            self.globals.dummyWindow.doneCurrent()
-            self.globals.dummyWindow.deleteLater()
-        self.log('Engine Terminated. Logger closed.', logLevelsEnum.info)
+            if self._isInitialized:
+                self.globals.dummyWindow.doneCurrent()
+                self.globals.dummyWindow.deleteLater()
+        self.log('Engine Terminated', logLevelsEnum.info)
 
     def log(self, message, messageType=logLevelsEnum.debug):
         self._logger.log(message, messageType)

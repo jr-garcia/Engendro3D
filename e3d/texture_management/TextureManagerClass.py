@@ -187,7 +187,8 @@ class TexturesManager():
 
     def terminate(self):
         try:
-            self.remotequeue.put_nowait(('close', []))
+            pass
+            # self.remotequeue.put_nowait(('close', []))
             # self.remotequeue.close()
         except BrokenPipeError:
             pass

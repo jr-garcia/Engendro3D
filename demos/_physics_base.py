@@ -1,11 +1,10 @@
-from _BaseDemo import game, runDemo, tubeMODEL
+from _BaseDemo import _Demo_Base, runDemo, tubeMODEL
 
 from math import sin
 from cycgkit.cgtypes import vec3
 
 
-
-class Demo(game):
+class Demo(_Demo_Base):
     def __init__(self):
         game.__init__(self)
         self.texturesToLoad = [

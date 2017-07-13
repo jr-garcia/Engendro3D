@@ -3,8 +3,7 @@ from _physics_base import Demo as game, runDemo
 from cycgkit.cgtypes import vec3
 
 
-
-class Demo(game):
+class Demo(_Demo_Base):
     def __init__(self):
         game.__init__(self)
 
