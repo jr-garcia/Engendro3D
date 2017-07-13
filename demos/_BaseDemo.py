@@ -67,6 +67,7 @@ class _Demo_Base:
         if self.pendingTex == 0:
             self.engine.log('All Textures Loaded.')
             self.prepareScene()
+            self.loadModels()
             self.buildGui()
             self.window.onKeyEvent = self.keydown
             self.window.onMouseEvent = self.mouseMove

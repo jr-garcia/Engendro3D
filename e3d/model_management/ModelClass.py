@@ -13,6 +13,7 @@ from .MaterialClass import Material
 from .geomModelsModule import geomTypeEnum, getObjectInfo
 from ..physics_management.physicsModule import bodyShapesEnum
 from .interpolation import getClosest, Lerp
+from ..Logging import logLevelsEnum
 
 
 class Skeleton(object):
@@ -179,8 +180,7 @@ class Model:
         self._preShape = bodyShapesEnum.box
 
     @staticmethod
-    def fromFile(filepath, engine, pretransformAccuracy, useChannel0AsUVChannel, lastUVs, uvsFilled,
-                 forceStatic=False):
+    def fromFile(filepath, engine, pretransformAccuracy, useChannel0AsUVChannel, lastUVs, uvsFilled, forceStatic=False):
         """
 
         @rtype : Model
@@ -196,15 +196,11 @@ class Model:
                   | pp.aiProcess_OptimizeMeshes | pp.aiProcess_GenUVCoords | pp.aiProcess_ImproveCacheLocality | \
                   pp.aiProcess_OptimizeGraph
 
-
-
         try:
             scene = aiImportFile(filepath, ppsteps)
         except Exception as ex:
             self._engine.log("Pyassimp load exception: " + str(ex))
             raise
-
-
 
         if scene is None:
             self._engine.log("The scene failed to import.")
@@ -263,7 +259,6 @@ class Model:
             self._engine.log(str(ex))
             raise
 
-
         return newModel
 
     def __get_bounding_box(self, bb):
@@ -307,7 +302,6 @@ class Model:
 
     def cacheMaterials(self, materialsList):
 
-
         def tryDecode(properties):
             newDict = {}
             for n, v in properties.items():
@@ -330,7 +324,7 @@ class Model:
                     glMaterial._ID = val
                 elif 'OPACITY' in prop:
                     glMaterial.opacity = val
-                # elif 'clr.ambient' in prop:
+                    # elif 'clr.ambient' in prop:
                     # glMaterial.ambientColor = self.checkcolor(val)
                 elif 'COLOR_DIFFUSE' in prop:
                     glMaterial.diffuseColor = self.checkcolor(val)
@@ -345,21 +339,20 @@ class Model:
                     if not path.exists(tp):
                         tp = path.join(self._directory, path.basename(val))
                     if not path.exists(tp):
-                        self._engine.log('Material error in {0}:\n{1}'.format(tp, 'File not found.'), 1)
+                        self._engine.log('Material error in {0}:\n{1}'.format(tp, 'File not found.'),
+                                         logLevelsEnum.debug)
                         glMaterial.diffuseTextureID = "default"
                         glMaterial.useDiffuseTexture = True
                     try:
                         self._textures.loadTexture(tp, tp)
                         glMaterial.diffuseTextureID = tp
                     except Exception as ex:
-                        self._engine.log('Material error in {0}:\n{1}'.format(val, ex.message), 1)
+                        self._engine.log('Material error in {0}:\n{1}'.format(val, ex.message), logLevelsEnum.debug)
                         glMaterial.diffuseTextureID = "default"
                     finally:
                         glMaterial.useDiffuseTexture = True
 
             self.materials.append(glMaterial)
-
-
 
     @staticmethod
     def checkcolor(col):
