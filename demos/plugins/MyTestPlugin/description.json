@@ -1,0 +1,6 @@
+{
+    "authorEmail": "Dummy plugin to test plugin creation",
+    "description": "JR-Garc\u00eda",
+    "name": "My Test Plugin",
+    "authorName": "some@example.com"
+}
