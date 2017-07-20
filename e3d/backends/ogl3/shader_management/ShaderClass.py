@@ -135,7 +135,7 @@ class Shader(object):
                     elif arrType in [int, bool]:
                         vecVal = np.asarray(paramValue, np.int32)
                     else:
-                        raise TypeError('array type {} not supported.'.format(arrType))
+                        raise TypeError('\'{}\' array type not supported.'.format(arrType))
                     if 'mat4' in str(type(paramValue)):
                         glUniformMatrix4fv(paramHandle, 1, 0, vecVal.reshape((-1)))
                     elif 'mat3' in str(type(paramValue)):

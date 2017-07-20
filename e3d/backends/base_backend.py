@@ -126,7 +126,7 @@ def setMaterialValues(textures, shader, mat):
     setUnif("Opacity", float(mat.opacity))
     setUnif("UseDiffuseTexture", mat.useDiffuseTexture)
     setUnif("UpSideDownTextures", mat.upSideDownTextures)
-    setUnif('TextureRepeat', float(mat.textureRepeat))
+    setUnif('TextureRepeat', mat._textureRepeatAsVec3)
     if mat.useDiffuseTexture:
         setText("DiffuseTexture", mat.diffuseTextureID)
     # else:

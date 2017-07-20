@@ -10,7 +10,8 @@ class Material(object):
         self._specCol = vec3(1.0, 1.0, 1.0)
         self.specularPower = 40.0
         self._shaderID = "default"
-        self.textureRepeat = 1.0
+        self._textureRepeat = (1.0, 1.0)
+        self._textureRepeatAsVec3 = vec3(1.0, 1.0, 0)
         self.diffuseTextureID = ""
         self.specularMapTextureID = ""
         self.emissiveMapTextureID = ""
@@ -75,6 +76,19 @@ class Material(object):
             raise TypeError('type {} not supported for color assigment. Use list of len=3, vec3 or single number.'.format(str(type(value))))
 
         return vec3(nvalue)
+
+    @property
+    def textureRepeat(self):
+        return self._textureRepeat
+
+    @textureRepeat.setter
+    def textureRepeat(self, value):
+        if not hasattr(value, '__getitem__') or len(value) < 2:
+            raise TypeError('repeat value must be a 2-tuple')
+
+        self._textureRepeat = value
+        self._textureRepeatAsVec3[0] = value[0]
+        self._textureRepeatAsVec3[1] = value[1]
 
     @staticmethod
     def _fromMaterial(baseMat):

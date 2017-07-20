@@ -4,12 +4,9 @@ from math import sin
 from cycgkit.cgtypes import vec3
 
 
-
 class Demo(_Demo_Base):
     def __init__(self):
-        game.__init__(self)
-        self.texturesToLoad = [
-            ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
+        _Demo_Base.__init__(self)
 
     def loadModels(self):
         engine = self.engine
@@ -50,10 +47,6 @@ class Demo(_Demo_Base):
         self.tk4._materials[0] = mt
 
         engine.models.loadPlane("floorplane", 500, 500, 6)
-        # engine.models.loadPlane("planemodel1", 1, 5)
-        # IMPORTANT!: High number of segments (tesselation) is needed for large objects. See:
-        # https://www.opengl.org/archives/resources/features/KilgardTechniques/oglpitfall/
-        # 2. Poor Tessellation Hurts Lighting
         self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1)
         mt = self.floor._materials[0]
         # self.floor._materials[0]  =mt

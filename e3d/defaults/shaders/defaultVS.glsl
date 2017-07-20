@@ -25,7 +25,7 @@ uniform mat4 ModelViewProjection;
 uniform mat4 ModelView;
 uniform mat3 NormalMatrix;
 uniform mat4 View;
-uniform float TextureRepeat;
+uniform vec3 TextureRepeat;
 uniform mat4 BoneTransforms[50];
 uniform mat4 BoneTransformsIT[50];
 uniform bool HasBones;
@@ -77,7 +77,7 @@ vec4 addBoneMat(vec4 pos, vec4 bind, vec4 bweights, mat4 transforms[50])
 
 void main()
 {
-    f_texcoord0 = texcoord0 * TextureRepeat;
+    f_texcoord0 = vec2(texcoord0.x * TextureRepeat.x, texcoord0.y * TextureRepeat.y);
     if (UpSideDownTextures)
         f_texcoord0.y = 1.0 - f_texcoord0.y;
 

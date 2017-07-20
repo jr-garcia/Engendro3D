@@ -10,6 +10,7 @@ from .TextureManagerServer import serve, TexturesManagerServer
 # from ThreadedSystemClass import ThreadedSystem
 # from ParalellServiceClass import messageType
 from ..Logging import logLevelsEnum
+from .._baseManager import BaseManager
 
 
 class textureLoadedEvent(Event):
@@ -19,11 +20,12 @@ class textureLoadedEvent(Event):
         self.textureID = textureID
 
 
-class TexturesManager():
+class TexturesManager(BaseManager):
     textureLoaded = 'textureLoaded'
 
     def __init__(self):
         # ThreadedSystem.__init__(self)
+        super(TexturesManager, self).__init__()
         self._textureCache = {}
         self._cubeTexCache = {}
         self._context = None
