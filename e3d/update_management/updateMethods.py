@@ -1,6 +1,9 @@
 def updateAll(window, netElapsedTime):
     engine = window._engine
     winSize = window.size
+
+    engine.plugins.preUpdatePlugins()
+
     engine.shaders.update()
 
     # engine.textures.checkQueue()
@@ -13,5 +16,7 @@ def updateAll(window, netElapsedTime):
                                     currentCamera._rotationMatrix)
 
     guiDrawingData = window.gui.updateGui(winSize)
+
+    engine.plugins.postUpdatePlugins()
 
     return sceneDrawingData, guiDrawingData

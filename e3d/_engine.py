@@ -13,6 +13,7 @@ from .scene_management.ScenesManagerClass import ScenesManager
 from .texture_management.TextureManagerClass import TexturesManager
 from .windowing.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
+from .plugin_management.PluginsManagerClass import PluginsManager
 
 
 class globalsStruct:
@@ -46,6 +47,7 @@ class Engine:
         self.textures = TexturesManager()
         self.scenes = ScenesManager()
         self.threading = ThreadingManager()
+        self.plugins = PluginsManager()
         self.globals = globalsStruct()
         self.models = None
         self.shaders = None
@@ -97,6 +99,9 @@ class Engine:
 
         self.log('\t Scenes...', logLevelsEnum.debug)
         self.scenes.initialize(self)
+
+        self.log('\t Plugins...', logLevelsEnum.debug)
+        self.plugins.initialize(self)
 
     def __setAttribs(self, multiSampleLevel, restrictContextTo):
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8)
@@ -169,6 +174,7 @@ class Engine:
             self.sounds.terminate()
             self.scenes.terminate()
             self.threading.terminate()
+            self.plugins.terminate()
 
             # self.localqueue.close()
 

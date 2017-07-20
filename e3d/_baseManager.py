@@ -3,7 +3,7 @@ class BaseManager(object):
         self._engine = None
 
     def initialize(self, engine):
-        pass
+        self._engine = engine
 
     def terminate(self):
         pass
