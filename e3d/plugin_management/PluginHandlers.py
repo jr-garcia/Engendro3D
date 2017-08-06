@@ -1,4 +1,3 @@
-from gzip import GzipFile
 from os import path
 from shutil import make_archive
 import os
