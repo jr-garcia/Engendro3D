@@ -3,12 +3,51 @@ from .PluginHandlers import PluginDescription, _Plugin
 from .RunnableClass import MAINFILENAME, MAINCLASSNAME, Runnable
 from sys import version_info
 from os import path
-from shutil import unpack_archive, rmtree
+from shutil import rmtree
 from tempfile import mkdtemp
 
 if version_info[0] == 2:
     import imp
+
+
+    def unpack_archive(filename, extract_dir=None, format=None):
+        """Unpack an archive.
+        >> copied from python 3 source <<
+
+        `filename` is the name of the archive.
+
+        `extract_dir` is the name of the target directory, where the archive
+        is unpacked. If not provided, the current working directory is used.
+
+        `format` is the archive format: one of "zip", "tar", or "gztar". Or any
+        other registered format. If not provided, unpack_archive will use the
+        filename extension and see if an unpacker was registered for that
+        extension.
+
+        In case none is found, a ValueError is raised.
+        """
+        if extract_dir is None:
+            extract_dir = os.getcwd()
+
+        if format is not None:
+            try:
+                format_info = _UNPACK_FORMATS[format]
+            except KeyError:
+                raise ValueError("Unknown unpack format '{0}'".format(format))
+
+            func = format_info[1]
+            func(filename, extract_dir, **dict(format_info[2]))
+        else:
+            # we need to look at the registered unpackers supported extensions
+            format = _find_unpack_format(filename)
+            if format is None:
+                raise ReadError("Unknown archive format '{0}'".format(filename))
+
+            func = _UNPACK_FORMATS[format][1]
+            kwargs = dict(_UNPACK_FORMATS[format][2])
+            func(filename, extract_dir, **kwargs)
 else:
+    from shutil import unpack_archive
     if version_info[1] < 5:
         from importlib.machinery import SourceFileLoader
     else:
@@ -83,11 +122,10 @@ class PluginsManager(BaseManager):
     def terminate(self):
         for ID, p in self._plugins.items():
             try:
-                p.mainClass.terminate()                
+                p.mainClass.terminate()
             except Exception as ex:
                 self._engine.log('plugin \'{}\' failed to terminate:\n\t{}'.format(p.description.name, str(ex)))
             try:
                 rmtree(self._tempPluginPaths[ID])
             except Exception as ex:
                 self._engine.log('error removing plugin \'{}\' folder:\n\t{}'.format(p.description.name, str(ex)))
-

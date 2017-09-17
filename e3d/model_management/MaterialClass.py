@@ -83,7 +83,9 @@ class Material(object):
 
     @textureRepeat.setter
     def textureRepeat(self, value):
-        if not hasattr(value, '__getitem__') or len(value) < 2:
+        if isinstance(value, (int, float)):
+            value = (value, value)
+        elif not hasattr(value, '__getitem__') or len(value) < 2:
             raise TypeError('repeat value must be a 2-tuple')
 
         self._textureRepeat = value
