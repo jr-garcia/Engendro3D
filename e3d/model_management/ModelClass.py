@@ -335,14 +335,7 @@ class Model:
                 elif 'SHININNESS' in prop:
                     glMaterial.specularPower = val
                 elif 'TEXTURE_BASE' in prop:
-                    tp = path.abspath(val)
-                    if not path.exists(tp):
-                        tp = path.join(self._directory, path.basename(val))
-                    if not path.exists(tp):
-                        self._engine.log('Material error in {0}:\n{1}'.format(tp, 'File not found.'),
-                                         logLevelsEnum.debug)
-                        glMaterial.diffuseTextureID = "default"
-                        glMaterial.useDiffuseTexture = True
+                    tp = self.findTexturePath(val)
                     try:
                         self._textures.loadTexture(tp, tp)
                         glMaterial.diffuseTextureID = tp
@@ -353,6 +346,22 @@ class Model:
                         glMaterial.useDiffuseTexture = True
 
             self.materials.append(glMaterial)
+
+    def findTexturePath(self, val):
+        tp = path.abspath(val)
+        if not path.exists(tp):
+            self._engine.log('Material error in {0}:\n{1}'.format(tp, 'Texture file not found.'), logLevelsEnum.debug)
+            tp = path.join(self._directory, path.basename(val))
+        if not path.exists(tp):
+            self._engine.log('Material error in {0}:\n{1}'.format(tp, 'Texture file not found.'), logLevelsEnum.debug)
+            name, ext = path.splitext(path.basename(val))
+            if ext.islower():
+                ext = ext.upper()
+            else:
+                ext = ext.lower()
+            newName = name + ext
+            tp = path.join(self._directory, newName)
+        return tp
 
     @staticmethod
     def checkcolor(col):

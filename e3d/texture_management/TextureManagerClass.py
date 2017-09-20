@@ -2,6 +2,7 @@ import os
 from multiprocessing import Process, cpu_count, Queue
 from multiprocessing.queues import Empty
 from time import sleep
+from warnings import warn
 
 
 from .CubeTextureClass import CubeTexture
@@ -108,7 +109,7 @@ class TexturesManager(BaseManager):
         @param filePath:
         @param ID:
         """
-        print('forcing serial texture load')
+        warn('forcing serial texture load')
         filePath = os.path.abspath(filePath)
         tex = self._textureCache.get(ID)
         getdefault = False
