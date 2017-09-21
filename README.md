@@ -40,7 +40,7 @@ Please refer to each project's documentation for specific instructions on how to
 
 ### Usage
 
-No docs for the moment. Check the 'demos' folder for examples.
+No docs for the moment. Check the 'demos' folder for examples and screenshots.
  
 <hr>
  
