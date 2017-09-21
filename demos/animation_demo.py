@@ -4,10 +4,9 @@ from math import sin
 from cycgkit.cgtypes import vec3
 
 
-
 class Demo(_Demo_Base):
     def __init__(self):
-        game.__init__(self)
+        super(Demo, self).__init__()
         self.texturesToLoad = [
             ['e3dlogo.png', 'logo']]
 

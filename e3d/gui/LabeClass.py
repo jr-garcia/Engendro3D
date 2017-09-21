@@ -48,8 +48,10 @@ class Label(BaseControl):
     def _updateText(self):
         self._isBuilt = True
         self._dirtyProperties = False
-        self._chars.clear()
-        self._children.clear()
+        try:
+            self._children.clear()
+        except AttributeError:
+            self._children = []
         for c in self._text:
             newChar = SingleChar(vec3(0, 0, 1), [1, 1], c, self, self._fontID, self._fontBorder, self._fontBorderColor,
                                  self._fontColor, self._fontWeight, borderSize=0,

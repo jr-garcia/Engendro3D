@@ -9,6 +9,7 @@ from e3d.gui import *
 
 from cycgkit.cgtypes import *
 from random import randint as ri, random as rf
+from string import printable
 
 import _model_paths
 import os
@@ -69,8 +70,9 @@ class game:  # TODO: Inherith from _BaseDemo
                 self.label3.text = self.label3.text[:len(self.label3.text) - 1]
                 return
             try:
-                if chr(e.keyCode).isprintable():
-                    self.label3.text += chr(e.keyCode)
+                letter = chr(e.keyCode)
+                if letter in printable:
+                    self.label3.text += letter
             except ValueError:
                 pass
             return
