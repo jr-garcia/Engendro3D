@@ -196,7 +196,7 @@ class Shader(object):
     def setTexture(self, samplerName, value):
         if value is None or value < 1:
             raise ValueError('Wrong value for texture')
-        if self._textureUnitsUsed <= self._maxTextureUnits:
+        if self._textureUnitsUsed + 1 <= self._maxTextureUnits:
             handle = self._uniformsHandlesCache.get(samplerName, -1)
             if handle > -1:
                 lastValue = self._textureLastValues.get(handle)

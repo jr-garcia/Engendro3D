@@ -14,7 +14,7 @@ import _model_paths
 import os
 
 
-class game:
+class game:  # TODO: Inherith from _BaseDemo
     def __init__(self, title):
         self.label = None
         self.onelayer = None
@@ -116,7 +116,7 @@ class game:
             self.camera.moveRight(movespeed)
 
     def updateTitle(self, ev):
-        self.window.title = "FPS: {0} | Frame: {1} | Engendro3D OpenGL - Alpha 0.5".format(ev[0], ev[1])
+        self.window.title = "FPS: {0} | Frame: {1} | Engendro3D OpenGL - Alpha 0.6".format(ev[0], ev[1])
 
     def close(self):
         self.window.close()
@@ -172,8 +172,7 @@ class game:
         self.char.fontBorder = 0.2
         self.char.fontWeight = .5
 
-        self.label1 = Label([.02, .09], [.8, .08], 'Gui needs a lot of work.', parent=textLayer,
-                            fontID='default')
+        self.label1 = Label([.02, .09], [.8, .08], 'Gui needs a lot of work.', parent=textLayer, fontID='default')
         self.label2 = Label([.05, .4], [.8, .2], '%#@%^%(*)!', parent=textLayer, fontID='auto',
                             fontColor=[.5, .5, 0, .8], fontBorder=1.1, fontBorderColor=[0, 1, 0, 1])
 

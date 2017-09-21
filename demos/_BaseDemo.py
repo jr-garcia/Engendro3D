@@ -17,7 +17,7 @@ from _model_paths import *
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
 
-class _Demo_Base:
+class _Demo_Base(object):
 
     camera = None
 
@@ -102,8 +102,10 @@ class _Demo_Base:
             # self.isWaitingTex = True
             self.engine.textures.loadTexture(args[0], args[1], args[2])
 
-        self.engine.log('Loading Textures.', logLevelsEnum.info)
-        list(map(loadTexture, self.texturesToLoad))
+        texCount = len(self.texturesToLoad)
+        if texCount > 0:
+            self.engine.log('Loading {} Textures.'.format(texCount), logLevelsEnum.info)
+            list(map(loadTexture, self.texturesToLoad))
 
     def prepareScene(self):
         engine = self.engine

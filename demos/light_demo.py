@@ -5,10 +5,9 @@ from random import random, randint
 from cycgkit.cgtypes import vec3
 
 
-
 class Demo(_Demo_Base):
     def __init__(self):
-        game.__init__(self)
+        super(Demo, self).__init__()
         self.texturesToLoad = [['e3dlogo.png', 'logo'], ['./textures/n_deep.png', 'defND', True],
             ['./textures/n_irr.png', 'defNI', True], ['./textures/nmap_test.png', 'testN', True],
             ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
@@ -109,7 +108,7 @@ class Demo(_Demo_Base):
 
     def addLights(self):
         print('Adding Lights')
-        game.addLights(self)
+        super(Demo, self).addLights()
         self.dlight.enabled = False
         self.createLightSphere(2, vec3(-259.0, 120.0, 0.0), vec3(1.0, 0.0, 0.0))
         self.createLightSphere(2, vec3(0.0, 270.0, -190.0), vec3(1.0, 1.0, 0.0))

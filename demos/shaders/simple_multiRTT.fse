@@ -49,7 +49,7 @@ technique
             fragment = sqf;
             in = diffuse, normals, positions, depth;
             out = _scene;
-            // clear = [.1, .1, .1]; // not used since background is not visible in last pass
+            // clear = [.1, .1, .1]; // not used since background is not visible in last pass (?)
         }
 }
 

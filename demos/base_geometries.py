@@ -7,6 +7,7 @@ from cycgkit.cgtypes import vec3
 class Demo(_Demo_Base):
     def __init__(self):
         _Demo_Base.__init__(self)
+        self.texturesToLoad.append(['e3dlogo.png', 'logo'])
 
     def loadModels(self):
         engine = self.engine

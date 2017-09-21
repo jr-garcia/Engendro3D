@@ -74,14 +74,14 @@ class Demo(_Demo_Base):
         elif self.window.events.isKeyPressed('d'):
             self.camera.moveRight(movespeed)
 
-    def updateTitle(self, ev):
-        self.window.title = "FPS: {0} | Frame: {1} | Engendro3D OpenGL - Alpha 0.5".format(ev[0], ev[1])
-
     def close(self):
         self.window.close()
 
     def prepareScene(self):
         try:
+
+            # Note: If default shaders in engine are modified, shaders in 'demos/shaders' should be updated acordingly.
+
             engine = self.engine
             # self.window.backend.fullScreenEffects.addEffect('simple_override.fse', 'simpleFSE', 'simple')
             self.fse = self.window.backend.fullScreenEffects.addEffect('shaders/simple_multiRTT.fse',

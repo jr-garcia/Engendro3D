@@ -15,10 +15,10 @@ struct light
 
 uniform mat3 NormalMatrix;
 uniform bool UseDiffuseTexture;
-uniform vec4 DiffuseColor;
+uniform vec3 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 uniform bool UseEmissiveTexture;
-uniform vec4 EmissiveColor;
+uniform vec3 EmissiveColor;
 uniform sampler2D EmissiveTexture;
 uniform bool UseNormalMapTexture;
 uniform sampler2D NormalMapTexture;
@@ -81,6 +81,7 @@ vec3 calcBumpedNormal()
 
 float calculateSpot(vec3 dir, vec3 lpos, vec2 params)
 {
+    // http://pyopengl.sourceforge.net/context/tutorials/shader_10.html
     float spot_effect = 1.0;
     float spot_cos = dot( normalize(dir),-lpos);
     if (spot_cos <= params.x)
@@ -149,7 +150,7 @@ void main()
     }
     else
     {
-        objectdiffuse = DiffuseColor;
+        objectdiffuse = vec4(DiffuseColor, 1);
     }
 
     vec3 diffuse = vec3(0);
@@ -175,7 +176,7 @@ void main()
 
     }
 
-    vec3 final = (objectdiffuse.rgb * (AmbientColor + diffuse)) + clamp(specular, 0.0, 1.0);
+    vec3 final = (objectdiffuse.rgb * (AmbientColor + clamp(diffuse, 0.0, 1.0))) + clamp(specular, 0.0, 1.0);
     vec3 gamma = vec3(1.0/2.2);
     final = pow(final, gamma);
 
