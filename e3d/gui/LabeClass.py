@@ -33,7 +33,7 @@ class Label(BaseControl):
         self._isBuilt = False
         self._dirtyProperties = True
 
-        self._updateRealSize()
+        self._updateRealSizePosition()
         self._updateText()
 
     def _getText(self):
@@ -163,8 +163,8 @@ class Label(BaseControl):
     def __repr__(self):
         return self._text
 
-    def _updateRealSize(self):
-        super(Label, self)._updateRealSize()
+    def _updateRealSizePosition(self):
+        super(Label, self)._updateRealSizePosition()
         self._setCharsRatio()
 
     def _setColor(self, value):

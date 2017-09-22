@@ -31,12 +31,17 @@ class BaseControl(Base3DObject):
         :param borderSize:
         :type borderSize:
         """
+        self._guiMan = parent._guiMan
         if not rotation:
             rotation = [0, 0, 0]
-        position = [position[0], position[1], 0]
+
+        position = vec3(position[0], position[1], 0)
+        self._realPosition = position
+        position = self._convertPixelToWindow(position)
 
         self._is2D = True
         super(BaseControl, self).__init__(position, rotation, 1, 1)
+
         self.ID = ''
         self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
@@ -50,28 +55,29 @@ class BaseControl(Base3DObject):
             raise ValueError('only integer size allowed: ' + str(size))
 
         size = vec3(width, height, 1)
+        self._realSize = size
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)
         self._internalSize = self._scale
-        self._guiMan = parent._guiMan
         assert isinstance(self._guiMan, GuiManager)
 
         self._material.shaderProperties.append(IntShaderProperty('borderSize', self._borderSize))
         self._material.shaderProperties.append(Vec4ShaderProperty('borderColor', self._borderColor))
-
+        self.borderSize = borderSize
+        self.borderColor = vec4(0, 0, 0, 1)
         if color is not None:
             self._material.diffuseColor = color
 
         if imgID is not None:
-            self._material.diffuseTextureID = imgID
+            self.backgroundImageID = imgID
 
         if parent is not None:
             self.attachTo(parent)
 
         self._set2d()
 
-        self._realSize = vec3(1)
+        # self._realSize = vec3(1)
         self._realScale = vec3(1)
         self._inverseScale = vec3(1)
         self._material.shaderProperties.append(Vec3ShaderProperty('realSize', self._realSize))
@@ -80,7 +86,7 @@ class BaseControl(Base3DObject):
         self._material.shaderProperties.append(Vec3ShaderProperty('realScale', self._realScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
-        self._updateRealSize()
+        self._updateRealSizePosition()
 
     def _getIs2D(self):
         """
@@ -178,7 +184,7 @@ class BaseControl(Base3DObject):
         else:
             v2 = [value] * 3
 
-        self._scale = vec3(v2)
+        self._scale = self._convertPixelToWindow(v2)
         self._dirty = True
         try:
             self._material.shaderProperties['size'] = self._scale
@@ -189,10 +195,10 @@ class BaseControl(Base3DObject):
                     doc='Size of control in percentage of parent\'s size')
 
     def getSize(self):
-        return self._getAbsoluteScale()
+        return self._convertWindowToPixel(self._getAbsoluteScale())
 
     def _getAbsolutePosition(self):
-        npos = vec3(self._position)
+        npos = self._convertWindowToPixel(vec3(self._position))
         # if self._is2D:
         #     npos.y = (1.0 - npos.y)
 
@@ -202,14 +208,26 @@ class BaseControl(Base3DObject):
         npos = value
         # if self._is2D:
         #     npos.y = (1.0 - npos.y - self._scale.y)
-        self._position = vec3(npos)
+        self._position = self._convertPixelToWindow(vec3(npos))
         self._material.shaderProperties['relativePosition'] = self._position
 
     position = property(fget=_getAbsolutePosition, fset=_setAbsolutePosition)
 
+    def _convertPixelToWindow(self, vec3Val):
+        x, y = self._guiMan._window.size
+        if not all((x, y)):
+            return
+        sx, sy, sz = vec3Val
+        return vec3(sx / x, sy / y, sz)
+
+    def _convertWindowToPixel(self, vec3Val):
+        x, y = self._guiMan._window.size
+        sx, sy, sz = vec3Val
+        return vec3(x * sx, y * sy, sz)
+
     def _update(self):
         # Todo: implement calbacks
-        # self._updateRealSize()
+        self._updateRealSizePosition()
         if self._dirty:
             self._updateTransformation()
             self._dirty = False
@@ -228,7 +246,7 @@ class BaseControl(Base3DObject):
         self._scaleMatrix = mat4.scaling(self._scale)
         self._transformation = self._positionMatrix * self._rotationMatrix * self._scaleMatrix
 
-    def _updateRealSize(self):
+    def _updateRealSizePosition(self):
         # if not guiMan._isResized:
         #     return
         if self.parent is None:
@@ -239,7 +257,8 @@ class BaseControl(Base3DObject):
             baseSize = self.parent.realSize
             baseScale = self.parent.realScale
 
-        self._realSize = ewMul(baseSize, self._scale)
+        self._setAbsoluteScale(self._realSize)
+        self._position = self._convertPixelToWindow(self._realPosition)
         self._realScale = ewMul(baseScale, self._scale)
         self._internalSize = self._scale - (ewDiv(self._scale, self._realSize) * (self._borderSize * 2))
         self._internalSize.z = 1
@@ -281,7 +300,7 @@ class BaseControl(Base3DObject):
     transformationMinusBorder = property(_getTransformationMinusBorder)
 
     def _resizeCallback(self):
-        self._updateRealSize()
+        self._updateRealSizePosition()
         for c in reversed(self._children):
             c._resizeCallback()
 
