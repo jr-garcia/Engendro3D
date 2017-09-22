@@ -6,6 +6,19 @@ from ..model_management.MaterialClass import *
 from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 
 
+class GradientTypesEnum(object):
+    noGradient = -1
+    Vertical = 0
+    Horizontal = 1
+    RightCorner = 2
+    LeftCorner = 3
+    CenterVertical = 4
+    CenterHorizontal = 5
+    Diagonal1 = 6
+    Diagonal2 = 7
+    Radial = 8
+
+
 class BaseControl(Base3DObject):
     """
         Abstract.
@@ -14,7 +27,8 @@ class BaseControl(Base3DObject):
     """
 
     @abstractmethod
-    def __init__(self, position, width, height, parent, color=None, imgID=None, rotation=None, borderSize=0):
+    def __init__(self, position, width, height, parent, color=None, imgID=None, rotation=None, borderSize=0,
+                 gradientType=GradientTypesEnum.noGradient):
         """
 
 
@@ -86,7 +100,19 @@ class BaseControl(Base3DObject):
         self._material.shaderProperties.append(Vec3ShaderProperty('realScale', self._realScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
+        self._gradientType = gradientType  # todo:fix this double assigning
+        self._material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
+        self.gradientType = gradientType
         self._updateRealSizePosition()
+
+    @property
+    def gradientType(self):
+        return self._gradientType
+
+    @gradientType.setter
+    def gradientType(self, value):
+        self._gradientType = value
+        self._material.shaderProperties['GradientType'] = value
 
     def _getIs2D(self):
         """
@@ -227,7 +253,7 @@ class BaseControl(Base3DObject):
 
     def _update(self):
         # Todo: implement calbacks
-        self._updateRealSizePosition()
+        # self._updateRealSizePosition()
         if self._dirty:
             self._updateTransformation()
             self._dirty = False
@@ -331,8 +357,7 @@ class Material2D(Material):
         elif isinstance(value, (int, float)):
             nvalue = [value] * 4
         else:
-            raise TypeError(
-                '{} not supported for color assigment. Use list of len=4, vec4 or single number.'.format(
+            raise TypeError('{} not supported for color assigment. Use list of len=4, vec4 or single number.'.format(
                     str(type(value))))
 
         return vec4(nvalue)
