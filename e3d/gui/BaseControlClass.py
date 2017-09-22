@@ -14,7 +14,7 @@ class BaseControl(Base3DObject):
     """
 
     @abstractmethod
-    def __init__(self, position, size, parent, color=None, imgID=None, rotation=None, borderSize=0):
+    def __init__(self, position, width, height, parent, color=None, imgID=None, rotation=None, borderSize=0):
         """
 
 
@@ -40,10 +40,16 @@ class BaseControl(Base3DObject):
         self.ID = ''
         self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
+        size = (width, height)
+
         if not hasattr(size, '__getitem__'):
             raise TypeError('size must be an object with 2 elements')
         if not all(size):
             raise ValueError('size of 0 not allowed: ' + str(size))
+        if not all([int(i) == i for i in size]):
+            raise ValueError('only integer size allowed: ' + str(size))
+
+        size = vec3(width, height, 1)
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)
@@ -307,7 +313,7 @@ class Material2D(Material):
             nvalue = [value] * 4
         else:
             raise TypeError(
-                'type {} not supported for color assigment. Use list of len=4, vec4 or single number.'.format(
+                '{} not supported for color assigment. Use list of len=4, vec4 or single number.'.format(
                     str(type(value))))
 
         return vec4(nvalue)
