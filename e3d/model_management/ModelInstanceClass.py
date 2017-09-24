@@ -5,7 +5,7 @@ from ..physics_management.physicsModule import bodyShapesEnum
 
 
 class ModelInstance(Base3DObject):
-    def __init__(self, baseMats, modelID, manfred, ID, animationQuality, position, rotation, uniformScale,
+    def __init__(self, baseMats, modelID, engine, ID, animationQuality, position, rotation, uniformScale,
                  shape=bodyShapesEnum.box, mass=None, isDynamic=False):
         """
        This object is returned by Scene.AddModel and represents one transformable instance
@@ -15,9 +15,9 @@ class ModelInstance(Base3DObject):
         @rtype : ModelInstance
         @param baseMats: List of materials to copy
         @param modelID: ID of this instance for the scene
-        @type manfred: ManagersReferenceHolder
+        @type engine: ManagersReferenceHolder
         """
-        mod = manfred.models._getModel(modelID)
+        mod = engine.models._getModel(modelID)
         if not mod:
             raise KeyError('Model \'{}\' not found. Try loading it first.')
         mins, maxs = mod.boundingBox.getBounds()
@@ -31,8 +31,8 @@ class ModelInstance(Base3DObject):
         self._attachedSounds = {}
         for m in baseMats:
             self._materials.append(Material._fromMaterial(m))
-        self._sounds = manfred.sounds
-        self._models = manfred.models
+        self._sounds = engine.sounds
+        self._models = engine.models
         self._baseModelID = modelID
         self.animationQuality = animationQuality
 

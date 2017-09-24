@@ -7,8 +7,8 @@ from glaze.GL import glGenTextures, glDeleteTextures, glTexParameteri, glTexImag
 
 
 class CubeTexture(object):
-    def __init__(self, manfred, ID):
-        self.manfred = manfred
+    def __init__(self, engine, ID):
+        self.engine = engine
         self.__xNeg = ''
         self.__yNeg = ''
         self.__xPos = ''

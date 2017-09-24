@@ -80,11 +80,11 @@ class TexturesManagerServer():
         cube = self._cubeTexCache.get(ID)
         if not cube:
             if not os.path.exists(folderPath):
-                folderPath = self.manfred.io.findPath(folderPath)
+                folderPath = self.engine.io.findPath(folderPath)
             if not folderPath:
                 self._engine.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), 1)
 
-            cube = CubeTexture(self.manfred, ID)
+            cube = CubeTexture(self.engine, ID)
             cube.loadFromFolder(folderPath, TexturesManagerServer.getPILpixels)
 
         return cube
