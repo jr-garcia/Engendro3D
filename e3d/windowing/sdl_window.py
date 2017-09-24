@@ -75,13 +75,13 @@ class Window(Window_Base):
 
     @size.setter
     def size(self, val):
+        self._previousSize = self.size
         w, h = val
         if not self._isFull:
             SDL_SetWindowSize(self._SDL_Window, ct.c_int(w), ct.c_int(h))
-            self._size = [w, h]
         else:
             SDL_SetWindowDisplayMode(_SDL_Window, SDL_DisplayMode(w, h))
-            self._fullscreenSize = [w, h]
+            self._fullscreenSize = (w, h)
         self._sizeChanged(w, h)
 
     @property

@@ -63,6 +63,8 @@ class Window_Base(object):
         self._debug_minFPS = 0
         self._debug_maxFPS = 0
 
+        self._previousSize = (0, 0)
+
         if gameName != '':
             self.gameName = gameName
         else:
@@ -174,9 +176,11 @@ class Window_Base(object):
 
     def _sizeChanged(self, w, h):
         """Reshape the OpenGL viewport based on the dimensions of the window."""
+        self._previousSize = self._size
         self._engine.scenes.currentScene.currentCamera.updateFOV(w, h)
         self._makeContextCurrent()
         self.backend.resize((w, h))
+        self._size = (w, h)
 
     def close(self):
         # TODO: add 'closed' callback
@@ -209,7 +213,7 @@ class Window_Base(object):
         pass
 
     @size.setter
-    def _setSize(self, val):
+    def size(self, val):
         pass
 
     @property

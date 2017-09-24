@@ -2,7 +2,6 @@ from PySide.QtOpenGL import QGLWidget, QGLFormat
 from PySide import QtGui
 from PySide.QtCore import Qt
 
-
 from .window_base import Window_Base
 
 
@@ -22,6 +21,8 @@ class e3DGLWidget(Window_Base, QGLWidget):
     @size.setter
     def size(self, val):
         self.frameSize = val
+        w, h = val
+        self._sizeChanged(w, h)  # todo: check validity
 
     def _performSwap(self):
         self.swapBuffers()
