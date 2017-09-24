@@ -199,20 +199,20 @@ class Model:
         try:
             scene = aiImportFile(filepath, ppsteps)
         except Exception as ex:
-            self._engine.log("Pyassimp load exception: " + str(ex))
+            engine.log("Pyassimp load exception: " + str(ex))
             raise
 
         if scene is None:
-            self._engine.log("The scene failed to import.")
+            engine.log("The scene failed to import.")
             raise Exception("The scene failed to import.")
 
         if scene.mNumMeshes == 0:
-            self._engine.log("The imported scene has no meshes.")
+            engine.log("The imported scene has no meshes.")
             raise Exception("The imported scene has no meshes.")
 
         cnode = scene.mRootNode
         if cnode.mNumMeshes == 0 and cnode.mNumChildren == 0:
-            self._engine.log("The root node has nothing readable.")
+            engine.log("The root node has nothing readable.")
             raise Exception("The root node has nothing readable.")
 
         newModel._directory = path.dirname(filepath)
@@ -220,7 +220,7 @@ class Model:
         try:
             newModel.cacheMaterials(scene.mMaterials)
         except Exception as ex:
-            self._engine.log('Error caching materials: ' + str(ex))
+            engine.log('Error caching materials: ' + str(ex))
             raise
 
         if scene.mNumAnimations > 0 and not forceStatic:
@@ -228,7 +228,7 @@ class Model:
                 newModel._getAnimations(scene.mAnimations)
             except Exception as ex:
                 ex.message = 'Error extracting animations: ' + ex.message
-                self._engine.log(ex.message)
+                engine.log(ex.message)
                 raise
             try:
                 # bnode = newModel.__getSkeletonRoot(scene.rootnode)
@@ -237,7 +237,7 @@ class Model:
                 newModel.hasBones = True
             except Exception as ex:
                 ex.message = 'Error building model\'s skeleton: ' + ex.message
-                self._engine.log(ex.message)
+                engine.log(ex.message)
                 raise
 
         world = mat4.identity()
@@ -256,7 +256,7 @@ class Model:
 
         except Exception as ex:
             ex.args = ('ModelClass - Error creating root node: ' + str(ex),)
-            self._engine.log(str(ex))
+            engine.log(str(ex))
             raise
 
         return newModel
