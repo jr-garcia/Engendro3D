@@ -19,6 +19,22 @@ class GradientTypesEnum(object):
     Radial = 8
 
 
+class PinningEnum(object):
+    Top = 'Top'
+    Left = 'Left'
+    Right = 'Right'
+    Bottom = 'Bottom'
+    TopLeft = (Top, Left)
+    TopRight = (Top, Right)
+    BottomLeft = (Bottom, Left)
+    BottomRight = (Bottom, Right)
+    BottomLeftRight = (Bottom, Left, Right)
+    TopLeftRight = (Top, Left, Right)
+    TopLeftBottom = (Top, Left, Bottom)
+    TopRightBottom = (Top, Right, Bottom)
+    all = (Top, Bottom, Left, Right)
+
+
 class BaseControl(Base3DObject):
     """
         Abstract.
@@ -27,8 +43,7 @@ class BaseControl(Base3DObject):
     """
 
     @abstractmethod
-    def __init__(self, position, width, height, parent, color=None, imgID=None, rotation=None, borderSize=0,
-                 gradientType=GradientTypesEnum.noGradient):
+    def __init__(self, top, left, width, height, parent, pinning, color, ID, imgID, rotation, borderSize, gradientType):
         """
 
 
@@ -46,17 +61,29 @@ class BaseControl(Base3DObject):
         :type borderSize:
         """
         self._guiMan = parent._guiMan
+        self._pinning = []
+        self.pinning = pinning
         if not rotation:
             rotation = [0, 0, 0]
 
-        position = vec3(position[0], position[1], 0)
+        self._top = top
+        self._left = left
+        self._width = width or 1
+        self._height = height or 1
+
+        sw, sh = self._guiMan._window.size
+        self._right = sw - (self._left + self._width)
+        self._bottom = sh - (self._top + self._height)
+
+        position = vec3(left, top, 0)
         self._realPosition = position
         position = self._convertPixelToWindow(position)
 
         self._is2D = True
-        super(BaseControl, self).__init__(position, rotation, 1, 1)
+        if ID is None:
+            ID = str(id(self))
+        super(BaseControl, self).__init__(position, rotation, 1, 1, ID=ID)
 
-        self.ID = ''
         self._material = Material2D()
         self._material._shaderID = DEFAULT2DSHADERID
         size = (width, height)
@@ -73,7 +100,7 @@ class BaseControl(Base3DObject):
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)
-        self._internalSize = self._scale
+        self._setInnerSize()
         assert isinstance(self._guiMan, GuiManager)
 
         self._material.shaderProperties.append(IntShaderProperty('borderSize', self._borderSize))
@@ -91,11 +118,10 @@ class BaseControl(Base3DObject):
 
         self._set2d()
 
-        # self._realSize = vec3(1)
         self._realScale = vec3(1)
         self._inverseScale = vec3(1)
         self._material.shaderProperties.append(Vec3ShaderProperty('realSize', self._realSize))
-        self._material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._internalSize))
+        self._material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
         self._material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
         self._material.shaderProperties.append(Vec3ShaderProperty('realScale', self._realScale))
         self._material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
@@ -103,7 +129,12 @@ class BaseControl(Base3DObject):
         self._gradientType = gradientType  # todo:fix this double assigning
         self._material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
         self.gradientType = gradientType
+
+        self._setLastDifferences()
         self._updateRealSizePosition()
+
+    def _setLastDifferences(self):
+        self._lastDifferences = (self._top, self._left, self._bottom, self._right)
 
     @property
     def gradientType(self):
@@ -113,6 +144,24 @@ class BaseControl(Base3DObject):
     def gradientType(self, value):
         self._gradientType = value
         self._material.shaderProperties['GradientType'] = value
+
+    @property
+    def pinning(self):
+        return self._pinning
+
+    @pinning.setter
+    def pinning(self, value):
+        if len(value) == 1 or isinstance(value, str):
+                raise AttributeError('single value \'{}\' not allowed.'.format(value))
+        if isinstance(value, list):
+            self._pinning = value
+        elif isinstance(value, tuple):
+            self._pinning = [v for v in value]
+        else:
+            pinningVals = (getattr(PinningEnum, n) for n in dir(PinningEnum) if not n.startswith('_'))
+            if value not in pinningVals:
+                raise AttributeError('pinning value \'{}\' not in PinningEnum'.format(value))
+            self._pinning = [value]
 
     def _getIs2D(self):
         """
@@ -162,8 +211,7 @@ class BaseControl(Base3DObject):
     def _setBorder(self, val):
         self._borderSize = val
         self._material.shaderProperties['borderSize'] = val
-        self._internalSize = self._scale - (ewDiv(self._scale, self._realSize) * (self._borderSize * 2))
-        self._internalSize.z = 1
+        self._setInnerSize()
         self._dirty = True
 
     borderSize = property(_getBorder, _setBorder)
@@ -189,7 +237,7 @@ class BaseControl(Base3DObject):
 
         @rtype : vec3
         """
-        v2 = vec3(self._scale)
+        v2 = self._convertWindowToPixel(vec3(self._scale))
         return v2
 
     def _setAbsoluteScale(self, value):
@@ -210,6 +258,7 @@ class BaseControl(Base3DObject):
         else:
             v2 = [value] * 3
 
+        self._realSize = v2
         self._scale = self._convertPixelToWindow(v2)
         self._dirty = True
         try:
@@ -225,15 +274,11 @@ class BaseControl(Base3DObject):
 
     def _getAbsolutePosition(self):
         npos = self._convertWindowToPixel(vec3(self._position))
-        # if self._is2D:
-        #     npos.y = (1.0 - npos.y)
 
         return npos
 
     def _setAbsolutePosition(self, value):
         npos = value
-        # if self._is2D:
-        #     npos.y = (1.0 - npos.y - self._scale.y)
         self._position = self._convertPixelToWindow(vec3(npos))
         self._material.shaderProperties['relativePosition'] = self._position
 
@@ -242,7 +287,7 @@ class BaseControl(Base3DObject):
     def _convertPixelToWindow(self, vec3Val):
         x, y = self._guiMan._window.size
         if not all((x, y)):
-            return
+            return vec3(0)
         sx, sy, sz = vec3Val
         return vec3(sx / x, sy / y, sz)
 
@@ -275,26 +320,69 @@ class BaseControl(Base3DObject):
     def _updateRealSizePosition(self):
         # if not guiMan._isResized:
         #     return
-        if self.parent is None:
-            x, y = self._guiMan._window.size
-            baseSize = vec3(x, y, 1)
+        parent = self.parent
+        if parent is None:
+            # x, y = self._guiMan._window.size
+            # baseSize = vec3(x, y, 1)
             baseScale = vec3(1)
         else:
-            baseSize = self.parent.realSize
-            baseScale = self.parent.realScale
+            # baseSize = self.parent.realSize
+            baseScale = parent.realScale
 
-        self._setAbsoluteScale(self._realSize)
+        realSize = self._realSize
+        self._setAbsoluteScale(realSize)
         self._position = self._convertPixelToWindow(self._realPosition)
         self._realScale = ewMul(baseScale, self._scale)
-        self._internalSize = self._scale - (ewDiv(self._scale, self._realSize) * (self._borderSize * 2))
-        self._internalSize.z = 1
+        self._setInnerSize()
 
-        self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
+        self._inverseScale = ewDiv(parent._inverseScale, self._scale)
 
-        self._material.shaderProperties['realSize'] = self._realSize
-        self._material.shaderProperties['internalSize'] = self._internalSize
+        # width, height = self._guiMan._window.size
+
+        self._setPinning()
+        self._setLastDifferences()
+
+        self._material.shaderProperties['realSize'] = realSize
+        self._material.shaderProperties['internalSize'] = self._innerSize
         self._material.shaderProperties['realScale'] = self._realScale
         self._material.shaderProperties['inverseScale'] = self._inverseScale
+
+    def _setInnerSize(self):
+        self._innerSize = self._scale - (ewDiv(self._scale, self._realSize) * (self._borderSize * 2))
+        self._innerSize.z = 1
+
+    def _setPinning(self):
+        t, l, b, r = self._lastDifferences
+        w, h = self._guiMan._window.size
+        ow, oh = self._guiMan._window._previousSize
+
+        if PinningEnum.Top in self._pinning:
+            nt = t
+        else:
+            nt = t - (oh - h)
+
+        if PinningEnum.Left in self._pinning:
+            nl = l
+        else:
+            nl = l - (ow - w)
+
+        if PinningEnum.Bottom in self._pinning:
+            nb = b
+        else:
+            nb = b - (oh - h)
+        if PinningEnum.Right in self._pinning:
+            nr = r
+        else:
+            nr = r - (ow - w)
+
+        self._top = nt
+        self._left = nl
+        self._bottom = nb
+        self._right = nr
+        self._setLastDifferences()
+        self._position = self._convertPixelToWindow(vec3(nl, nt, 0))
+        self.size = vec3(w - self._left - self._right, h - self._top - self._bottom, 1)
+        self._setInnerSize()
 
     def _getInverseScale(self):
         return self._inverseScale
@@ -313,13 +401,13 @@ class BaseControl(Base3DObject):
 
     def _getTransformationMinusBorder(self):
         npos = vec3(self._position)
-        if self._is2D:
-            npos.y = (1.0 - npos.y - self._internalSize.y)
+        # if self._is2D:
+        #     npos.y = (1.0 - npos.y - self._innerSize.y)
 
-        npos.x += (self._scale.x - self._internalSize.x) / 2.0
-        npos.y -= (self._scale.y - self._internalSize.y) / 2.0
+        npos.x += (self._scale.x - self._innerSize.x) / 2.0
+        npos.y -= (self._scale.y - self._innerSize.y) / 2.0
         alteredPositionMatrix = mat4.translation(npos)
-        alteredScaleMatrix = mat4.scaling(self._internalSize)
+        alteredScaleMatrix = mat4.scaling(self._innerSize)
         alteredTransformation = alteredPositionMatrix * self._rotationMatrix * alteredScaleMatrix
         return alteredTransformation
 

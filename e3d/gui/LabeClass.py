@@ -14,8 +14,8 @@ class Label(BaseControl):
        @rtype : Label
     """
 
-    def __init__(self, position, width, height, text, parent, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
-                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, imgID=None, rotation=None,
+    def __init__(self, top, left, width, height, text, parent, pinning=PinningEnum.TopLeft, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
+                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, ID=None, imgID=None, rotation=None,
                  borderSize=1):
         """
         :param borderSize:
@@ -29,7 +29,8 @@ class Label(BaseControl):
         self._fontBorderColor = fontBorderColor
         self._fontBorder = fontBorder
         self._fontID = fontID
-        super(Label, self).__init__(position, width, height, parent, color, imgID, rotation, borderSize=borderSize)
+        super(Label, self).__init__(top, left, width, height, parent, pinning, color, ID, imgID, rotation,
+                                    borderSize=borderSize)
         self._isBuilt = False
         self._dirtyProperties = True
 

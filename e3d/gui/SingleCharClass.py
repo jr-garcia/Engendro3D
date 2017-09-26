@@ -10,9 +10,11 @@ class SingleChar(BaseControl):
        @rtype : Panel
     """
 
-    def __init__(self, position, width, height, char, parent, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
-                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, imgID=None, rotation=None, borderSize=0.0):
-        super(SingleChar, self).__init__(position, width, height, parent, color, None, rotation, borderSize=borderSize)
+    def __init__(self, top, left, width, height, char, parent, pinning=PinningEnum.TopLeft, fontID='default',
+                 fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1), fontColor=vec4(1, 1, 1, 1),
+                 fontWeight=.5, color=None, ID=None, imgID=None, rotation=None, borderSize=0.0):
+
+        super(SingleChar, self).__init__(top, left, width, height, parent, pinning, color, ID, imgID, rotation, borderSize=borderSize)
         self._char = char
         self._fontBorder = fontBorder
         self._fontBorderColor = fontBorderColor

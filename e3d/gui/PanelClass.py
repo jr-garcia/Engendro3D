@@ -8,6 +8,7 @@ class Panel(BaseControl):
        @rtype : Panel
     """
 
-    def __init__(self, position, width, height, parent, color=None, imgID=None, rotation=None, borderSize=1,
-                 gradientType=GradientTypesEnum.noGradient):
-        super(Panel, self).__init__(position, width, height, parent, color, imgID, rotation, borderSize, gradientType)
+    def __init__(self, top, left, width, height, parent, pinning=PinningEnum.TopLeft, color=vec4(1), ID=None,
+                 imgID=None, rotation=None, borderSize=1, gradientType=GradientTypesEnum.noGradient):
+        super(Panel, self).__init__(top, left, width, height, parent, pinning, color, ID, imgID, rotation,
+                                    borderSize, gradientType)
