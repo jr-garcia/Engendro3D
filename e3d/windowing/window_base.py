@@ -10,7 +10,7 @@ from e3d.Logging import logLevelsEnum
 
 
 class Window_Base(object):
-    def __init__(self, engine, title, gameName, sizeAsList, FullScreenSize, fullscreen, vSynch, iconPath):
+    def __init__(self, engine, title, gameName, sizeTuple, FullScreenSize, fullscreen, vSynch, iconPath):
         """
 
 
@@ -22,12 +22,12 @@ class Window_Base(object):
 
 
             @type vSynch: bool
-            @type sizeAsList: list
+            @type sizeTuple: list
             @type title: str
             @type FullScreenSize: list
             @type fullscreen: bool
             @param title: The window title
-            @param sizeAsList: The size (as list) of the window
+            @param sizeTuple: The size (as list) of the window
             @param FullScreenSize: The size (as list) to display when in fullscreen mode
             @param fullscreen: start in fullscreen
             @param vSynch: enable vsynch
@@ -63,7 +63,7 @@ class Window_Base(object):
         self._debug_minFPS = 0
         self._debug_maxFPS = 0
 
-        self._previousSize = (0, 0)
+        self._previousSize = sizeTuple
 
         if gameName != '':
             self.gameName = gameName
@@ -72,8 +72,8 @@ class Window_Base(object):
         if title == '':
             title = self.gameName
 
-        if sizeAsList is not None and len(sizeAsList) == 2:
-            self._size = sizeAsList
+        if sizeTuple is not None and len(sizeTuple) == 2:
+            self._size = sizeTuple
         else:
             self._size = [640, 480]
         if FullScreenSize is not None and len(FullScreenSize) == 2:

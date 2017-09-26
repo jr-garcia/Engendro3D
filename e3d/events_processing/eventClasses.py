@@ -51,7 +51,6 @@ class windowEventName(object):
     leave = 'leave'
     restored = 'restored'
     moved = 'moved'
-    sizeChanged = 'sizeChanged'
 
     def __init__(self):
         pass
@@ -65,11 +64,7 @@ class WindowEvent(Event):
         """
         super(WindowEvent, self).__init__(EventType.window)
         self.code = event.event
-        if self.code == SDL_WINDOWEVENT_SIZE_CHANGED:
-            self.eventName = windowEventName.sizeChanged
-            self.w = event.data1
-            self.h = event.data2
-        elif self.code == SDL_WINDOWEVENT_CLOSE:
+        if self.code == SDL_WINDOWEVENT_CLOSE:
             self.eventName = windowEventName.close
         elif self.code == SDL_WINDOWEVENT_FOCUS_GAINED:
             self.eventName = windowEventName.focusGained

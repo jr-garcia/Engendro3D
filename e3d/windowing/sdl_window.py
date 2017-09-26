@@ -2,7 +2,6 @@ import ctypes as ct
 import os
 from sdl2 import *
 
-
 from . import Window_Base
 from ..Logging import logLevelsEnum
 
@@ -12,6 +11,7 @@ class Window(Window_Base):
     Class for starting an SDL2 based Engendro3D Window.
 
     """
+
     def _createInternalWindow(self, title, engine, fullscreen):
         flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
         if fullscreen:
@@ -19,7 +19,7 @@ class Window(Window_Base):
 
         try:
             title = title.encode()
-        except:
+        except Exception:
             pass
         self._SDL_Window = SDL_CreateWindow(title, 0, 0, self._size[0], self._size[1], flags)
         if not self._SDL_Window:
@@ -101,7 +101,7 @@ class Window(Window_Base):
         """
         try:
             value = value.encode()
-        except:
+        except Exception:
             pass
         SDL_SetWindowTitle(self._SDL_Window, value)
 
@@ -139,7 +139,7 @@ class Window(Window_Base):
             try:
                 pix = im.tobytes()
                 im.close()
-            except:
+            except Exception:
                 raise
 
             surface = SDL_CreateRGBSurfaceFrom(pix, w, h, depth, w * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, alphamask)
@@ -162,15 +162,15 @@ class Window(Window_Base):
     def _pollEvents(self):
         event = SDL_Event()
         while SDL_PollEvent(event):
-            self.events._announce(event)
             if event.type == SDL_QUIT:
                 self.close()
             elif event.type == SDL_WINDOWEVENT:
                 winev = event.window.event
-                if winev == SDL_WINDOWEVENT_SIZE_CHANGED:
+                if winev == SDL_WINDOWEVENT_RESIZED:
                     self._sizeChanged(event.window.data1, event.window.data2)
                 elif winev == SDL_WINDOWEVENT_CLOSE:
                     self.close()
+            self.events._announce(event)
 
     def _makeContextCurrent(self):
         SDL_GL_MakeCurrent(self._SDL_Window, self._context)

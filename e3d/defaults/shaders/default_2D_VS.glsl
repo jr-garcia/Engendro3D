@@ -5,18 +5,19 @@ varying vec2 f_texcoord;
 varying vec2 originalposition;
 uniform bool UpSideDownTextures;
 uniform vec4 uvOffset;
+uniform vec3 size;
 //uniform mat4 ModelViewProjectionInverse;
 
 void main()
 {
-if (UpSideDownTextures)
     f_texcoord =  vec2(position.xy);
-else
-    f_texcoord =  vec2(position.x, 1.0 - position.y);
+if (!UpSideDownTextures)
+    f_texcoord.y =  1.0 - f_texcoord.y;
 
 f_texcoord += uvOffset.xy;
 originalposition = position.xy;
+//originalposition.y = 1.0 - originalposition.y - size.y;
 //originalposition = (ModelViewProjectionInverse * vec4(position, 1.0)).xy;
-gl_Position = ModelProjection * vec4(position, 1.0);
+gl_Position = ModelProjection * vec4(originalposition, position.z, 1.0);
 
 }

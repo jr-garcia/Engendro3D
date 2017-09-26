@@ -463,7 +463,7 @@ class OGL3Backend(BaseBackend):
                 glGenerateMipmap(GL_TEXTURE_2D)
             except Exception:
                 self._engine.log('Error generating mipmaps for {}: glerror {}'.format(ID, glGetError()),
-                           logLevelsEnum.warning)
+                                 logLevelsEnum.warning)
                 # glBindTexture(GL_TEXTURE_2D, 0) #Raises shader compiling error on intel GMA 965 + Windows
         # glFlush()
         return tex
@@ -486,7 +486,7 @@ class OGL3Backend(BaseBackend):
 
         try:
             rTarget._act(attachmentTypes, colorIndexes)
-        except:
+        except Exception:
             self.unsetRenderTarget()
             raise
 
