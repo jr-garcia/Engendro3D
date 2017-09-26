@@ -1,8 +1,9 @@
-from _BaseDemo import _Demo_Base, runDemo, tubeMODEL
-
 from math import sin
-from random import random, randint
+from random import randint, random
+
 from cycgkit.cgtypes import vec3
+
+from Demos._base._BaseDemo import _Demo_Base, runDemo, tubeMODEL, logLevelsEnum
 
 
 class Demo(_Demo_Base):
@@ -37,9 +38,8 @@ class Demo(_Demo_Base):
     def loadModels(self):
         engine = self.engine
 
-        self.camera.rotateX(30)
-        self.camera.rotateY(30)
-        self.camera.position = vec3(107.262, 148.928, 22.752)
+        self.camera.rotateX(40)
+        self.camera.position = vec3(0, 340, 350)
 
         engine.models.loadSphere("mainspheremodel", 32)
         self.sphere1 = self.scene1.addModel('mainspheremodel', 'sphere1', [0, 10, 0], [0, 0, 0], 4, mass=8)
@@ -140,8 +140,8 @@ class Demo(_Demo_Base):
             self.dorot = not self.dorot
         if e.keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            self._engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            self._engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate), logLevelsEnum.info)
+            self.engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
+            self.engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate), logLevelsEnum.info)
         if e.keyName == 'g':
             val = self.window.gamma
             print('old gamma:' + str(val))

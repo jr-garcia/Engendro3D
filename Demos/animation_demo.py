@@ -1,7 +1,8 @@
-from _BaseDemo import _Demo_Base, runDemo, tubeMODEL, dwarfMODEL
-
 from math import sin
+
 from cycgkit.cgtypes import vec3
+
+from Demos._base._BaseDemo import _Demo_Base, dwarfMODEL, runDemo, tubeMODEL
 
 
 class Demo(_Demo_Base):

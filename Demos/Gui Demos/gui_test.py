@@ -1,17 +1,16 @@
-from _do_import import resolve_import
+from Demos._base._do_import import resolve_import
 
 resolve_import()
 
-from e3d import Engine, logLevelsEnum
+from e3d import Engine
 from e3d.backends import OGL3Backend
 from e3d.cameras import SimpleCamera
 from e3d.gui import *
 
 from cycgkit.cgtypes import *
-from random import randint as ri, random as rf
 from string import printable
 
-import _model_paths
+import Demos._base._model_paths
 import os
 
 
@@ -132,7 +131,7 @@ class game:  # TODO: Inherith from _BaseDemo
             self.scene1.currentCamera = self.camera
             # self.scene1.beforeUpdateCallback = self.scene1Update
 
-            engine.models.loadModel(_model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
+            engine.models.loadModel(Demos._base._model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
             self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 5, 5), vec3(0), 1.5)
             mat = self.triangle.getMaterialByIndex(0)
             mat.useDiffuseTexture = True
@@ -157,28 +156,28 @@ class game:  # TODO: Inherith from _BaseDemo
         textLayer = self.window.gui.addLayer('text')
 
         logos = []
-        pSize = [0.14]
-        fDis = 1.0 - pSize[0]
-        logos.append(Panel([0.0, 0.0], pSize, self.onelayer))
-        logos.append(Panel([fDis, 0.0], pSize, self.onelayer))
-        logos.append(Panel([0.0, fDis], pSize, self.onelayer))
-        logos.append(Panel([fDis, fDis], pSize, self.onelayer))
+        logoSize = 100
+        fDis = 200 - logoSize
+        logos.append(Panel([0.0, 0.0], logoSize, logoSize, self.onelayer))
+        logos.append(Panel([fDis, 0.0], logoSize, logoSize, self.onelayer))
+        logos.append(Panel([0.0, fDis], logoSize, logoSize, self.onelayer))
+        logos.append(Panel([fDis, fDis], logoSize, logoSize, self.onelayer))
         for panel in logos:
             panel.color = [0, 0, 0, 0]
             panel.backgroundImageID = 'logo'
             panel.opacity = .7
             panel.borderSize = 0
 
-        self.char = SingleChar([.12, .12], [.6, .6], '?', self.onelayer)
+        self.char = SingleChar([1, 12], 60, 60, '?', self.onelayer)
         self.char.fontBorderColor = vec4(1, 0, 0, 1)
         self.char.fontBorder = 0.2
         self.char.fontWeight = .5
 
-        self.label1 = Label([.02, .09], [.8, .08], 'Gui needs a lot of work.', parent=textLayer, fontID='default')
-        self.label2 = Label([.05, .4], [.8, .2], '%#@%^%(*)!', parent=textLayer, fontID='auto',
+        self.label1 = Label([2, 9], 380, 380, 'Gui needs a lot of work.', parent=textLayer, fontID='default')
+        self.label2 = Label([5, 400], 380, 320, '%#@%^%(*)!', parent=textLayer, fontID='auto',
                             fontColor=[.5, .5, 0, .8], fontBorder=1.1, fontBorderColor=[0, 1, 0, 1])
 
-        self.label3 = Label([.02, .8], [.97, .05], 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
+        self.label3 = Label([.02, .8], 97, 5, 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
 
         self.label1.color = [1, 0, 0, 1]
         self.label2.color = [0, 1, 0, .5]

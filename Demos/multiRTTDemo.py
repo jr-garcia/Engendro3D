@@ -1,16 +1,10 @@
 
 from cycgkit.cgtypes import vec3
 
-from e3d import Engine
-from e3d.backends import OGL3Backend
+from Demos._base._BaseDemo import _Demo_Base, runDemo
+from Demos._base._model_paths import *
 from e3d.cameras import SimpleCamera
 from e3d.gui import Panel
-
-import os
-
-from random import randint as ri, random as rf
-from _model_paths import *
-from _BaseDemo import _Demo_Base, runDemo
 
 
 class Demo(_Demo_Base):
@@ -80,7 +74,7 @@ class Demo(_Demo_Base):
     def prepareScene(self):
         try:
 
-            # Note: If default shaders in engine are modified, shaders in 'demos/shaders' should be updated acordingly.
+            # Note: If default shaders in engine are modified, shaders in 'Demos/shaders' should be updated acordingly.
 
             engine = self.engine
             # self.window.backend.fullScreenEffects.addEffect('simple_override.fse', 'simpleFSE', 'simple')

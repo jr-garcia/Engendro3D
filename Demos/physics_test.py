@@ -1,7 +1,6 @@
-from _physics_base import Demo as game, runDemo, tubeMODEL
-
-from math import sin
 from cycgkit.cgtypes import vec3
+
+from Demos._base._physics_base import Demo as game, runDemo, tubeMODEL
 
 
 class Demo(game):

@@ -1,6 +1,6 @@
 import os
 
-maindir = os.path.join(os.path.dirname(__file__), "models")
+maindir = os.path.join(os.path.dirname(__file__), os.pardir,"models")
 
 duckMODEL = os.path.join(maindir, "duck", "duck.3DS")
 dwarfMODEL = os.path.join(maindir, 'dwarf', "dwarf.x")

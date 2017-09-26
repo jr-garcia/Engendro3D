@@ -4,15 +4,16 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 logging.getLogger('PIL').setLevel(logging.ERROR)
 from cycgkit.cgtypes import vec3
 
-from _do_import import resolve_import
+from Demos._base._do_import import resolve_import
 resolve_import()
+
+from Demos._base._model_paths import *
 
 from e3d import Engine, __version__, logLevelsEnum
 from e3d.backends import OGL3Backend
 from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
-from e3d.gui import Panel
-from _model_paths import *
+from e3d.gui import Panel, PinningEnum
 
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
 
@@ -21,7 +22,8 @@ class _Demo_Base(object):
 
     camera = None
 
-    def __init__(self):
+    def __init__(self, winSize=(640, 480)):
+        self._winSize = winSize
         self.camrot = 3
         self.dorot = True
         self.sphereMat = None
@@ -42,9 +44,8 @@ class _Demo_Base(object):
         # Initialize the Engine
         self.engine.initialize()
 
-        nsize = [640, 480]
         # Create the Engendro3D.Window
-        self.window = self.engine.createWindow(title, size=nsize)
+        self.window = self.engine.createWindow(title, size=self._winSize)
 
         self.camera = SimpleCamera([0, 0, 0], [0, 180, 0])
 
@@ -124,7 +125,6 @@ class _Demo_Base(object):
         self.engine.log('Switch scene 0 >> 1', logLevelsEnum.debug)
         engine.scenes.setCurrentSceneID('scene1')
 
-
     def loadModels(self):
         pass
 
@@ -132,20 +132,27 @@ class _Demo_Base(object):
         pass
 
     def buildGui(self):
+        if not self.window.gui.hasLayerID('one'):
+            self.onelayer = self.window.gui.addLayer('one')
         self._addCornerLogos()
 
     def _addCornerLogos(self):
-        self.onelayer = self.window.gui.addLayer('one')
+        w, h = self.window.size
+        
         logos = []
-        pSize = [0.1, 0.1]
-        fDis = 1.0 - pSize[0]
-        logos.append(Panel([0.0, 0.0], pSize, self.onelayer))
-        logos.append(Panel([fDis, 0.0], pSize, self.onelayer))
-        logos.append(Panel([0.0, fDis], pSize, self.onelayer))
-        logos.append(Panel([fDis, fDis], pSize, self.onelayer))
+        logosSize = 60
+        rightBorder = w - logosSize
+        bottomBorder = h - logosSize
+        
+        logos.append(Panel(0, 0, logosSize, logosSize, self.onelayer))
+        logos.append(Panel(0, rightBorder, logosSize, logosSize, self.onelayer, PinningEnum.TopRight))
+        logos.append(Panel(bottomBorder, 0, logosSize, logosSize, self.onelayer, PinningEnum.BottomLeft))
+        logos.append(Panel(bottomBorder, rightBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomRight))
         for panel in logos:
+            panel.color = 0
+            panel.borderSize = 0
             panel.backgroundImageID = 'logo'
-            panel.opacity = .3
+            panel.opacity = .4
 
     def customEvent(self, e):
         if e.name == self.engine.textures.textureLoaded and self.isWaitingTex:
