@@ -63,9 +63,9 @@ class Base3DObject(Attachable):
         self._position = vec3(position)
         self._scale = vec3(uniformScale)
         self._rotation = vec3(rotation)
-        self._rotationMatrix = None
-        self._positionMatrix = None
-        self._scaleMatrix = None
+        self._rotationMatrix = mat4(1)
+        self._positionMatrix = mat4(1)
+        self._scaleMatrix = mat4(1)
         self.visible = True
         self._dirty = True
         self._dirtyP = False

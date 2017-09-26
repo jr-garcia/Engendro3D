@@ -13,7 +13,6 @@ from ..model_management.MaterialClass import Material
 
 from cycgkit.cgtypes import mat4
 
-
 from bullet.bullet import ACTIVE_TAG, WANTS_DEACTIVATION
 
 
@@ -32,7 +31,7 @@ class Scene(object):
         self.sounds = engine.sounds
         self._engine = engine
         self._iID = ID
-        self.__lastUpdate = 0
+        self._lastUpdate = 0
         self.__skipped = 0
         self.__frames = 0
         self.beforeUpdateCallback = None
@@ -87,8 +86,8 @@ class Scene(object):
             if shape == bodyShapesEnum.auto:
                 shape = model._preShape
             materials = model.materials if materialsList is None else materialsList
-            modelIns = ModelInstance(materials, modelID, self._engine, IDInScene, animationQuality, position,
-                                     rotation, uniformScale, shape, mass, isDynamic)
+            modelIns = ModelInstance(materials, modelID, self._engine, IDInScene, animationQuality, position, rotation,
+                                     uniformScale, shape, mass, isDynamic)
             self.__currentDebugColor += 1
             if self.__currentDebugColor > len(self._DebugColors) - 1:
                 self.__currentDebugColor = 0
@@ -101,8 +100,7 @@ class Scene(object):
             return modelIns
         else:
             raise KeyError(
-                "Error adding model. The specified ID ('" + modelID +
-                "') does not exist.\nTry loading the model before calling addModel.")
+                    "Error adding model. The specified ID ('" + modelID + "') does not exist.\nTry loading the model before calling addModel.")
 
     def addLight(self, ltype=lightTypesEnum.directional, position=None, rotation=None, ID=''):
         """
@@ -148,42 +146,43 @@ class Scene(object):
 
     def _baseModelsUpdate(self):
         # Todo: implement per model calbacks
-        updatables = {}
-        simpleUpdateList = []
+        # updatables = {}
+        # simpleUpdateList = []
         for m in self._models.values():
             # assert isinstance(m, ModelInstance)
-            if m._dirty:
-                updatables[id(m)] = m
-                simpleUpdateList.append((id(m), m._position, m._rotation, m._scale))
-                m._dirty = False
-                m._dirtyP = False
+            # if m._dirty:
+            #     updatables[id(m)] = m
+            #     simpleUpdateList.append((id(m), m._position, m._rotation, m._scale))
+            #     m._dirty = False
+            #     m._dirtyP = False
+            m._update()  # todo: reimplement threaded update with stronger method And / or remove from physics vv
 
-        if len(simpleUpdateList) > 0:
-            res = self._engine.threading.map(updateModelTransformation, simpleUpdateList)
+        # if len(simpleUpdateList) > 0:
+        #     res = self._engine.threading.map(updateModelTransformation, simpleUpdateList)
+        #
+        #     if res:
+        #         for mt in res:
+        #             ID, trans, pos, rot, scale = mt
+        #             m = updatables[ID]
+        #             m._transformation = trans
+        #             m._positionMatrix = pos
+        #             m._rotationMatrix = rot
+        #             m._scaleMatrix = scale
+            if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
+                self.physics.removeRigidObject(m.physicsBody)
+                m.physicsBody._phyUpdWait = 0
+                m.visible = False
+            else:
+                if m.physicsBody._beyondBoundary:
+                    m.visible = True  # todo: add previous state detection
+                    self.physics.addRigidObject(m.physicsBody)
+                if not m.physicsBody._isTempKin:
+                    m.physicsBody._setAsKinematic()
+                m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
+                m.physicsBody._phyUpdWait = 2
 
-            if res:
-                for mt in res:
-                    ID, trans, pos, rot, scale = mt
-                    m = updatables[ID]
-                    m._transformation = trans
-                    m._positionMatrix = pos
-                    m._rotationMatrix = rot
-                    m._scaleMatrix = scale
-                    if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
-                        self.physics.removeRigidObject(m.physicsBody)
-                        m.physicsBody._phyUpdWait = 0
-                        m.visible = False
-                    else:
-                        if m.physicsBody._beyondBoundary:
-                            m.visible = True   # todo: add previous state detection
-                            self.physics.addRigidObject(m.physicsBody)
-                        if not m.physicsBody._isTempKin:
-                            m.physicsBody._setAsKinematic()
-                        m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
-                        m.physicsBody._phyUpdWait = 2
-
-                        for Sn in m._attachedSounds.values():
-                            Sn.soundSource.position = list(m._position)
+                for Sn in m._attachedSounds.values():
+                    Sn.soundSource.position = list(m._position)
 
     def _physicsModelsUpdate(self):
         # Todo: implement per model calbacks
@@ -202,8 +201,8 @@ class Scene(object):
                 # if lvcg > 0.4:
                 updatables[id(m)] = m
                 transform = m.physicsBody._motion.getWorldTransform()
-                pos = vec3(
-                    bulletVectorToList(transform.getOrigin() - Vector3(m._pOffset[0], m._pOffset[1], m._pOffset[2])))
+                pos = vec3(bulletVectorToList(
+                    transform.getOrigin() - Vector3(m._pOffset[0], m._pOffset[1], m._pOffset[2])))
                 rot = vec3(bulletQuatToRotList(transform.getRotation()))
                 m._position = pos
                 m._rotation = rot
@@ -237,37 +236,38 @@ class Scene(object):
 
     def _UpdateLights(self):
         # Todo: implement per model callbacks
-        updatables = {}
-        simpleUpdateList = []
+        # updatables = {}
+        # simpleUpdateList = []
         for m in self._lights.values():
             assert isinstance(m, light)
             if m._dirty:
-                updatables[id(m)] = m
-                simpleUpdateList.append((id(m), m._rotation))
-                m._dirty = False
-                m._dirtyP = False
+                # updatables[id(m)] = m
+                # simpleUpdateList.append((id(m), m._rotation))
+                # m._dirty = False
+                # m._dirtyP = False
+                m._update()
 
-        if len(simpleUpdateList) > 0:
-            res = self._engine.threading.map(updateLightTransformation, simpleUpdateList)
-            # res = list(map(updateLightTransformation, simpleUpdateList))
-
-            if res:
-                for mt in res:
-                    ID, rot = mt
-                    m = updatables[ID]
-                    m._rotationMatrix = rot
-                    if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
-                        self.physics.removeRigidObject(m.physicsBody)
-                        m.physicsBody._phyUpdWait = 0
-                        m.visible = False
-                    else:
-                        if m.physicsBody._beyondBoundary:
-                            m.visible = True   # todo: add previous state detection
-                            self.physics.addRigidObject(m.physicsBody)
-                        if not m.physicsBody._isTempKin:
-                            m.physicsBody._setAsKinematic()
-                        m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
-                        m.physicsBody._phyUpdWait = 2
+        # if len(simpleUpdateList) > 0:
+        #     res = self._engine.threading.map(updateLightTransformation, simpleUpdateList)
+        #     # res = list(map(updateLightTransformation, simpleUpdateList))
+        #
+        #     if res:
+        #         for mt in res:
+        #             ID, rot = mt
+        #             m = updatables[ID]
+        #             m._rotationMatrix = rot
+                if m._position[1] <= self.bottom and not m.physicsBody._beyondBoundary:
+                    self.physics.removeRigidObject(m.physicsBody)
+                    m.physicsBody._phyUpdWait = 0
+                    m.visible = False
+                else:
+                    if m.physicsBody._beyondBoundary:
+                        m.visible = True  # todo: add previous state detection
+                        self.physics.addRigidObject(m.physicsBody)
+                    if not m.physicsBody._isTempKin:
+                        m.physicsBody._setAsKinematic()
+                    m.physicsBody._motion._setKinematicState(list(m._position), list(m._rotationMatrix))
+                    m.physicsBody._phyUpdWait = 2
 
     def setDefaultSkyBox(self):
         self._sky = Skybox('default', self._engine)
@@ -284,10 +284,10 @@ class Scene(object):
     sky = property(_getSky, _setSky)
 
     def update(self, netTime, windowSize):
-        if self.__lastUpdate == 0:
+        if self._lastUpdate == 0:
             frameTime = 0
         else:
-            frameTime = netTime - self.__lastUpdate
+            frameTime = netTime - self._lastUpdate
         if self.beforeUpdateCallback is not None:
             self.beforeUpdateCallback([frameTime, netTime])
 
@@ -300,7 +300,7 @@ class Scene(object):
 
         if self._sky is not None:
             self._sky._update()
-        self.__lastUpdate = netTime
+        self._lastUpdate = netTime
 
         currentModelID = ''
         currentModel = None
@@ -366,13 +366,12 @@ class Scene(object):
             transformations = None
             if time is not None:
                 # todo: implement currentModel.hasBones debug bounding box
-                transformations = scene.getInstanceAnimationTransformations(currentModelInstance,
-                                                                            time, mesh)
+                transformations = scene.getInstanceAnimationTransformations(currentModelInstance, time, mesh)
                 # self._currentAnimatedBBox.clear()
             newDrawingData.meshes.add(mesh)
             meshMat = currentModelInstance._materials[mesh._materialIndex]
-            newDrawingData.instances[meshid].append(InstanceData(meshMat, defaultParams, transformations,
-                                                     currentModelInstance._baseModelID))
+            newDrawingData.instances[meshid].append(
+                InstanceData(meshMat, defaultParams, transformations, currentModelInstance._baseModelID))
         for cnode in node._childNodes:
             Scene.extractRenderInfo(currentModelInstance, defaultParams, cnode, newDrawingData, time, scene)
 
@@ -418,7 +417,7 @@ class Scene(object):
             anim = self._currentModel.animations[currentModelInstance._animationID]
             currentTransformations = self._currentModel.skeleton.getAnimationTranformations(anim, time, mesh)
 
-        # for b in mesh.boneMinMax.items():
+            # for b in mesh.boneMinMax.items():
             # flatm = currentTransformations[b[0]]
             # pointa = flatm * b[1][0]
             # self._currentAnimatedBBox.addPoint(pointa)
@@ -443,6 +442,3 @@ class DefaultSceneParameters(object):
 
     def construct(self):
         self.ViewProjection = self.projection * self.view
-
-
-
