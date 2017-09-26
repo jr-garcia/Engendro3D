@@ -123,6 +123,9 @@ class GuiManager:
         # fixme!
         raise NotImplementedError('Delete layer in GuiManager. Please report it.')
 
+    def hasLayerID(self, ID):
+        return ID in self._layers
+
     def getLayerOrder(self, layerID):
         return self._layersOrder.__getitem__(self._layers[layerID])
 
@@ -169,7 +172,7 @@ class GuiManager:
         defaultObjectParams.projection = self.projectionMatrix
         defaultObjectParams.hasBones = False
 
-        defaultObjectParams.model = child._transformation
+        defaultObjectParams.model = child.transformation
         downTrans = child.transformationMinusBorder
         if trans is not None:
             defaultObjectParams.model = trans * defaultObjectParams.model
