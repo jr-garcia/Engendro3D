@@ -13,9 +13,10 @@ class logLevelsEnum(object):
 
 class _Logger(object):
     def __init__(self):
-        self.loggers = {}
+        pass
 
-    def log(self, message, messageType=logLevelsEnum.debug):
+    @staticmethod
+    def log(message, messageType=logLevelsEnum.debug):
         """
 
 
@@ -29,7 +30,7 @@ class _Logger(object):
         else:
             modName = 'root'
 
-        logger = self.loggers.get(modName, logging.getLogger(modName))
+        logger = logging.getLogger(modName)
 
         if messageType == logLevelsEnum.debug:
             logger.debug(message)

@@ -2,7 +2,7 @@ from copy import copy
 from cycgkit.cgtypes import *
 
 from ..Base3DObjectClass import Base3DObject
-from ..Logging import logLevelsEnum
+from ..Logging import logLevelsEnum, _Logger
 
 from ..physics_management.physicsModule import bodyShapesEnum
 
@@ -73,7 +73,7 @@ class SimpleCamera(Base3DObject):
             self.projectionMatrix = mat4.perspective(self._p_fov, float(width) / float(height),
                                                      self._p_zNear, self._p_zFar)
         except Exception as ex:
-            self._engine.log(str(ex), logLevelsEnum.warning)
+            _Logger.log(str(ex), logLevelsEnum.warning)
             self.projectionMatrix = mat4.perspective(45, 640.0 / 480.0, 0.1, 500)
 
     def _update(self, force=False):
