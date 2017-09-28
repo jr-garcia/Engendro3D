@@ -10,11 +10,10 @@ class SingleChar(BaseControl):
        @rtype : Panel
     """
 
-    def __init__(self, top, left, width, height, char, parent, pinning=PinningEnum.TopLeft, fontID='default',
-                 fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1), fontColor=vec4(1, 1, 1, 1),
-                 fontWeight=.5, color=None, ID=None, imgID=None, rotation=None, borderSize=0.0):
+    def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, borderSize, gradientType):
 
-        super(SingleChar, self).__init__(top, left, width, height, parent, pinning, color, ID, imgID, rotation, borderSize=borderSize)
+        super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
+                                         borderSize, gradientType)
         self._char = char
         self._fontBorder = fontBorder
         self._fontBorderColor = fontBorderColor

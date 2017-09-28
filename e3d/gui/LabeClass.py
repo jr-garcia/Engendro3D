@@ -14,9 +14,9 @@ class Label(BaseControl):
        @rtype : Label
     """
 
-    def __init__(self, top, left, width, height, text, parent, pinning=PinningEnum.TopLeft, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
+    def __init__(self, left, top, width, height, text, parent, pinning=PinningEnum.TopLeft, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
                  fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, ID=None, imgID=None, rotation=None,
-                 borderSize=1):
+                 borderSize=1, gradientType=GradientTypesEnum.noGradient):
         """
         :param borderSize:
         :type borderSize:
@@ -29,8 +29,8 @@ class Label(BaseControl):
         self._fontBorderColor = fontBorderColor
         self._fontBorder = fontBorder
         self._fontID = fontID
-        super(Label, self).__init__(top, left, width, height, parent, pinning, color, ID, imgID, rotation,
-                                    borderSize=borderSize)
+        super(Label, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation, borderSize,
+                                    gradientType)
         self._isBuilt = False
         self._dirtyProperties = True
 
@@ -54,8 +54,8 @@ class Label(BaseControl):
         except AttributeError:
             self._children = []
         for c in self._text:
-            newChar = SingleChar(vec3(0, 0, 1), 1, 1, c, self, self._fontID, self._fontBorder, self._fontBorderColor,
-                                 self._fontColor, self._fontWeight, borderSize=0, color=[0, 0, 0, 0])
+            newChar = SingleChar(0, 0, 1, 1, c, self, PinningEnum.TopLeft, self._fontID, self._fontBorder,
+                                 self._fontBorderColor, self._fontColor, self._fontWeight)
             self._chars.append(newChar)
         self._setCharsRatio()
 
