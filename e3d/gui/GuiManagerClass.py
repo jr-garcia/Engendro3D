@@ -166,17 +166,18 @@ class GuiManager:
             instances.clear()
             instances[key].extend(finals)
 
-    def _buildLayerDrawingData(self, child, trans, layerDrawingData):
+    def _buildLayerDrawingData(self, child, parentTrans, layerDrawingData):
         defaultObjectParams = DefaultObjectParameters()
         defaultObjectParams.view = self.view
         defaultObjectParams.projection = self.projectionMatrix
         defaultObjectParams.hasBones = False
 
-        defaultObjectParams.model = child.transformation
-        downTrans = child.transformationMinusBorder
-        if trans is not None:
-            defaultObjectParams.model = trans * defaultObjectParams.model
-            downTrans = trans * child.transformationMinusBorder
+        if parentTrans is not None:
+            defaultObjectParams.model = parentTrans * child.transformation
+            downTrans = parentTrans * child.transformationMinusBorder
+        else:
+            defaultObjectParams.model = child.transformation
+            downTrans = child.transformationMinusBorder
 
         defaultObjectParams.construct()
 
@@ -241,7 +242,7 @@ class GuiManager:
             try:
                 with open(finalInfoPath, 'w') as dest:
                     dump(fontRangeInfo, dest, default=GuiManager.convertToJsonable)
-            except:
+            except Exception:
                 os.remove(finalInfoPath)
                 os.remove(finalPath)
                 raise
