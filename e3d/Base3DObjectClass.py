@@ -12,9 +12,11 @@ class Attachable(object):
 
     parent = property(_getParent)
 
-    def __init__(self):
+    def __init__(self, parent):
         self._children = []
         self._parent = None
+        if parent is not None:
+            self.attachTo(parent)
 
     def attachTo(self, parent):
         if parent is not None:
@@ -22,8 +24,10 @@ class Attachable(object):
                 if self._parent is not None:
                     try:
                         self._parent._children.pop(self._parent._children.index(self._children))
-                    except:
+                    except Exception:
                         pass
+                if self in parent._children:
+                    return 
                 parent._children.append(self)
                 parent._dirty = True
                 self._parent = parent
@@ -52,12 +56,12 @@ class Base3DObject(Attachable):
     __metaclass__ = ABCMeta
 
     def __init__(self, position, rotation, uniformScale, size, shape=bodyShapesEnum.box, mass=None, isDynamic=False,
-                 ID='', offset=None):
+                 ID='', offset=None, parent=None):
         if not offset:
             offset = [0, 0, 0]
-        super(Base3DObject, self).__init__()
-        self.debugColor = []
         self.ID = ID
+        super(Base3DObject, self).__init__(parent)
+        self.debugColor = []
         self._transformation = None
         self._forwardConstant = vec3(0, 0, 1)
         self._position = vec3(position)
@@ -318,10 +322,22 @@ class DefaultObjectParameters(object):
     def construct(self):
         self.ModelView = self.view * self.model
         self.ModelViewProjection = self.projection * self.ModelView
-        self.ModelInverse = self.model.inversed()
+        try:
+            self.ModelInverse = self.model.inversed()
+        except RuntimeError:
+            self.ModelInverse = mat4(1)
         self.ModelInverseTranspose = self.ModelInverse.transposed()
-        self.ModelViewInverse = self.ModelView.inversed()
-        self.ModelViewInverseTranspose = self.ModelViewInverse.transposed()
+        try:
+            self.ModelViewInverse = self.ModelView.inversed()
+        except RuntimeError:
+            self.ModelViewInverse = mat4(1)
+        try:
+            self.ModelViewInverseTranspose = self.ModelViewInverse.transposed()
+        except RuntimeError:
+            self.ModelViewInverseTranspose = mat4(1)
         self.ModelProjection = self.projection * self.model
-        self.NormalMatrix = self.ModelView.getMat3().inversed().transposed()
+        try:
+            self.NormalMatrix = self.ModelView.getMat3().inversed().transposed()
+        except RuntimeError:
+            self.NormalMatrix = mat4(1)
         # todo:convert each field into property to multiply only when needed.
