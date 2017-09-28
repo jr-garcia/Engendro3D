@@ -16,13 +16,15 @@ class Layer(Attachable):
             @rtype : Layer
             @type visible: bool
             """
-        super(Layer, self).__init__()
+        super(Layer, self).__init__(None)
         self.ID = ID
         self.visible = visible
         self._realSize = vec3(1)
         self._realScale = vec3(1)
         self._inverseScale = vec3(1)
         self._guiMan = guiMan
+        self._previousSize = self.realSize
+        self._onInit = True
         self._updateRealSize()
 
     def _getis2D(self):
@@ -42,14 +44,22 @@ class Layer(Attachable):
                 c._update()
 
     def _updateRealSize(self):
+        self._previousSize = self._realSize
         x, y = self._guiMan._window.size
         baseSize = vec3(x, y, 1)
         self._realSize = baseSize
+        if self._onInit:
+            self._previousSize = self._realSize
+            self._onInit = False
 
     def getRealSize(self):
         return self._realSize
 
     realSize = property(getRealSize)
+
+    @property
+    def size(self):
+        return self._realSize
 
     def _getRealScale(self):
         return self._realScale
