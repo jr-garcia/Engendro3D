@@ -145,7 +145,7 @@ class GuiManager:
         for layer in self._layersOrder:
             if layer.visible:
                 layer._update()
-                for child in layer._children:
+                for child in reversed(layer._children):
                     if child.visible:
                         self._buildLayerDrawingData(child, None, newDrawingData)
 

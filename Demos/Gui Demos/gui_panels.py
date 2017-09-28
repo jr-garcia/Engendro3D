@@ -75,7 +75,7 @@ class Demo(_Demo_Base):
             panel.borderSize = 1
 
         for i in range(4):
-            Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, .5))
+            Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, 1))
 
 
 if __name__ == '__main__':
