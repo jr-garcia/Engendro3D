@@ -158,26 +158,26 @@ class game:  # TODO: Inherith from _BaseDemo
         logos = []
         logoSize = 100
         fDis = 200 - logoSize
-        logos.append(Panel([0.0, 0.0], logoSize, logoSize, self.onelayer))
-        logos.append(Panel([fDis, 0.0], logoSize, logoSize, self.onelayer))
-        logos.append(Panel([0.0, fDis], logoSize, logoSize, self.onelayer))
-        logos.append(Panel([fDis, fDis], logoSize, logoSize, self.onelayer))
+        logos.append(Panel(0.0, 0.0, logoSize, logoSize, self.onelayer))
+        logos.append(Panel(0.0, fDis, logoSize, logoSize, self.onelayer))
+        logos.append(Panel(fDis, 0.0, logoSize, logoSize, self.onelayer))
+        logos.append(Panel(fDis, fDis, logoSize, logoSize, self.onelayer))
         for panel in logos:
             panel.color = [0, 0, 0, 0]
             panel.backgroundImageID = 'logo'
             panel.opacity = .7
             panel.borderSize = 0
 
-        self.char = SingleChar([1, 12], 60, 60, '?', self.onelayer)
+        self.char = SingleChar(12, 1, 60, 60, '?', self.onelayer,,
         self.char.fontBorderColor = vec4(1, 0, 0, 1)
         self.char.fontBorder = 0.2
         self.char.fontWeight = .5
 
-        self.label1 = Label([2, 9], 380, 380, 'Gui needs a lot of work.', parent=textLayer, fontID='default')
-        self.label2 = Label([5, 400], 380, 320, '%#@%^%(*)!', parent=textLayer, fontID='auto',
+        self.label1 = Label(2, 9, 380, 380, 'Gui needs a lot of work.', parent=textLayer, fontID='default')
+        self.label2 = Label(5, 400, 380, 320, '%#@%^%(*)!', parent=textLayer, fontID='auto',
                             fontColor=[.5, .5, 0, .8], fontBorder=1.1, fontBorderColor=[0, 1, 0, 1])
 
-        self.label3 = Label([.02, .8], 97, 5, 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
+        self.label3 = Label(.02, .8, 97, 5, 'Press CTRL, SHIFT, UP, DOWN or resize the window', textLayer)
 
         self.label1.color = [1, 0, 0, 1]
         self.label2.color = [0, 1, 0, .5]

@@ -145,9 +145,9 @@ class _Demo_Base(object):
         bottomBorder = h - logosSize
         
         logos.append(Panel(0, 0, logosSize, logosSize, self.onelayer))
-        logos.append(Panel(0, rightBorder, logosSize, logosSize, self.onelayer, PinningEnum.TopRight))
-        logos.append(Panel(bottomBorder, 0, logosSize, logosSize, self.onelayer, PinningEnum.BottomLeft))
-        logos.append(Panel(bottomBorder, rightBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomRight))
+        logos.append(Panel(rightBorder, 0, logosSize, logosSize, self.onelayer, PinningEnum.TopRight))
+        logos.append(Panel(0, bottomBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomLeft))
+        logos.append(Panel(rightBorder, bottomBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomRight))
         for panel in logos:
             panel.color = 0
             panel.borderSize = 0

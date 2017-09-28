@@ -50,14 +50,32 @@ class Demo(_Demo_Base):
 
         panelSize = 100
 
-        borderedPanel = Panel(0, 110, panelSize, panelSize, self.onelayer, borderSize=5)
-        longPanel = Panel(0, 220, panelSize * 2.5, panelSize, self.onelayer, color=vec4(1, 0, 1, 1), borderSize=0)
-
+        borderedPanel = Panel(110, 0, panelSize, panelSize, self.onelayer)
+        longPanel = Panel(220, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(1, 0, 1, 1), borderSize=0)
         for i in range(9):
-            Panel(105, 110 * i, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i).opacity = .7
+            Panel(110 * i, 105, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i).opacity = .7
 
-        pinnedPanel = Panel(220, 430, panelSize, panelSize, self.onelayer, color=vec4(0, 1, 0, .5), borderSize=5)
+        pinnedW = panelSize * 4
+        pinnedH = panelSize * 2
+        pinnedCorners = []
+        cornerSize = 30
+        rightBorder = pinnedW - cornerSize
+        bottomBorder = pinnedH - cornerSize
+
+        pinnedPanel = Panel(250, 220, pinnedW, pinnedH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
+                            borderSize=5)
         pinnedPanel.pinning = PinningEnum.all
+        pinnedCorners.append(Panel(0, 0, cornerSize, cornerSize, pinnedPanel))
+        pinnedCorners.append(Panel(rightBorder, 0, cornerSize, cornerSize, pinnedPanel, PinningEnum.TopRight))
+        pinnedCorners.append(Panel(0, bottomBorder, cornerSize, cornerSize, pinnedPanel, PinningEnum.BottomLeft))
+        pinnedCorners.append(Panel(rightBorder, bottomBorder, cornerSize, cornerSize, pinnedPanel,
+                                   PinningEnum.BottomRight))
+        for panel in pinnedCorners:
+            panel.color = vec4(.5, 1, 1, 1)
+            panel.borderSize = 1
+
+        for i in range(4):
+            Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, .5))
 
 
 if __name__ == '__main__':
