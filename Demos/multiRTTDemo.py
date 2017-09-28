@@ -1,7 +1,7 @@
 
 from cycgkit.cgtypes import vec3
 
-from Demos._base._BaseDemo import _Demo_Base, runDemo
+from Demos._base._BaseDemo import _Demo_Base, runDemo, LOGOSSIZE
 from Demos._base._model_paths import *
 from e3d.cameras import SimpleCamera
 from e3d.gui import Panel
@@ -137,23 +137,17 @@ class Demo(_Demo_Base):
 
     def buildGui(self):
         self.onelayer = self.window.gui.addLayer('one')
-        logos = []
-        pSize = 0.1
-        rtSize = (0.1, 0.12)
-        fDis = 1.0 - pSize[0]
-        logos.append(Panel(pSize, [0.0, 0.0], self.onelayer,,)
-        logos.append(Panel(pSize, [fDis, 0.0], self.onelayer,,)
-        logos.append(Panel(pSize, [0.0, fDis], self.onelayer,,)
-        logos.append(Panel(pSize, [fDis, fDis], self.onelayer,,)
-        for panel in logos:
-            panel.backgroundImageID = 'logo'
-            panel.opacity = .5
-            
-        diffuse = Panel(rtSize, rtSize, 0.0, 0.0, self.onelayer,,
-        normals = Panel(rtSize, rtSize[0], 0.0, self.onelayer,,
-        positions = Panel(rtSize, [rtSize[0] * 2, 0.0], self.onelayer,,
-        depth = Panel(rtSize, [rtSize[0] * 3, 0.0], self.onelayer,,
-        diffuse.backgroundImageID = self.fse.ID + '_diffuse'
+        super(Demo, self).buildGui()
+
+        rtW = 120
+        rtH = 100
+        left = LOGOSSIZE + 10
+        diffuse = Panel(left, 0, rtW, rtH, self.onelayer)
+        normals = Panel(left + rtW, 0, rtW, rtH, self.onelayer)
+        positions = Panel(left + rtW * 2, 0, rtW, rtH, self.onelayer)
+        depth = Panel(left + rtW * 3, 0, rtW, rtH, self.onelayer)
+
+        diffuse.backgroundImageID = self.fse.ID + '_diffuse'  # TODO: implement texture retrieval
         normals.backgroundImageID = self.fse.ID + '_normals'
         positions.backgroundImageID = self.fse.ID + '_positions'
         depth.backgroundImageID = self.fse.ID + '_depth'

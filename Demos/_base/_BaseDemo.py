@@ -16,6 +16,7 @@ from e3d.events_processing.EventsManagerClass import EventsListener
 from e3d.gui import Panel, PinningEnum
 
 GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
+LOGOSSIZE = 60
 
 
 class _Demo_Base(object):
@@ -140,14 +141,14 @@ class _Demo_Base(object):
         w, h = self.window.size
         
         logos = []
-        logosSize = 60
-        rightBorder = w - logosSize
-        bottomBorder = h - logosSize
+
+        rightBorder = w - LOGOSSIZE
+        bottomBorder = h - LOGOSSIZE
         
-        logos.append(Panel(0, 0, logosSize, logosSize, self.onelayer))
-        logos.append(Panel(rightBorder, 0, logosSize, logosSize, self.onelayer, PinningEnum.TopRight))
-        logos.append(Panel(0, bottomBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomLeft))
-        logos.append(Panel(rightBorder, bottomBorder, logosSize, logosSize, self.onelayer, PinningEnum.BottomRight))
+        logos.append(Panel(0, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer))
+        logos.append(Panel(rightBorder, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.TopRight))
+        logos.append(Panel(0, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomLeft))
+        logos.append(Panel(rightBorder, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomRight))
         for panel in logos:
             panel.color = 0
             panel.borderSize = 0
