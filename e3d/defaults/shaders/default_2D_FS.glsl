@@ -14,9 +14,7 @@ uniform int GradientDirection = 0;
 
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
-uniform vec3 realScale;
 uniform vec3 realSize;
-uniform vec3 WindowSize;
 
 
 vec4 getGradColorSided(float spos)
