@@ -330,7 +330,7 @@ class BaseControl(Base3DObject):
             npos.y = (1.0 - npos.y - self._scale.y)
         self._positionMatrix = mat4.translation(npos)
         self._scaleMatrix = mat4.scaling(self._scale)
-        self._transformation = self._positionMatrix * self._rotationMatrix * self._scaleMatrix
+        self._transformation = self._positionMatrix * self._scaleMatrix * self._rotationMatrix
 
     def _updateRealSizePosition(self):
         parent = self.parent
