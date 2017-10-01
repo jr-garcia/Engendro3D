@@ -186,7 +186,7 @@ class GuiManager:
         meshMat = child._material
         layerDrawingData.instances[meshid].append(InstanceData(meshMat, defaultObjectParams))
 
-        for c in child._children:
+        for c in reversed(child._children):
             if c.visible:
                 self._buildLayerDrawingData(c, downTrans, layerDrawingData)
 
