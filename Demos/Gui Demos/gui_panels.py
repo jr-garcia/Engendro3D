@@ -7,7 +7,7 @@ from e3d.gui import Panel, GradientTypesEnum, PinningEnum
 class Demo(_Demo_Base):
     def __init__(self, winSize):
         super(Demo, self).__init__(winSize)
-        self.texturesToLoad = [['e3dlogo.png', 'logo']]
+        self.texturesToLoad = [['e3dlogo.png', 'logo'], ['textures/Grass.jpg', 'grass']]
 
     def loadModels(self):
         engine = self.engine
@@ -41,6 +41,8 @@ class Demo(_Demo_Base):
         movespeed = ft / 10.0
         self.lastspeed = movespeed
         if self.dorot:
+            # self.rotatingPanel.rotate2D(1)
+            self.scrollingPanel._material.uvOffset.x += .01
             if self.triangle:
                 self.triangle.rotateY(.1 * ft)
 
@@ -51,6 +53,8 @@ class Demo(_Demo_Base):
         panelSize = 100
 
         borderedPanel = Panel(110, 0, panelSize, panelSize, self.onelayer)
+        # self.rotatingPanel = borderedPanel
+        
         longPanel = Panel(220, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(1, 0, 1, 1), borderSize=0)
         for i in range(9):
             Panel(110 * i, 105, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i).opacity = .7
@@ -73,6 +77,8 @@ class Demo(_Demo_Base):
         for panel in pinnedCorners:
             panel.color = vec4(.5, 1, 1, 1)
             panel.borderSize = 1
+
+        self.scrollingPanel = Panel(600, 0, panelSize, panelSize, self.onelayer, borderSize=0, imgID='grass')
 
         for i in range(4):
             Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, 1))
