@@ -425,6 +425,24 @@ class BaseControl(Base3DObject):
         for c in reversed(self._children):
             c._resizeCallback()
 
+    def rotateX(self, angle):
+        if self.is2D:
+            raise RuntimeError('2d objects can only be rotated using \'rotate2D\'')
+
+    def rotateY(self, angle):
+        if self.is2D:
+            raise RuntimeError('2d objects can only be rotated using \'rotate2D\'')
+
+    def rotateZ(self, angle):
+        if self.is2D:
+            raise RuntimeError('2d objects can only be rotated using \'rotate2D\'')
+
+    def rotate2D(self, angle):
+        super(BaseControl, self).rotateZ(angle)
+
+    # def _updateRotationMatrix(self):
+    #     self._rotationMatrix = self._buildRotMat(self._rotation.x, self._rotation.y, self._rotation.z))
+
 
 def ewMul(a, b):
     return vec3(a.x * b.x, a.y * b.y, a.z * b.z)
