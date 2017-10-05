@@ -25,19 +25,20 @@ class Demo(_Demo_Base):
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
+        keyName = e.keyName
         try:
-            e.keyName = e.keyName.decode()
-        except:
+            keyName = keyName.decode()
+        except Exception:
             pass
-        if e.keyName.__contains__('shift'):
+        if 'shift' in keyName:
             self.window.mouseLock = not self.window.mouseLock
-        if e.keyName == 'escape':  # ESC
+        if keyName == 'escape':  # ESC
             self.close()
-        if e.keyName == 'space':
+        if keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
-        if e.keyName.__contains__('ctrl'):
+        if keyName.__contains__('ctrl'):
             self.dorot = not self.dorot
-        if e.keyName == 'f1':  # F1
+        if keyName == 'f1':  # F1
             np = [round(d, 3) for d in self.camera.position]
             print('Camera pos:{0}'.format(str(np)))
 
@@ -118,9 +119,10 @@ class Demo(_Demo_Base):
 
         engine.models.loadModel(dwarfMODEL, "dwarfmodel", preCalculateFrames=-1)
         self.dwarf = self.scene1.addModel('dwarfmodel', 'dwarf1', vec3(0), vec3(0), 13)
-        self.dwarf.rotateY(180)
-        self.dwarf.moveRight(100)
-        self.dwarf.setAnimation(self.dwarf.getAnimationsList()[0], True)
+        self_dwarf = self.dwarf
+        self_dwarf.rotateY(180)
+        self_dwarf.moveRight(100)
+        self_dwarf.setAnimation(self_dwarf.getAnimationsList()[0], True)
 
         engine.models.loadModel(tubeMODEL, "tubemodel")
         self.tube = self.scene1.addModel('tubemodel', 'tube1', vec3(0), vec3(0), 7)

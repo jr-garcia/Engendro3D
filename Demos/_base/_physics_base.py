@@ -78,26 +78,28 @@ class Demo(_Demo_Base):
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
-        if e.keyName.__contains__('shift'):
+        keyName = e.keyName
+        if 'shift' in keyName:
             self.window.mouseLock = not self.window.mouseLock
-        if e.keyName == 'escape':  # ESC
+        if keyName == 'escape':  # ESC
             self.close()
-        if e.keyName == 'f8':
+        if keyName == 'f8':
             self.window.backend.debugModeActive = not self.window.backend.debugModeActive
-        if e.keyName == 'f4':
+        if keyName == 'f4':
             self.window.backend.showAsWireframe = not self.window.backend.showAsWireframe
-        if e.keyName == 'space':
+        if keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
-        if e.keyName.__contains__('ctrl'):
+        if keyName.__contains__('ctrl'):
             self.dorot = not self.dorot
-        if e.keyName == 'f1':
+        if keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            self._engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            self._engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
+            engine = self._engine
+            engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
+            engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
                        logLevelsEnum.info)
-            self._engine.log('Boxes: ' + str(self.boxcount), logLevelsEnum.debug)
-            self._engine.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
-        if e.keyName == 'g':
+            engine.log('Boxes: ' + str(self.boxcount), logLevelsEnum.debug)
+            engine.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
+        if keyName == 'g':
             val = self.window.gamma
             print ('old gamma:' + str(val))
             if val <= 1.8:
@@ -105,18 +107,18 @@ class Demo(_Demo_Base):
             else:
                 self.window.gamma = 1.7
             print ('new gamma:' + str(self.window.gamma))
-        if e.keyName == 'right':
+        if keyName == 'right':
             self.scene1.physics.step(50)
-        if e.keyName == 'left':
+        if keyName == 'left':
             self.scene1.physics.paused = False
-        if e.keyName == 'p':
+        if keyName == 'p':
             self.box1.physicsBody.punchCenter(250, [1, .5, 0])
-        if e.keyName == 'l':
+        if keyName == 'l':
             self.dlight.enabled = not self.dlight.enabled
-        if e.keyName == 'n':
+        if keyName == 'n':
             for mat in self.bumpymats:
                 mat.useNormalMapTexture = not mat.useNormalMapTexture
-        if e.keyName == 't':
+        if keyName == 't':
             for mat in self.texmats:
                 mat.useDiffuseTexture = not mat.useDiffuseTexture
 
