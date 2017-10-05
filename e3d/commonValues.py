@@ -139,3 +139,11 @@ def _threeAxisRot(r11, r12, r21, r31, r32):
         pass
     res[2] = arctan2(r11, r12)
     return res
+
+
+def ewMul(a, b):
+    return vec3(a.x * b.x, a.y * b.y, a.z * b.z)
+
+
+def ewDiv(a, b):
+    return vec3(a.x / b.x, a.y / b.y, a.z / b.z)

@@ -1,9 +1,11 @@
-from abc import ABCMeta, abstractmethod
-from cycgkit.cgtypes import vec3, vec4, mat4
+from abc import abstractmethod
 
+from cycgkit.cgtypes import vec3
+
+from e3d.commonValues import ewDiv, ewMul
+from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 from ..Base3DObjectClass import Base3DObject
 from ..model_management.MaterialClass import *
-from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 
 
 class GradientTypesEnum(object):
@@ -73,13 +75,14 @@ class BaseControl(Base3DObject):
         self._left = left
         self._width = width or 1
         self._height = height or 1
+        self._realScale = vec3(1)
+        self._inverseScale = vec3(1)
 
-        position = vec3(left, top, 0)
-        position = self._convertPixelToParent(position)
+        scaledPosition = self._convertPixelToParent(vec3(left, top, 0))
 
         if ID is None:
             ID = str(id(self))
-        super(BaseControl, self).__init__(position, rotation, 1, 1, ID=ID, parent=parent)
+        super(BaseControl, self).__init__(scaledPosition, rotation, 1, 1, ID=ID, parent=parent)
 
         sw, sh, _ = self.parent.size
         self._bottom = sh - (self._top + self._height)
@@ -118,8 +121,6 @@ class BaseControl(Base3DObject):
 
         self._set2d()
 
-        self._realScale = vec3(1)
-        self._inverseScale = vec3(1)
         material.shaderProperties.append(Vec3ShaderProperty('realSize', self._realSize))
         material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
         material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
@@ -280,7 +281,7 @@ class BaseControl(Base3DObject):
         return npos
 
     def _setAbsolutePosition(self, value):
-        npos = value
+        npos = value + vec3(.5, .5, 0)
         self._position = self._convertParentToPixel(vec3(npos))
         self._material.shaderProperties['relativePosition'] = self._position
 
@@ -330,8 +331,23 @@ class BaseControl(Base3DObject):
             npos.y = (1.0 - npos.y - self._scale.y)
         self._positionMatrix = mat4.translation(npos)
         self._scaleMatrix = mat4.scaling(self._scale)
-        self._transformation = self._positionMatrix * self._scaleMatrix * self._rotationMatrix
+        offsetMat = mat4.translation(ewMul(vec3(.5, .5, 0), self.realScale))
+        self._transformation = offsetMat * self._positionMatrix * self._scaleMatrix * self._rotationMatrix
 
+    def _getTransformationMinusBorder(self):
+        npos = vec3(self._position)
+        if self._is2D:
+            npos.y = (1.0 - npos.y - self._innerSize.y)
+
+        npos.x += (self._scale.x - self._innerSize.x) / 2.0
+        npos.y -= (self._scale.y - self._innerSize.y) / 2.0
+        alteredPositionMatrix = mat4.translation(npos)
+        alteredScaleMatrix = mat4.scaling(self._innerSize)
+        alteredTransformation = alteredPositionMatrix * alteredScaleMatrix * self._rotationMatrix
+        return alteredTransformation
+
+    transformationMinusBorder = property(_getTransformationMinusBorder)
+    
     def _updateRealSizePosition(self):
         parent = self.parent
         if parent is None:
@@ -405,19 +421,6 @@ class BaseControl(Base3DObject):
 
     realScale = property(_getRealScale, doc='Size of control in window percentage.')
 
-    def _getTransformationMinusBorder(self):
-        npos = vec3(self._position)
-        if self._is2D:
-            npos.y = (1.0 - npos.y - self._innerSize.y)
-
-        npos.x += (self._scale.x - self._innerSize.x) / 2.0
-        npos.y -= (self._scale.y - self._innerSize.y) / 2.0
-        alteredPositionMatrix = mat4.translation(npos)
-        alteredScaleMatrix = mat4.scaling(self._innerSize)
-        alteredTransformation = alteredPositionMatrix * self._rotationMatrix * alteredScaleMatrix
-        return alteredTransformation
-
-    transformationMinusBorder = property(_getTransformationMinusBorder)
 
     def _resizeCallback(self):
         self._setPinning()
@@ -439,17 +442,6 @@ class BaseControl(Base3DObject):
 
     def rotate2D(self, angle):
         super(BaseControl, self).rotateZ(angle)
-
-    # def _updateRotationMatrix(self):
-    #     self._rotationMatrix = self._buildRotMat(self._rotation.x, self._rotation.y, self._rotation.z))
-
-
-def ewMul(a, b):
-    return vec3(a.x * b.x, a.y * b.y, a.z * b.z)
-
-
-def ewDiv(a, b):
-    return vec3(a.x / b.x, a.y / b.y, a.z / b.z)
 
 
 class Material2D(Material):

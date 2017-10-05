@@ -23,16 +23,19 @@ class Demo(_Demo_Base):
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
+        keyName = e.keyName
         try:
-            e.keyName = e.keyName.decode()
+            e.keyName = keyName.decode()
         except Exception:
             pass
 
-        if e.keyName == 'escape':  # ESC
+        if keyName == 'escape':  # ESC
             self.close()
-        if e.keyName.__contains__('space'):
+        if 'ctrl' in keyName:
+            self.dorot = not self.dorot
+        if keyName.__contains__('space'):
             self.window.setFullScreen(not self.window.isFullScreen())
-        if e.keyName == 'f1':  # F1
+        if keyName == 'f1':  # F1
             np = [round(d, 3) for d in self.camera.position]
             print('Camera pos:{0}'.format(str(np)))
 
@@ -41,7 +44,7 @@ class Demo(_Demo_Base):
         movespeed = ft / 10.0
         self.lastspeed = movespeed
         if self.dorot:
-            # self.rotatingPanel.rotate2D(1)
+            self.rotatingPanel.rotate2D(1)
             self.scrollingPanel._material.uvOffset.x += .01
             if self.triangle:
                 self.triangle.rotateY(.1 * ft)
@@ -53,7 +56,7 @@ class Demo(_Demo_Base):
         panelSize = 100
 
         borderedPanel = Panel(110, 0, panelSize, panelSize, self.onelayer)
-        # self.rotatingPanel = borderedPanel
+        self.rotatingPanel = borderedPanel
         
         longPanel = Panel(220, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(1, 0, 1, 1), borderSize=0)
         for i in range(9):

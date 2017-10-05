@@ -1,6 +1,5 @@
-from .BaseControlClass import BaseControl
-from .SingleCharClass import *
 from .FontRendering.MSDFAtlasRenderer import AtlasInfo, CharData
+from .SingleCharClass import *
 
 DEFAULTSPACING = 10
 

@@ -5,7 +5,7 @@ uniform vec4 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 uniform float Opacity;
 
-varying vec2 originalposition;
+varying vec2 fixedposition;
 
 uniform vec4 GradientColor0 = vec4(1, 0, 0, 1);
 uniform vec4 GradientColor1 = vec4(0, 0, 1, 1);
@@ -62,7 +62,7 @@ vec4 getGradientRGBA(vec2 coords)
 void main()
 {
     vec4 objectdiffuse, texCol, bgcol;
-    vec2 realPos = clamp(originalposition, 0.0, 1.0) * realSize.xy;
+    vec2 realPos = clamp(fixedposition, 0.0, 1.0) * realSize.xy;
 
     if (realPos.x < borderSize || realPos.y < borderSize ||
         realPos.x > (realSize.x - borderSize) || realPos.y > (realSize.y - borderSize))
@@ -72,7 +72,7 @@ void main()
     else
     {
         if (GradientType>=0)
-            bgcol = getGradientRGBA(originalposition);
+            bgcol = getGradientRGBA(fixedposition);
         else
             bgcol = DiffuseColor;
 

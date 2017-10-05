@@ -99,7 +99,7 @@ class _Demo_Base(object):
             args = args[0]
             if len(args) == 2:
                 args.append(False)
-            print('<< Loading texture:' + args[1])
+            print('<< Loading texture: ' + args[1])
             # self.pendingTex += 1
             # self.isWaitingTex = True
             self.engine.textures.loadTexture(args[0], args[1], args[2])

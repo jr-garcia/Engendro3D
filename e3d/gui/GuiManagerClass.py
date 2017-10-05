@@ -41,7 +41,7 @@ class GuiManager:
         if not os.path.exists(self.fontsCache):
             os.mkdir(self.fontsCache)
 
-        vertices = np.array([[0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 0]], dtype=np.float32)
+        vertices = np.array([[-.5, .5, 0], [-.5, -.5, 0], [.5, -.5, 0], [.5, .5, 0]], dtype=np.float32)
         faces = np.array([[0, 1, 2], [0, 2, 3]], dtype=np.int32)
         self.quadmesh = Mesh.fromObjectInfo(vertices, faces, ([0, 0, 0], [1, 1, 1]), UVCalculationTypeEnum.planar,
                                             NormalsCalculationTypeEnum.hard, materialIndex=1)
