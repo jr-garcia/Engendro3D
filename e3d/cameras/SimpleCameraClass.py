@@ -38,7 +38,8 @@ class SimpleCamera(Base3DObject):
     #
     # lookAt = property(fget=get_lookAt)
 
-    def __init__(self, position=vec3(0), rotation=vec3(0), size=None, shape=bodyShapesEnum.capsule, fov=45, zFar=5000, zNear=1, ID=''):
+    def __init__(self, position=vec3(0), rotation=vec3(0), size=None, shape=bodyShapesEnum.capsule,
+                 fov=45, zFar=5000, zNear=1, ID=None):
         """
         Basic Camera
         @type position: list
@@ -48,6 +49,8 @@ class SimpleCamera(Base3DObject):
         @type sceneHeight: int
         @rtype : SimpleCamera
         """
+        if ID is None:
+            ID = id(self)
         if not size:
             size = [1, 5, 1]
 
