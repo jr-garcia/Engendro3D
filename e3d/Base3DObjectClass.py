@@ -71,7 +71,7 @@ class Base3DObject(Attachable):
         self._positionMatrix = mat4(1)
         self._scaleMatrix = mat4(1)
         self.visible = True
-        self._dirty = True
+        self._dirty_ = True
         self._dirtyP = False
         self._animationID = ''
         self._animationStartupTime = -1
@@ -156,6 +156,17 @@ class Base3DObject(Attachable):
         return self._transformation
 
     transformation = property(_getTransformation)
+
+    @property
+    def _dirty(self):
+        return self._dirty_
+
+    @_dirty.setter
+    def _dirty(self, value):
+        self._dirty_ = value
+        if value:
+            for c in self._children:
+                c._dirty = True
 
     def _updateTransformation(self):
         self._updateRotationMatrix()
