@@ -2,14 +2,14 @@
 attribute vec3 position;
 uniform mat4 ModelProjection;
 varying vec2 f_texcoord;
-varying vec2 fixedposition;
+varying vec2 fixedPosition;
 uniform bool UpSideDownTextures;
 uniform vec4 uvOffset;
 
 void main()
 {
-    fixedposition = position.xy + vec2(.5);
-    f_texcoord =  vec2(fixedposition.xy);
+    fixedPosition = position.xy + vec2(.5);
+    f_texcoord =  vec2(fixedPosition.xy);
     if (!UpSideDownTextures)
         f_texcoord.y =  1.0 - f_texcoord.y;
 

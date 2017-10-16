@@ -5,7 +5,7 @@ uniform vec4 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 uniform float Opacity;
 
-varying vec2 fixedposition;
+varying vec2 fixedPosition;
 
 uniform vec4 GradientColor0 = vec4(1, 0, 0, 1);
 uniform vec4 GradientColor1 = vec4(0, 0, 1, 1);
@@ -14,7 +14,7 @@ uniform int GradientDirection = 0;
 
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
-uniform vec3 realSize;
+uniform vec3 pixelSize;
 
 
 vec4 getGradColorSided(float spos)
@@ -62,17 +62,17 @@ vec4 getGradientRGBA(vec2 coords)
 void main()
 {
     vec4 objectdiffuse, texCol, bgcol;
-    vec2 realPos = clamp(fixedposition, 0.0, 1.0) * realSize.xy;
+    vec2 realPos = clamp(fixedPosition, 0.0, 1.0) * pixelSize.xy;
 
     if (realPos.x < borderSize || realPos.y < borderSize ||
-        realPos.x > (realSize.x - borderSize) || realPos.y > (realSize.y - borderSize))
+        realPos.x > (pixelSize.x - borderSize) || realPos.y > (pixelSize.y - borderSize))
     {
         objectdiffuse = vec4(borderColor.rgb, borderColor.a * Opacity);
     }
     else
     {
         if (GradientType>=0)
-            bgcol = getGradientRGBA(fixedposition);
+            bgcol = getGradientRGBA(fixedPosition);
         else
             bgcol = DiffuseColor;
 
