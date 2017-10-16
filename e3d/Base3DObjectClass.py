@@ -170,6 +170,8 @@ class Base3DObject(Attachable):
 
     @staticmethod
     def _fixrot(l):
+        isneg = l < 0
+        l = abs(l)
         while l > 360:
             l = 360 - l
         while l < 0:
@@ -177,21 +179,23 @@ class Base3DObject(Attachable):
         if l == 360:
             l = 0
 
+        if isneg:
+            l = l * -1
         return l
 
     def _updateRotationMatrix(self):
         self._rotationMatrix = self._buildRotMat(self._rotation.x, self._rotation.y, self._rotation.z)
 
     def rotateX(self, angle):
-        self._rotation.x += angle
+        self._rotation.x += self._fixrot(angle)
         self._dirty = True
 
     def rotateY(self, angle):
-        self._rotation.y += angle
+        self._rotation.y += self._fixrot(angle)
         self._dirty = True
 
     def rotateZ(self, angle):
-        self._rotation.z += angle
+        self._rotation.z += self._fixrot(angle)
         self._dirty = True
 
     def addMove(self, vector):
