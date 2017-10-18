@@ -180,19 +180,19 @@ class Base3DObject(Attachable):
                                                                                                     vec3(1, 0, 0))
 
     @staticmethod
-    def _fixrot(l):
-        isneg = l < 0
-        l = abs(l)
-        while l > 360:
-            l = 360 - l
-        while l < 0:
-            l = 360 + l
-        if l == 360:
-            l = 0
+    def _fixrot(val):
+        isneg = val < 0
+        val = abs(val)
+        while val > 360:
+            val = 360 - val
+        while val < 0:
+            val = 360 + val
+        if val == 360:
+            val = 0
 
         if isneg:
-            l = l * -1
-        return l
+            val = val * -1
+        return val
 
     def _updateRotationMatrix(self):
         self._rotationMatrix = self._buildRotMat(self._rotation.x, self._rotation.y, self._rotation.z)
@@ -218,7 +218,7 @@ class Base3DObject(Attachable):
         """
         self._updateRotationMatrix()
         tv = self._rotationMatrix * vector
-        self._position = self._position + tv
+        self._position += tv
         self._dirty = True
 
     def moveForward(self, amount):
