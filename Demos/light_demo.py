@@ -10,8 +10,8 @@ class Demo(_Demo_Base):
     def __init__(self):
         super(Demo, self).__init__()
         self.texturesToLoad = [['e3dlogo.png', 'logo'], ['./textures/n_deep.png', 'defND', True],
-            ['./textures/n_irr.png', 'defNI', True], ['./textures/nmap_test.png', 'testN', True],
-            ['./textures/earth_nasa_brighter.jpg', 'earth']]  # TODO: credit textures or replace them
+            ['./textures/n_irr.png', 'defNI', True], ['./textures/nmap_test.png', 'testN', True]]
+        # TODO: credit textures or replace them
 
         self.bumpymats = []
         self.texmats = []
