@@ -80,6 +80,7 @@ class GuiManager:
         vsp = p + 'VS.glsl'
         fsp = p + 'FS.glsl'
         backend.shaders.loadShader(vsp, fsp, DEFAULT2DTEXTSHADERID)
+        self.resizeProjection()
         self._window.events.addListener('_winreslistgui', self.resizeListener)
 
     def addLayer(self, ID, order=-1, visible=True):
@@ -129,6 +130,20 @@ class GuiManager:
     def getLayerOrder(self, layerID):
         return self._layersOrder.__getitem__(self._layers[layerID])
 
+    @staticmethod
+    def orderInstances(instances):
+        orderedPerShader = defaultdict(list)
+        for key, appendable in instances.items():
+            for i in appendable:
+                orderedPerShader[i._stuff[0]._shaderID].append(i)
+
+            finals = []
+            for val in orderedPerShader.values():
+                finals.extend(val)
+
+            instances.clear()
+            instances[key].extend(finals)
+
     def updateGui(self, windowSize):
         newDrawingData = DrawingData()
 
@@ -147,48 +162,27 @@ class GuiManager:
                 layer._update()
                 for child in reversed(layer._children):
                     if child.visible:
-                        self._buildLayerDrawingData(child, None, newDrawingData)
+                        self._buildLayerDrawingData(child, newDrawingData)
 
         # GuiManager.orderInstances(newDrawingData.instances)  # todo: implement GUI z-ordering to enable this
         return newDrawingData
 
-    @staticmethod
-    def orderInstances(instances):
-        orderedPerShader = defaultdict(list)
-        for key, appendable in instances.items():
-            for i in appendable:
-                orderedPerShader[i._stuff[0]._shaderID].append(i)
-
-            finals = []
-            for val in orderedPerShader.values():
-                finals.extend(val)
-
-            instances.clear()
-            instances[key].extend(finals)
-
-    def _buildLayerDrawingData(self, child, parentTrans, layerDrawingData):
+    def _buildLayerDrawingData(self, currentControl, layerDrawingData):
         defaultObjectParams = DefaultObjectParameters()
         defaultObjectParams.view = self.view
         defaultObjectParams.projection = self.projectionMatrix
         defaultObjectParams.hasBones = False
 
-        if parentTrans is not None:
-            defaultObjectParams.model = parentTrans * child.transformation
-            downTrans = parentTrans * child.transformationMinusBorder
-        else:
-            defaultObjectParams.model = child.transformation
-            downTrans = child.transformationMinusBorder
-
+        defaultObjectParams.model = currentControl.transformation
         defaultObjectParams.construct()
 
         meshid = self.quadmesh.ID
-
-        meshMat = child._material
+        meshMat = currentControl._material
         layerDrawingData.instances[meshid].append(InstanceData(meshMat, defaultObjectParams))
 
-        for c in reversed(child._children):
+        for c in reversed(currentControl._children):
             if c.visible:
-                self._buildLayerDrawingData(c, downTrans, layerDrawingData)
+                self._buildLayerDrawingData(c, layerDrawingData)
 
     @staticmethod
     def convertCharData(data):
@@ -257,9 +251,14 @@ class GuiManager:
 
     def _onWindowEventCallback(self, e):
         if e.eventName == 'resized':
-            self._resizeOcurred()
+            self.resizeProjection()
+            self._resizeLayers()
 
-    def _resizeOcurred(self):
+    def resizeProjection(self):
+        width, height = self._window.size
+        self.projectionMatrix = mat4.orthographic(0, width,height, 0, 0, -1)
+
+    def _resizeLayers(self):
         for layer in self._layersOrder:
             if layer.visible:
                 layer._resizeCallback()

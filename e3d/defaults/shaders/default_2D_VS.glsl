@@ -10,7 +10,7 @@ void main()
 {
     fixedPosition = position.xy + vec2(.5);
     f_texcoord =  vec2(fixedPosition.xy);
-    if (!UpSideDownTextures)
+    if (UpSideDownTextures)
         f_texcoord.y =  1.0 - f_texcoord.y;
 
     f_texcoord += uvOffset.xy;
