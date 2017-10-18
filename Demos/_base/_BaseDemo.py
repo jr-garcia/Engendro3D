@@ -54,6 +54,7 @@ class _Demo_Base(object):
 
         self.window.firstRunCallback = self.onFirstRun
 
+        self.loadTextures()
         self.scene0 = self.engine.scenes.addScene('scene0')
         self.scene0.beforeUpdateCallback = self.defUpdate
         self.scene0.ambientColor = vec3(.2, .0, .05)
@@ -64,8 +65,6 @@ class _Demo_Base(object):
         listener = EventsListener()
         listener.onCustomEvent = self.customEvent
         self.window.events.addListener('main', listener)
-
-        self.loadTextures()
 
     def defUpdate(self, e):
         if self.pendingTex == 0:
