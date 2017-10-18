@@ -73,41 +73,37 @@ class BaseControl(Base3DObject):
 
         self._top = top
         self._left = left
-        self._width = width or 1
-        self._height = height or 1
-        self._realScale = vec3(1)
+        self._width = width
+        self._height = height
         self._inverseScale = vec3(1)
+        # self.__offset = vec3(0.0, 0.0, 0)
+        self.__offset = vec3(0.5, 0.5, 0)
 
-        scaledPosition = self._convertPixelToParent(vec3(left, top, 0))
+        position = vec3(left, top, 0)
 
         if ID is None:
             ID = str(id(self))
-        super(BaseControl, self).__init__(scaledPosition, rotation, 1, 1, ID=ID, parent=parent)
+        super(BaseControl, self).__init__(position, rotation, 1, 1, ID=ID, parent=parent)
 
-        sw, sh, _ = self.parent.size
-        self._bottom = sh - (self._top + self._height)
-        self._right = sw - (self._left + self._width)
+        self._updateLastPositions()
 
         self._material = Material2D()
         material = self._material
         material._shaderID = DEFAULT2DSHADERID
-        size = (width, height)
 
-        if not hasattr(size, '__getitem__'):
-            raise TypeError('size must be an object with 2 elements')
-        if not all(size):
-            raise ValueError('size of 0 not allowed: ' + str(size))
-        if not all((int(i) == i for i in size)):
-            raise ValueError('only integer size allowed: ' + str(size))
+        if not all((width, height)):
+            raise ValueError('size of 0 not allowed: ' + str((width, height)))
+        # if not all((int(i) == i for i in size)):
+        #     raise ValueError('only integer size allowed: ' + str(size))
 
         size = vec3(width, height, 1)
-        self._realSize = size
-        self._previousSize = self.realSize
+        self._pixelSize = size
+        self._previousSize = self.pixelSize
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)
         self._setInnerSize()
-        assert isinstance(self._guiMan, GuiManager)
+        # assert isinstance(self._guiMan, GuiManager)
 
         material.shaderProperties.append(IntShaderProperty('borderSize', self._borderSize))
         material.shaderProperties.append(Vec4ShaderProperty('borderColor', self._borderColor))
@@ -121,10 +117,10 @@ class BaseControl(Base3DObject):
 
         self._set2d()
 
-        material.shaderProperties.append(Vec3ShaderProperty('realSize', self._realSize))
+        material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._pixelSize))
         material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
         material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
-        material.shaderProperties.append(Vec3ShaderProperty('realScale', self._realScale))
+        material.shaderProperties.append(Vec3ShaderProperty('realScale', self._scale))
         material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
         self._gradientType = gradientType  # todo:fix this double assigning
@@ -132,10 +128,22 @@ class BaseControl(Base3DObject):
         self.gradientType = gradientType
 
         self._setLastDifferences()
-        self._updateRealSizePosition()
+        self._updateSizeProperties()
+
+    def _updateLastPositions(self):
+        pw, ph = self._guiMan._window.size
+        left = self.position.x
+        top = self.position.y
+        self._right = pw - (left + self._width)
+        self._bottom = ph - (top + self._height)
+        self._lastDifferences = left, top, self._bottom, self._right
+
+    @property
+    def _offset(self):
+        return self.__offset
 
     def _setLastDifferences(self):
-        self._lastDifferences = (self._top, self._left, self._bottom, self._right)
+        self._lastDifferences = (self._left, self._top, self._bottom, self._right)
 
     @property
     def gradientType(self):
@@ -239,7 +247,7 @@ class BaseControl(Base3DObject):
 
         @rtype : vec3
         """
-        v2 = self._convertParentToPixel(vec3(self._scale))
+        v2 = self._scale
         return v2
 
     def _setAbsoluteScale(self, value):
@@ -260,9 +268,9 @@ class BaseControl(Base3DObject):
         else:
             v2 = (value) * 3
 
-        self._previousSize = vec3(self.realSize)
-        self._realSize = v2
-        self._scale = self._convertPixelToParent(v2)
+        self._previousSize = vec3(self.pixelSize)
+        self._pixelSize = v2
+        self._scale = v2
         self._dirty = True
         try:
             self._material.shaderProperties['size'] = self._scale
@@ -273,16 +281,16 @@ class BaseControl(Base3DObject):
                     doc='Size of control in percentage of parent\'s size')
 
     def getSize(self):
-        return self._convertParentToPixel(self._getAbsoluteScale())
+        return self._getAbsoluteScale()
 
     def _getAbsolutePosition(self):
-        npos = self._convertParentToPixel(vec3(self._position))
+        npos = vec3(self._position)
 
         return npos
 
     def _setAbsolutePosition(self, value):
         npos = value + vec3(.5, .5, 0)
-        self._position = self._convertParentToPixel(vec3(npos))
+        self._position = vec3(npos)
         self._material.shaderProperties['relativePosition'] = self._position
 
     position = property(fget=_getAbsolutePosition, fset=_setAbsolutePosition)
@@ -311,71 +319,69 @@ class BaseControl(Base3DObject):
         sx, sy, sz = vec3Val
         return vec3(x * sx, y * sy, sz)
 
-    def _update(self):
-        # Todo: implement calbacks
-        # self._updateRealSizePosition()
-        dirty = self._dirty
-        if dirty:
-            self._updateTransformation()
-            self._dirty = False
-            for c in self._children:
-                c._update()
-            return True
-        else:
-            return False
+    def _updateRotationMatrix(self):
+        super(BaseControl, self)._updateRotationMatrix()
+        angle = self.rotation.z
+        angle = abs(angle)
+        amount = 0
+        if angle < 0:
+            if angle > 180:
+                angle = angle / 2
+            if angle <= 90:
+                amount = angle / 90
+            elif angle > 90:
+                amount = (180 - angle) / 90
+
+        self.rotationAmount = amount * 100
 
     def _updateTransformation(self):
         self._updateRotationMatrix()
-        npos = vec3(self._position)
-        if self._is2D:
-            npos.y = (1.0 - npos.y - self._scale.y)
-        self._positionMatrix = mat4.translation(npos)
+        parent = self._parent
+        parentCenter = (parent.size / 2)
+        parentCenter.z = 0
+        position = vec3(self._position)
+        rotation = self._rotationMatrix
+
+        scaledOffset = ewMul(self._offset, self._scale)
+        position += scaledOffset
+        # parentCenter -= scaledOffset
+        parentTrans = mat4.translation(parent._position)
+        pCTrans = mat4.translation(parentCenter)
+        self._positionMatrix = mat4.translation(position)
         self._scaleMatrix = mat4.scaling(self._scale)
-        offsetMat = mat4.translation(ewMul(vec3(.5, .5, 0), self.realScale))
-        self._transformation = offsetMat * self._positionMatrix * self._scaleMatrix * self._rotationMatrix
+        self._transformation = parentTrans * pCTrans * parent._rotationMatrix * pCTrans.inversed() * \
+                               self._positionMatrix * rotation * self._scaleMatrix
 
-    def _getTransformationMinusBorder(self):
-        npos = vec3(self._position)
-        if self._is2D:
-            npos.y = (1.0 - npos.y - self._innerSize.y)
+    # def _getTransformationMinusBorder(self):
+    #     npos = vec3(self._position)
+    #
+    #     npos.x += (self._scale.x - self._innerSize.x) / 2.0
+    #     npos.y -= (self._scale.y - self._innerSize.y) / 2.0
+    #     npos += ewMul(self._offset, self.scale)
+    #     alteredPositionMatrix = mat4.translation(npos)
+    #     alteredScaleMatrix = mat4.scaling(self._innerSize)
+    #     alteredTransformation = alteredPositionMatrix * alteredScaleMatrix * self._rotationMatrix
+    #     return alteredTransformation
+    #
+    # transformationMinusBorder = property(_getTransformationMinusBorder)
 
-        npos.x += (self._scale.x - self._innerSize.x) / 2.0
-        npos.y -= (self._scale.y - self._innerSize.y) / 2.0
-        alteredPositionMatrix = mat4.translation(npos)
-        alteredScaleMatrix = mat4.scaling(self._innerSize)
-        alteredTransformation = alteredPositionMatrix * alteredScaleMatrix * self._rotationMatrix
-        return alteredTransformation
-
-    transformationMinusBorder = property(_getTransformationMinusBorder)
-    
-    def _updateRealSizePosition(self):
-        parent = self.parent
-        if parent is None:
-            baseScale = vec3(1)
-        else:
-            baseScale = parent.realScale
-
-        self._realScale = ewMul(baseScale, self._scale)
-
-        self._inverseScale = ewDiv(parent._inverseScale, self._scale)
-
-        self._setLastDifferences()
+    def _updateSizeProperties(self):
+        self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
 
         material = self._material
-        material.shaderProperties['realSize'] = self._realSize
+        material.shaderProperties['pixelSize'] = self._pixelSize
         material.shaderProperties['internalSize'] = self._innerSize
-        material.shaderProperties['realScale'] = self._realScale
+        material.shaderProperties['realScale'] = self._scale
         material.shaderProperties['inverseScale'] = self._inverseScale
 
     def _setInnerSize(self):
-        self._innerSize = self._scale - (ewDiv(self._scale, self._realSize) * (self._borderSize * 2))
+        self._innerSize = self.size - vec3(self._borderSize * 2)
         self._innerSize.z = 1
 
     def _setPinning(self):
-        t, l, b, r = self._lastDifferences
-        parent = self.parent
-        w, h, _ = parent.size
-        ow, oh, _ = parent._previousSize
+        l, t, b, r = self._lastDifferences
+        w, h = self._guiMan._window.size
+        ow, oh = self._guiMan._window._previousSize
 
         pinning = self._pinning
         if PinningEnum.Top in pinning:
@@ -402,8 +408,8 @@ class BaseControl(Base3DObject):
         self._bottom = nb
         self._right = nr
         self._setLastDifferences()
-        self._position = self._convertPixelToParent(vec3(nl, nt, 0))
-        self.size = vec3(max(w - self._left - self._right, 1), max(h - self._top - self._bottom, 1), 1)
+        self._position = vec3(nl, nt, 0)
+        self.size = vec3(max(w - nl - nr, 1), max(h - nt - nb, 1), 1)
         self._setInnerSize()
 
     def _getInverseScale(self):
@@ -411,20 +417,19 @@ class BaseControl(Base3DObject):
 
     inverseScale = property(_getInverseScale, doc='Scale needed to pass from local to window scale.')
 
-    def _getRealSize(self):
-        return self._realSize
+    def _getpixelSize(self):
+        return self._pixelSize
 
-    realSize = property(_getRealSize, doc='Size of control in pixels.')
+    pixelSize = property(_getpixelSize, doc='Size of control in pixels.')
 
     def _getRealScale(self):
-        return self._realScale
+        return self._scale
 
     realScale = property(_getRealScale, doc='Size of control in window percentage.')
 
-
     def _resizeCallback(self):
         self._setPinning()
-        self._updateRealSizePosition()
+        self._updateSizeProperties()
         for c in reversed(self._children):
             c._resizeCallback()
 
@@ -442,6 +447,18 @@ class BaseControl(Base3DObject):
 
     def rotate2D(self, angle):
         super(BaseControl, self).rotateZ(angle)
+
+    def moveForward(self, amount):
+        if self.is2D:
+            raise RuntimeError('2d objects can not move Forward')
+
+    def moveBackward(self, amount):
+        if self.is2D:
+            raise RuntimeError('2d objects can not move Backward')
+
+    def addMove(self, vector):
+        super(BaseControl, self).addMove(vector)
+        self._updateLastPositions()
 
 
 class Material2D(Material):
