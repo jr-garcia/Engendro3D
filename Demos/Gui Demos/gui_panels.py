@@ -2,6 +2,7 @@ from cycgkit.cgtypes import vec3, vec4
 
 from Demos._base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
 from e3d.gui import Panel, GradientTypesEnum, PinningEnum
+from math import sin
 
 
 class Demo(_Demo_Base):
@@ -43,9 +44,11 @@ class Demo(_Demo_Base):
         ft = ev[0] + .01
         movespeed = ft / 10.0
         self.lastspeed = movespeed
+        self.scrollingPanel._material.uvOffset.x += .01
         if self.dorot:
+            self.movingPanel.moveLeft(sin(ev[1] / 1000.0))
             self.rotatingPanel.rotate2D(1)
-            self.scrollingPanel._material.uvOffset.x += .01
+            self.rotatingPanel2.rotate2D(-1)
             if self.triangle:
                 self.triangle.rotateY(.1 * ft)
 
@@ -55,37 +58,46 @@ class Demo(_Demo_Base):
 
         panelSize = 100
 
-        borderedPanel = Panel(110, 0, panelSize, panelSize, self.onelayer)
-        self.rotatingPanel = borderedPanel
-        
-        longPanel = Panel(220, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(1, 0, 1, 1), borderSize=0)
-        for i in range(9):
-            Panel(110 * i, 105, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i).opacity = .7
+        longPanel = Panel(110, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(.4, 0, .9, 1), borderSize=0)
+        self.rotatingPanel = Panel(420, 0, panelSize, panelSize, self.onelayer, imgID='grass')
+        self.rotatingPanel.opacity = .8
 
-        pinnedW = panelSize * 4
-        pinnedH = panelSize * 2
+        for i in range(9):
+            p = Panel(110 * i, 105, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i)
+            p.opacity = .9
+            p.borderColor = vec4(1)
+
+        pinnedW = panelSize + 220
+        pinnedH = panelSize + 100
         pinnedCorners = []
-        cornerSize = 30
+        cornerSize = 20
         rightBorder = pinnedW - cornerSize
         bottomBorder = pinnedH - cornerSize
 
-        pinnedPanel = Panel(250, 220, pinnedW, pinnedH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
-                            borderSize=5)
+        pinnedPanel = Panel(280, 300, pinnedW, pinnedH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
+                            borderSize=8)
         pinnedPanel.pinning = PinningEnum.all
+
+        self.rotatingPanel2 = pinnedPanel
         pinnedCorners.append(Panel(0, 0, cornerSize, cornerSize, pinnedPanel))
-        pinnedCorners.append(Panel(rightBorder, 0, cornerSize, cornerSize, pinnedPanel, PinningEnum.TopRight))
-        pinnedCorners.append(Panel(0, bottomBorder, cornerSize, cornerSize, pinnedPanel, PinningEnum.BottomLeft))
+        pinnedCorners.append(Panel(rightBorder, 0, cornerSize, cornerSize, pinnedPanel, PinningEnum.all))
+        pinnedCorners.append(Panel(0, bottomBorder, cornerSize, cornerSize, pinnedPanel, PinningEnum.all))
         pinnedCorners.append(Panel(rightBorder, bottomBorder, cornerSize, cornerSize, pinnedPanel,
                                    PinningEnum.BottomRight))
         for panel in pinnedCorners:
-            panel.color = vec4(.5, 1, 1, 1)
-            panel.borderSize = 1
+            panel.color = vec4(.9, .4, 0, 1)
+            panel.borderSize = 2
+            panel.borderColor = vec4(1, 1, 0, 1)
 
         self.scrollingPanel = Panel(600, 0, panelSize, panelSize, self.onelayer, borderSize=0, imgID='grass')
 
         for i in range(4):
-            Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, 1))
+            p = Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, 1))
+            if i == 2:
+                self.movingPanel = p
 
+        print('Press CTRL to show rotation.')
+                
 
 if __name__ == '__main__':
-    runDemo(Demo((950, 480)), 'GUI Demo - Panels')
+    runDemo(Demo((980, 600)), 'GUI Demo - Panels')
