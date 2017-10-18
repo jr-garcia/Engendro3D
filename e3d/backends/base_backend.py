@@ -17,6 +17,7 @@ class BaseBackend(object):
         self.shaders = None
         self.textures = None
         self._poliCount = 0
+        self._culling = False
 
     def renderMeshes(self, drawingData):
         pass
@@ -51,6 +52,14 @@ class BaseBackend(object):
 
     @staticmethod
     def _getMaxColorAttachments():
+        pass
+
+    @property
+    def culling(self):
+        return self._culling
+
+    @culling.setter
+    def culling(self, value):
         pass
 
 

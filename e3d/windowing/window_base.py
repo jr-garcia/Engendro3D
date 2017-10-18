@@ -1,7 +1,6 @@
 from time import time
 import os
 
-
 from e3d.events_processing.EventsListenerClass import EventsListener
 from e3d.events_processing.EventsManagerClass import EventsManager
 from e3d.gui.GuiManagerClass import GuiManager
@@ -125,8 +124,12 @@ class Window_Base(object):
             self.backend.drawAll(sceneDrawingData)
 
             self.backend.switchMultiSample(0)
+            culling = self.backend.culling
+            self.backend.culling = False  # todo: invert culling instead?
+            # todo: switch on/off depth-test
             self.backend.renderMeshes(guiDrawingData)
             self.backend.switchMultiSample(1)
+            self.backend.culling = culling
 
             if self.is1stRun:
                 self.is1stRun = False

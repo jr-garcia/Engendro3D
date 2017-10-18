@@ -1,14 +1,15 @@
+from os import path
+
 import numpy as np
 from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
-from os import path
 
 from .RenderTarget_OGL3 import RenderTarget
 from .shader_management.ShadersManagerClass import ShadersManager
 from ..RenderTargetBase import attachmentTypeEnum, renderTextureTypeEnum
-from ..base_backend import BaseBackend, _setObjectUniforms, _setSceneUniforms, setMaterialValues, \
-    _setBoneTransformationsForMesh
+from ..base_backend import BaseBackend, _setBoneTransformationsForMesh, _setObjectUniforms, _setSceneUniforms, \
+    setMaterialValues
 from ...fse_management.FSEManagerClass import FSEManager, FullScreenEffect
 
 
@@ -84,7 +85,7 @@ class OGL3Backend(BaseBackend):
 
         glDepthRange(0, 1.0)
 
-        glEnable(GL_CULL_FACE)  # <<<<<<<<<<<< Culling
+        self.culling = True
         glCullFace(GL_BACK)
         glFrontFace(GL_CCW)
 
@@ -93,6 +94,18 @@ class OGL3Backend(BaseBackend):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         glClearDepth(1.0)
+
+    @property
+    def culling(self):
+        return self._culling
+
+    @culling.setter
+    def culling(self, value):
+        if value:
+            glEnable(GL_CULL_FACE)  # <<<<<<<<<<<< Culling
+        else:
+            glDisable(GL_CULL_FACE)
+        self._culling = value
 
     @staticmethod
     def getShadersManager():
