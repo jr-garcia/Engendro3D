@@ -19,13 +19,17 @@ class Layer(Attachable):
         super(Layer, self).__init__(None)
         self.ID = ID
         self.visible = visible
-        self._realSize = vec3(1)
+        self._pixelSize = vec3(1)
         self._realScale = vec3(1)
         self._inverseScale = vec3(1)
         self._guiMan = guiMan
-        self._previousSize = self.realSize
+        self._previousSize = self.pixelSize
         self._onInit = True
-        self._updateRealSize()
+
+        self._rotationMatrix = mat4(1)
+        self._position = vec3(0)
+
+        self._updatePixelSize()
 
     def _getis2D(self):
         return True
@@ -43,23 +47,24 @@ class Layer(Attachable):
             for c in reversed(self._children):
                 c._update()
 
-    def _updateRealSize(self):
-        self._previousSize = self._realSize
+    def _updatePixelSize(self):
+        self._previousSize = self._pixelSize
         x, y = self._guiMan._window.size
         baseSize = vec3(x, y, 1)
-        self._realSize = baseSize
+        self._pixelSize = baseSize
+        self._scale = self.realScale
         if self._onInit:
-            self._previousSize = self._realSize
+            self._previousSize = self._pixelSize
             self._onInit = False
 
-    def getRealSize(self):
-        return self._realSize
+    def getPixelSize(self):
+        return self._pixelSize
 
-    realSize = property(getRealSize)
+    pixelSize = property(getPixelSize)
 
     @property
     def size(self):
-        return self._realSize
+        return self._pixelSize
 
     def _getRealScale(self):
         return self._realScale
@@ -72,6 +77,10 @@ class Layer(Attachable):
     inverseScale = property(_getInverseScale, doc='Scale needed to pass from local to window scale.')
 
     def _resizeCallback(self):
-        self._updateRealSize()
+        self._updatePixelSize()
         for c in reversed(self._children):
             c._resizeCallback()
+
+    @property
+    def _offset(self):
+        return vec3(0)
