@@ -467,6 +467,7 @@ class Material2D(Material):
         self.diffuseColor = vec4(0)
         self.emissiveColor = vec4(0)
         self.specularColor = vec4(0)
+        self._isText = False
 
     def _checkColor(self, value):
         if isinstance(value, vec4):
