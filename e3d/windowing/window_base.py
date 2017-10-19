@@ -260,6 +260,14 @@ class Window_Base(object):
     def vsynch(self, val):
         pass
 
+    def getCurrentDPIs(self):
+        """
+        This reads and returns current monitor's DPI H and V
+        :return:
+        :rtype: int, int
+        """
+        pass
+
 
 class winEvents(EventsListener):
     def onMouseEvent(self, event):
