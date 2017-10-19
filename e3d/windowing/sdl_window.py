@@ -182,3 +182,10 @@ class Window(Window_Base):
         SDL_GL_DeleteContext(self._context)
         SDL_DestroyWindow(self._SDL_Window)
         Window_Base.close(self)
+
+    def getCurrentDPIs(self):
+        h = ct.pointer(ct.c_float(0))
+        v = ct.pointer(ct.c_float(0))
+        d = ct.pointer(ct.c_float(0))
+        SDL_GetDisplayDPI(0, d, h, v)  # fixme: should consider real monitor index
+        return int(h.contents.value), int(v.contents.value)
