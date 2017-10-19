@@ -38,5 +38,5 @@ class _Logger(object):
             logger.info(message)
         elif messageType == logLevelsEnum.warning:
             logger.warning(message)
-        elif messageType == logLevelsEnum.error:
+        else:  # logLevelsEnum.error:
             logger.error(message)
