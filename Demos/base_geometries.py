@@ -2,7 +2,7 @@ from math import sin
 
 from cycgkit.cgtypes import vec3
 
-from Demos._base._BaseDemo import _Demo_Base, runDemo
+from _base._BaseDemo import _Demo_Base, runDemo
 
 
 class Demo(_Demo_Base):

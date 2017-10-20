@@ -1,6 +1,6 @@
 from cycgkit.cgtypes import vec3
 
-from Demos._base._physics_base import Demo as game, runDemo
+from _base._physics_base import Demo as game, runDemo
 
 
 class Demo(_Demo_Base):

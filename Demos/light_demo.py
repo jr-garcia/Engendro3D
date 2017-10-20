@@ -3,7 +3,7 @@ from random import randint, random
 
 from cycgkit.cgtypes import vec3
 
-from Demos._base._BaseDemo import _Demo_Base, runDemo, tubeMODEL, logLevelsEnum
+from _base._BaseDemo import _Demo_Base, runDemo, tubeMODEL, logLevelsEnum
 
 
 class Demo(_Demo_Base):

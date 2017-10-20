@@ -1,8 +1,8 @@
 
 from cycgkit.cgtypes import vec3
 
-from Demos._base._BaseDemo import _Demo_Base, runDemo, LOGOSSIZE
-from Demos._base._model_paths import *
+from _base._BaseDemo import _Demo_Base, runDemo, LOGOSSIZE
+from _base._model_paths import *
 from e3d.cameras import SimpleCamera
 from e3d.gui import Panel
 

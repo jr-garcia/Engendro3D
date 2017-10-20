@@ -1,4 +1,4 @@
-from Demos._base._do_import import resolve_import
+from _base._do_import import resolve_import
 
 resolve_import()
 
@@ -10,7 +10,7 @@ from e3d.gui import *
 from cycgkit.cgtypes import *
 from string import printable
 
-import Demos._base._model_paths
+import _base._model_paths
 import os
 
 
@@ -131,7 +131,7 @@ class game:  # TODO: Inherith from _BaseDemo
             self.scene1.currentCamera = self.camera
             # self.scene1.beforeUpdateCallback = self.scene1Update
 
-            engine.models.loadModel(Demos._base._model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
+            engine.models.loadModel(_base._model_paths.triangleMODEL, "trianglemodel", forceStatic=True)
             self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 5, 5), vec3(0), 1.5)
             mat = self.triangle.getMaterialByIndex(0)
             mat.useDiffuseTexture = True
@@ -168,7 +168,7 @@ class game:  # TODO: Inherith from _BaseDemo
             panel.opacity = .7
             panel.borderSize = 0
 
-        self.char = SingleChar(12, 1, 60, 60, '?', self.onelayer,,
+        self.char = SingleChar(12, 1, 60, 60, '?', self.onelayer)
         self.char.fontBorderColor = vec4(1, 0, 0, 1)
         self.char.fontBorder = 0.2
         self.char.fontWeight = .5

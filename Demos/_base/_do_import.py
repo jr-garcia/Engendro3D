@@ -14,7 +14,7 @@ def resolve_import(local=False):
             print('Forcing local copy.')
         else:
             print('Engendro3D not found on PythonPath. Setting local copy.')
-        module_path = os.path.abspath('../')
+        module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
         if module_path not in sys.path:
             sys.path.append(module_path)
 

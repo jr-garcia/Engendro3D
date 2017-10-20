@@ -1,6 +1,8 @@
 from cycgkit.cgtypes import vec3, vec4
 
-from Demos._base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
+from _set_path import setPath
+setPath()
+from _base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
 from e3d.gui import Panel, GradientTypesEnum, PinningEnum
 from math import sin
 
@@ -8,7 +10,7 @@ from math import sin
 class Demo(_Demo_Base):
     def __init__(self, winSize):
         super(Demo, self).__init__(winSize)
-        self.texturesToLoad = [['e3dlogo.png', 'logo'], ['textures/Grass.jpg', 'grass']]
+        self.texturesToLoad = [['e3dlogo.png', 'logo'], ['../textures/Grass.jpg', 'grass']]
 
     def loadModels(self):
         engine = self.engine
