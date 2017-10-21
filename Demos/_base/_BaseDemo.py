@@ -4,7 +4,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 logging.getLogger('PIL').setLevel(logging.ERROR)
 from cycgkit.cgtypes import vec3
 
-from _do_import import resolve_import
+from ._do_import import resolve_import
 resolve_import()
 
 from _base._model_paths import *
