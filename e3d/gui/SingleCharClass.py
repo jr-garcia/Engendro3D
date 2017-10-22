@@ -12,14 +12,14 @@ class SingleChar(BaseControl):
 
     def __init__(self, left, top, height, char, parent, pinning=PinningEnum.TopLeft, color=vec4(.3, .3, .3, 1), ID=None,
                  imgID=None, rotation=None, borderSize=1, gradientType=GradientTypesEnum.noGradient, fontID='default',
-                 fontColor=vec4(0, 0, 0, 1), fontBorderColor=vec4(1)):
+                 fontColor=vec4(0, 0, 0, 1), outlineColor=vec4(1)):
 
         width = height
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                          borderSize, gradientType)
         self._char = char
         self._outlineLength = .18
-        self._fontBorderColor = fontBorderColor
+        self._outlineColor = outlineColor
         self._fontColor = fontColor
         self._fontWeight = .56
         self._charCode = ord(char)
@@ -29,7 +29,7 @@ class SingleChar(BaseControl):
         self.isBuilt = False
 
         self._material.shaderProperties.append(FloatShaderProperty('outlineLength', self.outlineLength))
-        self._material.shaderProperties.append(Vec4ShaderProperty('fontBorderColor', fontBorderColor))
+        self._material.shaderProperties.append(Vec4ShaderProperty('outlineColor', outlineColor))
         self._material.shaderProperties.append(Vec4ShaderProperty('fontColor', fontColor))
         self._material.shaderProperties.append(FloatShaderProperty('fontWeight', self.fontWeight))
 
@@ -42,14 +42,14 @@ class SingleChar(BaseControl):
 
     outlineLength = property(_getOutlineLength, _setOutlineLength)
 
-    def _getFontBorderColor(self):
-        return self._fontBorderColor
+    @property
+    def outlineColor(self):
+        return self._outlineColor
 
-    def _setFontBorderColor(self, val):
-        self._fontBorderColor = val
-        self._material.shaderProperties['fontBorderColor'] = val
-
-    fontBorderColor = property(_getFontBorderColor, _setFontBorderColor)
+    @outlineColor.setter
+    def outlineColor(self, value):
+        self._outlineColor = value
+        self._material.shaderProperties['outlineColor'] = value
 
     def _getFontColor(self):
         return self._fontColor

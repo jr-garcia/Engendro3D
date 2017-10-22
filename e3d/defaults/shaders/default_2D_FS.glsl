@@ -20,7 +20,7 @@ uniform vec3 pixelSize;
 uniform bool isText=False;
 uniform vec4 fontColor = vec4(1.0);
 uniform float outlineLength = 0.2;
-uniform vec4 fontBorderColor = vec4(0, 0 ,0 , 1.0);
+uniform vec4 outlineColor = vec4(0, 0 ,0 , 1.0);
 uniform float fontWeight = .6;
 uniform float f_gamma = 0.0;
 uniform float fb_gamma = 0.0;
@@ -99,7 +99,7 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
 //                if (outlineLength == 0)
 //                    color = bgcolor;
 //                else
-//                    color = fontBorderColor;
+//                    color = charOutlineColor;
 //                resultColor = mix(fontColor, color, 1-fbalpha);
 //            }
             return resultColor;
@@ -107,11 +107,11 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
         else
             {
                 if (distanceToBorder <= outlineLength && outlineLength > 0)
-                    return fontBorderColor;
+                    return outlineColor;
 //                    if (bgcolor.a == 0)
-//                        return vec4(fontBorderColor.rgb, balpha);
+//                        return vec4(charOutlineColor.rgb, balpha);
 //                    else
-//                        return mix(bgcolor, fontBorderColor, balpha);
+//                        return mix(bgcolor, charOutlineColor, balpha);
                 else
                     return bgcolor;
             }

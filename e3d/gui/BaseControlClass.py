@@ -268,7 +268,7 @@ class BaseControl(Base3DObject):
         else:
             v2 = (value, value, value)
 
-        self._previousSize = vec3(self.pixelSize)
+        self._previousSize = vec3(self._pixelSize)
         self._pixelSize = v2
         try:
             self._material.shaderProperties['pixelSize'] = v2
