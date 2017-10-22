@@ -22,6 +22,7 @@ class GradientTypesEnum(object):
 
 
 class PinningEnum(object):
+    NoPinning = 'NoPinning'
     Top = 'Top'
     Left = 'Left'
     Right = 'Right'
@@ -159,7 +160,7 @@ class BaseControl(Base3DObject):
 
     @pinning.setter
     def pinning(self, value):
-        if len(value) == 1 or isinstance(value, str):
+        if len(value) == 1 or isinstance(value, str) and value != PinningEnum.NoPinning:
             raise AttributeError('single value \'{}\' not allowed.'.format(value))
         if isinstance(value, list):
             self._pinning = value
@@ -387,24 +388,27 @@ class BaseControl(Base3DObject):
         ow, oh = self._guiMan._window._previousSize
 
         pinning = self._pinning
-        if PinningEnum.Top in pinning:
-            nt = t
+        if PinningEnum.NoPinning in pinning:
+            return
         else:
-            nt = t - (oh - h)
+            if PinningEnum.Top in pinning:
+                nt = t
+            else:
+                nt = t - (oh - h)
 
-        if PinningEnum.Left in pinning:
-            nl = l
-        else:
-            nl = l - (ow - w)
+            if PinningEnum.Left in pinning:
+                nl = l
+            else:
+                nl = l - (ow - w)
 
-        if PinningEnum.Bottom in pinning:
-            nb = b
-        else:
-            nb = b - (oh - h)
-        if PinningEnum.Right in pinning:
-            nr = r
-        else:
-            nr = r - (ow - w)
+            if PinningEnum.Bottom in pinning:
+                nb = b
+            else:
+                nb = b - (oh - h)
+            if PinningEnum.Right in pinning:
+                nr = r
+            else:
+                nr = r - (ow - w)
 
         self._top = nt
         self._left = nl
