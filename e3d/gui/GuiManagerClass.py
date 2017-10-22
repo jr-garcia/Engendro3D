@@ -3,6 +3,7 @@ from json import dump, load
 from collections import OrderedDict, defaultdict
 import numpy as np
 from cycgkit.cgtypes import mat4, vec3
+from freetype import Face
 
 from ..Base3DObjectClass import DefaultObjectParameters
 from .LayerClass import Layer
@@ -22,6 +23,8 @@ FONTTEXTUREIDSTRING = '{}_fonttex'
 
 class GuiManager:
     def __init__(self):
+        self.fontSizes = defaultdict(dict)
+        self.fontFilePaths = {}
         self.fontTextureNames = {}
         self.engine = None
         self.backend = None
@@ -75,11 +78,6 @@ class GuiManager:
         # load default font
         self.loadFont('default', os.path.join(self.engine.path.defaults.fonts, 'code', 'Code200365k.ttf'))
 
-        # load default 2d text shader
-        p = os.path.join(shadersDefaultPath, 'default_2D_text_')
-        vsp = p + 'VS.glsl'
-        fsp = p + 'FS.glsl'
-        backend.shaders.loadShader(vsp, fsp, DEFAULT2DTEXTSHADERID)
         self.resizeProjection()
         self._window.events.addListener('_winreslistgui', self.resizeListener)
 
@@ -96,14 +94,14 @@ class GuiManager:
         if ID in self._layers:
             raise KeyError('ID already exist.')
         else:
-            l = Layer(ID, self, visible)
+            layer = Layer(ID, self, visible)
             if order == -1 or len(self._layers) < order + 1:
-                self._layersOrder.append(l)
+                self._layersOrder.append(layer)
             else:
-                self._layersOrder.insert(order + 1, l)
+                self._layersOrder.insert(order + 1, layer)
 
-            self._layers[ID] = l
-            return l
+            self._layers[ID] = layer
+            return layer
 
     def moveLayer(self, ID, order=-1):
         """
@@ -248,6 +246,7 @@ class GuiManager:
         self.engine.textures.loadTexture(finalPath, fontTextureName, repeat=False, force=True)
         self.fontInfos[ID] = fontRangeInfo
         self.fontTextureNames[ID] = fontTextureName
+        self.fontFilePaths[ID] = fontPath
 
     def _onWindowEventCallback(self, e):
         if e.eventName == 'resized':
@@ -256,9 +255,22 @@ class GuiManager:
 
     def resizeProjection(self):
         width, height = self._window.size
-        self.projectionMatrix = mat4.orthographic(0, width,height, 0, 0, -1)
+        self.projectionMatrix = mat4.orthographic(0, width, height, 0, 0, -1)
 
     def _resizeLayers(self):
         for layer in self._layersOrder:
             if layer.visible:
                 layer._resizeCallback()
+
+    def getFontSizeInPixels(self, sizeInPoints, fontID):
+        size = self.fontSizes[sizeInPoints].get(fontID)
+        if size is None:
+            path = self.fontFilePaths[fontID]
+            if path is None:
+                raise RuntimeError('font info not found. Is the font loaded?')
+            face = Face(path)
+            hdpi, vdpi = self._window.getCurrentDPIs()
+            face.set_char_size(0, sizeInPoints * 64, hdpi, vdpi)
+            size = face.size.height / 64
+            self.fontSizes[sizeInPoints][fontID] = size
+        return size
