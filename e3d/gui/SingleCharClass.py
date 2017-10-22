@@ -7,37 +7,40 @@ class SingleChar(BaseControl):
     """
         Single Character object.
 
-       @rtype : Panel
+       @rtype : SingleChar
     """
 
-    def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, borderSize, gradientType):
+    def __init__(self, left, top, height, char, parent, pinning=PinningEnum.TopLeft, color=vec4(.3, .3, .3, 1), ID=None,
+                 imgID=None, rotation=None, borderSize=1, gradientType=GradientTypesEnum.noGradient, fontID='default',
+                 fontColor=vec4(0, 0, 0, 1), fontBorderColor=vec4(1)):
 
+        width = height
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                          borderSize, gradientType)
         self._char = char
-        self._fontBorder = fontBorder
+        self._outlineLength = .18
         self._fontBorderColor = fontBorderColor
         self._fontColor = fontColor
-        self._fontWeight = fontWeight
+        self._fontWeight = .56
         self._charCode = ord(char)
         self._fontID = fontID
-        self._material.shaderID = DEFAULT2DTEXTSHADERID
+        self._material._isText = True
         self._material.useDiffuseTexture = True
         self.isBuilt = False
 
-        self._material.shaderProperties.append(FloatShaderProperty('fontBorder', fontBorder))
+        self._material.shaderProperties.append(FloatShaderProperty('outlineLength', self.outlineLength))
         self._material.shaderProperties.append(Vec4ShaderProperty('fontBorderColor', fontBorderColor))
         self._material.shaderProperties.append(Vec4ShaderProperty('fontColor', fontColor))
-        self._material.shaderProperties.append(FloatShaderProperty('fontWeight', fontWeight))
+        self._material.shaderProperties.append(FloatShaderProperty('fontWeight', self.fontWeight))
 
-    def _getFontBorder(self):
-        return self._fontBorder
+    def _getOutlineLength(self):
+        return self._outlineLength
 
-    def _setFontBorder(self, val):
-        self._fontBorder = val
-        self._material.shaderProperties['fontBorder'] = val
+    def _setOutlineLength(self, val):
+        self._outlineLength = val
+        self._material.shaderProperties['outlineLength'] = val
 
-    fontBorder = property(_getFontBorder, _setFontBorder)
+    outlineLength = property(_getOutlineLength, _setOutlineLength)
 
     def _getFontBorderColor(self):
         return self._fontBorderColor
@@ -47,7 +50,7 @@ class SingleChar(BaseControl):
         self._material.shaderProperties['fontBorderColor'] = val
 
     fontBorderColor = property(_getFontBorderColor, _setFontBorderColor)
-    
+
     def _getFontColor(self):
         return self._fontColor
 
@@ -56,7 +59,7 @@ class SingleChar(BaseControl):
         self._material.shaderProperties['fontColor'] = val
 
     fontColor = property(_getFontColor, _setFontColor)
-    
+
     def _getfontWeight(self):
         return self._fontWeight
 
@@ -77,10 +80,10 @@ class SingleChar(BaseControl):
                 raise NotImplementedError('Add the char!!!!!!!')
             cData = info.charDataDict[self._charCode]
             assert isinstance(cData, CharData)
-            x = cData.atlasOriginX / info.width
-            y = cData.atlasOriginY / info.height
-            z = info.fontSize / info.width
-            w = info.fontSize / info.height
+            x = cData.atlasOriginX / float(info.width)
+            y = cData.atlasOriginY / float(info.height)
+            z = info.fontSize / float(info.width)
+            w = info.fontSize / float(info.height)
             self._material.uvOffset = (x, y, z, w)
             self.isBuilt = True
 
