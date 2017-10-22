@@ -75,8 +75,7 @@ class BaseControl(Base3DObject):
         self._left = left
         self._width = width
         self._height = height
-        self._inverseScale = vec3(1)
-        # self.__offset = vec3(0.0, 0.0, 0)
+        # self._inverseScale = vec3(1)
         self.__offset = vec3(0.5, 0.5, 0)
 
         position = vec3(left, top, 0)
@@ -121,7 +120,7 @@ class BaseControl(Base3DObject):
         material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
         material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
         material.shaderProperties.append(Vec3ShaderProperty('realScale', self._scale))
-        material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
+        # material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
         self._gradientType = gradientType  # todo:fix this double assigning
         material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
@@ -289,7 +288,7 @@ class BaseControl(Base3DObject):
         return npos
 
     def _setAbsolutePosition(self, value):
-        npos = value + vec3(.5, .5, 0)
+        npos = value
         self._position = vec3(npos)
         self._material.shaderProperties['relativePosition'] = self._position
 
@@ -366,13 +365,13 @@ class BaseControl(Base3DObject):
     # transformationMinusBorder = property(_getTransformationMinusBorder)
 
     def _updateSizeProperties(self):
-        self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
+        # self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
 
         material = self._material
         material.shaderProperties['pixelSize'] = self._pixelSize
         material.shaderProperties['internalSize'] = self._innerSize
         material.shaderProperties['realScale'] = self._scale
-        material.shaderProperties['inverseScale'] = self._inverseScale
+        # material.shaderProperties['inverseScale'] = self._inverseScale
 
     def _setInnerSize(self):
         self._innerSize = self.size - vec3(self._borderSize * 2)
