@@ -1,6 +1,7 @@
 # coding=utf-8
 from collections import OrderedDict
 from os import makedirs, path
+from unicodedata import category
 
 import freetype
 import numpy as np
@@ -16,6 +17,7 @@ DISTANCE = 2
 
 
 def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRange=CharRangesEnum.latin):
+    fontSize = float(fontSize)
     face = freetype.Face(fontPath)
     face.set_pixel_sizes(int(fontSize - (BORDER * 2)), 0)
     imgs = []
@@ -30,36 +32,32 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
     charRangeName, charRangeRange = charRange
 
     if isinstance(charRangeRange, type(range)):
-        finalRange = [chr(i) for i in charRangeRange]
+        finalRange = (chr(i) for i in charRangeRange)
     elif isinstance(charRangeRange, list):
-        if isinstance(charRangeRange[0], str):
-            finalRange = [c for c in charRangeRange]
-        else:
-            finalRange = [chr(c) for c in charRangeRange]
+        # if isinstance(charRangeRange[0], str):
+        finalRange = charRangeRange
+        # else:
+        #     finalRange = (chr(c) for c in charRangeRange)
     elif isinstance(charRangeRange, tuple):
-        finalRange = [chr(i) for i in range(charRangeRange[0], charRangeRange[1])]
+        finalRange = (chr(i) for i in range(charRangeRange[0], charRangeRange[1]))
     elif isinstance(charRangeRange, str):
-        finalRange = [ord(c) for c in charRangeRange]
+        finalRange = (ord(c) for c in charRangeRange)
     else:
         raise TypeError('charRange should be: element from CharRangesEnum, '
                         'list of characters, string, range object or 2-tuple with range start and end. '
                         'Is ' + str(type(charRangeRange)))
 
-    print('Rendering {} {}...'.format(fontName, charRange[0]))
+    print('Rendering {} {}...'.format(fontName, charRangeName))
     chars = []
     for c in finalRange:
-        if hasattr(c, 'isprintable'):
-            isPrintableTest = c.isprintable()
-        else:
-            from string import printable
-            isPrintableTest = c in printable
+        isPrintableTest = isPrintable(c)
         if not isPrintableTest:
             continue
 
         face.load_char(c)
         glyph = face.glyph
-        bitmap = face.glyph.bitmap
-        advance = (glyph.advance.x, glyph.advance.y)
+        bitmap = glyph.bitmap
+        advance = (float(glyph.advance.x), float(glyph.advance.y))
         if bitmap.rows > 0 and bitmap.width > 0:
             # Image.fromarray(np.array(bitmap.buffer, np.uint8).reshape(bitmap.rows, bitmap.width)).show()
             chars.append((c, glyph.bitmap_top, glyph.bitmap_left, advance, bitmap.rows, bitmap.width))
@@ -75,7 +73,7 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
     for i in range(len(chars)):
         sdf = bmplist[i]
         c, bitmap_top, bitmap_left, advance, height, width = chars[i]
-        arr = np.empty((fontSize, fontSize, 3), np.float32)
+        arr = np.empty((int(fontSize), int(fontSize), 3), np.float32)
         sdf.asArray(arr)
         b = np.uint8(np.clip(arr, 0, 1) * 255)
         im = Image.fromarray(b)
@@ -105,7 +103,7 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
     # lowestBaseLine = baseline
 
     finalLocations = OrderedDict()
-    atlas = Image.new("RGB", (atlasSize, finalHeight), bgcolor)
+    atlas = Image.new("RGB", (atlasSize, int(finalHeight)), bgcolor)
     for imD in imgs:
         if imD.char in finalLocations.keys():
             continue
@@ -117,7 +115,7 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
         if imD.image is None:
             pass
         else:
-            atlas.paste(imD.image, (originX, originY))
+            atlas.paste(imD.image, (int(originX), int(originY)))
         finalLocations[imD.char] = CharData(originX, originY, imD)
         originX += fontSize + 1
 
@@ -173,7 +171,7 @@ class ImData:
         self.above = top / fontSize
         self.below = self.height - self.above
         self.size = GlyphSize(self.width, self.left, self.height, top / fontSize)
-        self.scale = scale if scale else (1, 1)
+        self.scale = scale or (1, 1)
 
     def __repr__(self):
         return chr(self.char)
@@ -276,10 +274,22 @@ def addSingleChar(atlasPIL, fontPath, char, locations):
 
     return finalLocations[imD.char]
 
-# if __name__ == '__main__':
-#     infos = render("./code/Code200365k.ttf", 32, 1024, 'atlases/', 'png')
-#     # infos = render("./code/Code200365k.ttf", 32, 1024, 'atlases/', 'png', CharRangesEnum.katakana)
-#     # infos = render("./code/Code200365k.ttf", 32, 1024, 'atlases/', 'png', CharRangesEnum.egipt_hieroglyphs)
-#     # infos = render("./code/Code200365k.ttf", 32, 1024, 'atlases/', 'png', CharRangesEnum.japanese)
-#     atlas = Image.open(infos.filePath)
-#     addSingleChar(atlas, "./code/Code200365k.ttf", 'ñ', infos)
+
+def isPrintable(char):
+    """Based on:
+    https://stackoverflow.com/a/41761339d
+    """
+    letters = ('LC', 'Ll', 'Lm', 'Lo', 'Lt', 'Lu')
+    numbers = ('Nd', 'Nl', 'No')
+    marks = ('Mc', 'Me', 'Mn')
+    punctuation = ('Pc', 'Pd', 'Pe', 'Pf', 'Pi', 'Po', 'Ps')
+    symbol = ('Sc', 'Sk', 'Sm', 'So')
+    space = ('Zs',)
+
+    allowed_categories = letters + numbers + marks + punctuation + symbol + space
+
+    try:
+        cat = category(char)
+    except TypeError:
+        return False
+    return cat in allowed_categories
