@@ -155,7 +155,7 @@ class GuiManager:
 
         newDrawingData.meshes.add(self.quadmesh)
 
-        for layer in self._layersOrder:
+        for layer in reversed(self._layersOrder):
             if layer.visible:
                 layer._update()
                 for child in reversed(layer._children):
