@@ -6,6 +6,10 @@ varying vec2 fixedPosition;
 uniform bool UpSideDownTextures;
 uniform vec4 uvOffset;
 
+// Text
+uniform bool isText=False;
+
+
 void main()
 {
     fixedPosition = position.xy + vec2(.5);
@@ -13,6 +17,8 @@ void main()
     if (UpSideDownTextures)
         f_texcoord.y =  1.0 - f_texcoord.y;
 
+    if (isText)
+        f_texcoord *= uvOffset.zw;
     f_texcoord += uvOffset.xy;
     gl_Position = ModelProjection * vec4(position, 1.0);
 }

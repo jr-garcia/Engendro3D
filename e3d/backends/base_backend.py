@@ -160,6 +160,10 @@ def setMaterialValues(textures, shader, mat):
     setUnif('IsLightAffected', mat.isLightAffected)
 
     setUnif('uvOffset', vec4(mat.uvOffset))
+    try:
+        setUnif('isText', int(mat._isText))
+    except AttributeError:
+        pass
 
     _setMaterialShaderProperties(shader, mat.shaderProperties)
 

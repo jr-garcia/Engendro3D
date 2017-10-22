@@ -16,6 +16,20 @@ uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
 
+// Text
+uniform bool isText=False;
+uniform vec4 fontColor = vec4(1.0);
+uniform float outlineLenght = 0.2;
+uniform vec4 fontBorderColor = vec4(0, 0 ,0 , 1.0);
+uniform float fontWeight = .6;
+uniform float f_gamma = 0.0;
+uniform float fb_gamma = 0.0;
+uniform bool showSDF=false;
+
+
+float median(float r, float g, float b) {
+    return max(min(r, g), min(max(r, g), b));
+}
 
 vec4 getGradColorSided(float spos)
 {
@@ -59,9 +73,54 @@ vec4 getGradientRGBA(vec2 coords)
     return getGradColorSided(singlepos);
 }
 
+vec4 setUpText(vec4 sampled, vec4 bgcolor)
+{
+    float rawDistance = median(sampled.r, sampled.g, sampled.b);
+
+    if (showSDF)
+        return vec4(vec3(1-rawDistance), 1);
+    else
+    {
+        float fixedDistance = 1.0 - rawDistance;
+        float distanceToBorder = fixedDistance - fontWeight;
+//        float falpha = smoothstep(fixedDistance - f_gamma, fixedDistance + f_gamma, rawDistance);
+//        float balpha = smoothstep(distanceToBorder - fb_gamma, distanceToBorder + fb_gamma, rawDistance);
+//        float fbalpha = smoothstep(fixedDistance - fb_gamma, fixedDistance + fb_gamma, rawDistance);
+        vec4 resultColor;
+
+        if (fixedDistance <= fontWeight)
+        {
+            resultColor = fontColor;
+//            if (outlineLenght == 0 && bgcolor.a == 0)
+//                resultColor.a = falpha;
+//            else
+//            {
+//                vec4 color;
+//                if (outlineLenght == 0)
+//                    color = bgcolor;
+//                else
+//                    color = fontBorderColor;
+//                resultColor = mix(fontColor, color, 1-fbalpha);
+//            }
+            return resultColor;
+       }
+        else
+            {
+                if (distanceToBorder <= outlineLenght && outlineLenght > 0)
+                    return fontBorderColor;
+//                    if (bgcolor.a == 0)
+//                        return vec4(fontBorderColor.rgb, balpha);
+//                    else
+//                        return mix(bgcolor, fontBorderColor, balpha);
+                else
+                    return bgcolor;
+            }
+    }
+}
+
 void main()
 {
-    vec4 objectdiffuse, texCol, bgcol;
+    vec4 objectdiffuse, textureColor, bgColor;
     vec2 realPos = clamp(fixedPosition, 0.0, 1.0) * pixelSize.xy;
 
     if (realPos.x < borderSize || realPos.y < borderSize ||
@@ -72,18 +131,23 @@ void main()
     else
     {
         if (GradientType>=0)
-            bgcol = getGradientRGBA(fixedPosition);
+            bgColor = getGradientRGBA(fixedPosition);
         else
-            bgcol = DiffuseColor;
+            bgColor = DiffuseColor;
 
         if (UseDiffuseTexture)
         {
-            texCol = vec4(texture2D(DiffuseTexture, f_texcoord));
-            objectdiffuse.rgb = (bgcol.rgb * (1.0 - texCol.a)) + (texCol.rgb * texCol.a);
-            objectdiffuse.a =  max(bgcol.a, texCol.a);
+            textureColor = vec4(texture2D(DiffuseTexture, f_texcoord));
+            if (isText)
+                objectdiffuse = setUpText(textureColor, bgColor);
+            else
+            {
+                objectdiffuse.rgb = (bgColor.rgb * (1.0 - textureColor.a)) + (textureColor.rgb * textureColor.a);
+                objectdiffuse.a =  max(bgColor.a, textureColor.a);
+            }
         }
         else
-            objectdiffuse = bgcol;
+            objectdiffuse = bgColor;
 
     }
     gl_FragColor = vec4(objectdiffuse.rgb, objectdiffuse.a * Opacity);
