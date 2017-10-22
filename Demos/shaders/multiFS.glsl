@@ -164,7 +164,7 @@ void main()
     if (IsLightAffected)
     {
         // This used to be a for-loop that would not work on Nvidia Quadro FX 570M
-        // without a fixed lenght and #pragma optionNV (unroll all)
+        // without a fixed length and #pragma optionNV (unroll all)
         phong_weightCalc(0, finalNormal, diffuse, specular);
         phong_weightCalc(1, finalNormal, diffuse, specular);
         phong_weightCalc(2, finalNormal, diffuse, specular);

@@ -8,14 +8,14 @@ def getShaderActives(program, what1, what2):
     actives = []
     _count = np.empty(1, np.int32)
     glGetProgramiv(program, what1, _count)
-    maxLenght = np.empty(1, np.int32)
-    glGetProgramiv(program, what2, maxLenght)
+    maxLength = np.empty(1, np.int32)
+    glGetProgramiv(program, what2, maxLength)
 
-    name = np.empty(maxLenght, np.uint8)
+    name = np.empty(maxLength, np.uint8)
 
     size = np.empty(1, np.int32)
     type = np.empty(1, np.uint32)
-    lenght = np.empty(1, np.int32)
+    length = np.empty(1, np.int32)
 
     for i in range(int(_count)):
         if what1 == GL_ACTIVE_UNIFORMS:
@@ -25,12 +25,12 @@ def getShaderActives(program, what1, what2):
             func1 = glGetActiveAttrib
             func2 = glGetAttribLocation
 
-        func1(program, i, maxLenght, lenght, size, type, name)
+        func1(program, i, maxLength, length, size, type, name)
         location = func2(program, name)
 
         type_name = type_set[int(type)]
 
-        nname = ''.join([chr(c) for c in name[:int(lenght)]])
+        nname = ''.join([chr(c) for c in name[:int(length)]])
         try:
             nname = nname.decode()
         except AttributeError:

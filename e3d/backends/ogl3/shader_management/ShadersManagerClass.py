@@ -426,8 +426,9 @@ class ShaderFile:
 
     def isModified(self):
         vsres = stat(self.filePath)
-        if vsres.st_mtime != self.lastmodTime:
-            self.lastmodTime = vsres.st_mtime
+        mtime = vsres.st_mtime
+        if mtime != self.lastmodTime:
+            self.lastmodTime = mtime
             return True
         else:
             return False
