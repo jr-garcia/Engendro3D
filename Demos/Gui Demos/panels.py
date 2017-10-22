@@ -5,18 +5,21 @@ setPath()
 from _base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
 from e3d.gui import Panel, GradientTypesEnum, PinningEnum
 from math import sin
+from os import path
 
 
 class Demo(_Demo_Base):
     def __init__(self, winSize):
         super(Demo, self).__init__(winSize)
-        self.texturesToLoad = [['e3dlogo.png', 'logo'], ['../textures/Grass.jpg', 'grass']]
+        self.texturesToLoad = [['e3dlogo.png', 'logo'],
+                               [path.join(path.dirname(__file__), path.pardir, 'textures/Grass.jpg'), 'grass']]
 
     def loadModels(self):
         engine = self.engine
 
-        self.camera.position = vec3(0, 100, 290)
-        self.camera.rotateX(20)
+        camera = self.camera
+        camera.position = vec3(0, 100, 290)
+        camera.rotateX(20)
 
         engine.models.loadModel(triangleMODEL, "trianglemodel", forceStatic=True)
         self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 0, 0), vec3(0), 1.5)
@@ -58,43 +61,43 @@ class Demo(_Demo_Base):
         self.onelayer = self.window.gui.addLayer('one')
         super(Demo, self).buildGui()
 
-        panelSize = 100
+        PANELSIZE = 100
 
-        longPanel = Panel(110, 0, panelSize * 2.5, panelSize, self.onelayer, color=vec4(.4, 0, .9, 1), borderSize=0)
-        self.rotatingPanel = Panel(420, 0, panelSize, panelSize, self.onelayer, imgID='grass')
+        longPanel = Panel(110, 0, PANELSIZE * 2.5, PANELSIZE, self.onelayer, color=vec4(0, 0, 1, 1), borderSize=2)
+        longPanel.borderColor = vec4(.2, .5, 1, 1)
+
+        self.rotatingPanel = Panel(420, 0, PANELSIZE, PANELSIZE, self.onelayer, imgID='grass')
         self.rotatingPanel.opacity = .8
 
         for i in range(9):
-            p = Panel(110 * i, 105, panelSize, panelSize, self.onelayer, borderSize=1, gradientType=i)
+            p = Panel(110 * i, 105, PANELSIZE, PANELSIZE, self.onelayer, borderSize=1, gradientType=i)
             p.opacity = .9
             p.borderColor = vec4(1)
 
-        pinnedW = panelSize + 220
-        pinnedH = panelSize + 100
-        pinnedCorners = []
-        cornerSize = 20
-        rightBorder = pinnedW - cornerSize
-        bottomBorder = pinnedH - cornerSize
+        PINNEDW = PANELSIZE + 220
+        PINNEDH = PANELSIZE + 100
+        CORNERSIZE = 20
+        rightBorder = PINNEDW - CORNERSIZE
+        bottomBorder = PINNEDH - CORNERSIZE
 
-        pinnedPanel = Panel(280, 300, pinnedW, pinnedH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
+        pinnedPanel = Panel(280, 300, PINNEDW, PINNEDH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
                             borderSize=8)
         pinnedPanel.pinning = PinningEnum.all
-
         self.rotatingPanel2 = pinnedPanel
-        pinnedCorners.append(Panel(0, 0, cornerSize, cornerSize, pinnedPanel))
-        pinnedCorners.append(Panel(rightBorder, 0, cornerSize, cornerSize, pinnedPanel, PinningEnum.all))
-        pinnedCorners.append(Panel(0, bottomBorder, cornerSize, cornerSize, pinnedPanel, PinningEnum.all))
-        pinnedCorners.append(Panel(rightBorder, bottomBorder, cornerSize, cornerSize, pinnedPanel,
-                                   PinningEnum.BottomRight))
+
+        pinnedCorners = (Panel(0, 0, CORNERSIZE, CORNERSIZE, pinnedPanel),
+                         Panel(rightBorder, 0, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
+                         Panel(0, bottomBorder, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
+                         Panel(rightBorder, bottomBorder, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.BottomRight))
         for panel in pinnedCorners:
             panel.color = vec4(.9, .4, 0, 1)
             panel.borderSize = 2
             panel.borderColor = vec4(1, 1, 0, 1)
 
-        self.scrollingPanel = Panel(600, 0, panelSize, panelSize, self.onelayer, borderSize=0, imgID='grass')
+        self.scrollingPanel = Panel(600, 0, PANELSIZE, PANELSIZE, self.onelayer, borderSize=0, imgID='grass')
 
         for i in range(4):
-            p = Panel(10 + (20 * i), 220 + (20 * i), panelSize, panelSize, self.onelayer, color=vec4(1, 1, 0, 1))
+            p = Panel(10 + (20 * i), 220 + (20 * i), PANELSIZE, PANELSIZE, self.onelayer, color=vec4(1, 1, 0, 1))
             if i == 2:
                 self.movingPanel = p
 
