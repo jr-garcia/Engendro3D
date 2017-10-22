@@ -265,10 +265,14 @@ class BaseControl(Base3DObject):
             else:
                 v2 = (value[0]) * 3
         else:
-            v2 = (value) * 3
+            v2 = (value, value, value)
 
         self._previousSize = vec3(self.pixelSize)
         self._pixelSize = v2
+        try:
+            self._material.shaderProperties['pixelSize'] = v2
+        except KeyError:
+            pass
         self._scale = v2
         self._dirty = True
         try:
