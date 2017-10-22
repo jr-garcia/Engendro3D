@@ -1,39 +1,45 @@
 from .FontRendering.MSDFAtlasRenderer import AtlasInfo, CharData
 from .SingleCharClass import *
 
-DEFAULTSPACING = 10
-
-CHAR_SEPARATION = .05
+DEFAULTSPACING = 1.0 / 10
 
 
 class Label(BaseControl):
     """
-        Text container.
+        Text displayer.
 
        @rtype : Label
     """
 
-    def __init__(self, left, top, width, height, text, parent, pinning=PinningEnum.TopLeft, fontID='default', fontBorder=.0, fontBorderColor=vec4(0, 0, 0, 1),
-                 fontColor=vec4(1, 1, 1, 1), fontWeight=.5, color=None, ID=None, imgID=None, rotation=None,
-                 borderSize=1, gradientType=GradientTypesEnum.noGradient):
+    def __init__(self, left, top, width, text, parent, fontSize=10, pinning=PinningEnum.TopLeft, fontID='default',
+                 outlineColor=vec4(0, 0, 1, 1), fontColor=vec4(0, 0, 0, 1), color=vec4(1), ID=None, imgID=None,
+                 rotation=None, borderSize=1, outlineLength=0.0, gradientType=GradientTypesEnum.noGradient):
         """
         :param borderSize:
         :type borderSize:
 
         """
+        self._outlineLength = outlineLength
+        self.fontSize = fontSize
         self._chars = []
         self._text = text
-        self._fontWeight = fontWeight
+        self._fontWeight = .5
         self._fontColor = fontColor
-        self._fontBorderColor = fontBorderColor
-        self._fontBorder = fontBorder
+        self._outlineColor = outlineColor
+        self._fontBorder = 0
         self._fontID = fontID
-        super(Label, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation, borderSize,
+        height = parent._guiMan.getFontSizeInPixels(fontSize, fontID)
+        self._fontMaxHeight = height
+        self._spacing = DEFAULTSPACING * height
+        
+        self._baseline = height - (height / 6.0)
+
+        super(Label, self).__init__(left, top, width, height + (self._spacing * 2), parent, pinning, color, ID, imgID, rotation, borderSize,
                                     gradientType)
         self._isBuilt = False
         self._dirtyProperties = True
 
-        self._updateRealSizePosition()
+        self._updateSizeProperties()
         self._updateText()
 
     def _getText(self):
@@ -52,48 +58,65 @@ class Label(BaseControl):
             self._children.clear()
         except AttributeError:
             self._children = []
+        height = self._height
+        left = 0
         for c in self._text:
-            newChar = SingleChar(0, 0, 1, 1, c, self, PinningEnum.TopLeft, self._fontID, self._fontBorder,
-                                 self._fontBorderColor, self._fontColor, self._fontWeight)
+            newChar = SingleChar(left, 0, height, c, self, PinningEnum.NoPinning, fontID=self._fontID,
+                                 fontColor=self._fontColor, outlineColor=self._outlineColor,
+                                 borderSize=0, color=vec4(0, 0, 0, 0))
+            newChar.outlineLength = self._outlineLength
             self._chars.append(newChar)
+            left += height
         self._setCharsRatio()
-
+                                 
     def _setCharsRatio(self):
         self._dirty = True
         if len(self._chars) == 0:
             return
-        advanceX = 0
-        internalSpacing = self._scale - (ewDiv(self._scale, self._realSize) * (2 * 2))
-        internalSpacing.z = 1
-        ratioScaleH = self._realSize[1] / self._realSize[0]
-        correctedScale = ratioScaleH * self._inverseScale[0]
+        spacing = self._spacing
+        advanceX = spacing
+        maxHeight = float(self._fontMaxHeight)
         guiMan = self._guiMan
         assert isinstance(guiMan, GuiManager)
         fontInfo = guiMan.fontInfos[self.fontID]
         assert isinstance(fontInfo, AtlasInfo)
-        posX = 0
-        preoffset = 0
+        baseline = self._baseline
+
         for c in self._chars:
             c._dirty = True
             assert isinstance(c, SingleChar)
             cdata = fontInfo.charDataDict[c._charCode]
             assert isinstance(cdata, CharData)
-            maxSize = max(cdata.height, cdata.width)
-            charHeight = maxSize
-            charWidth = maxSize
-            posX += advanceX - ((charWidth + fontInfo.border - cdata.width) / 2) - preoffset
-            preoffset = ((charWidth + fontInfo.border - cdata.width) / 2)
-            advanceX = charWidth + CHAR_SEPARATION
+            if cdata.height > cdata.width:
+                boxScale = maxHeight * cdata.height
+            else:
+                boxScale = cdata.width * maxHeight
+
+            boxWidth = boxScale
+            boxHeight = boxScale
+
+            charHeight = cdata.height * maxHeight
+            charWidth = cdata.width * maxHeight
+
+            charBottom = (boxHeight - charHeight) / 2.0
+            charLeft = (boxWidth - charWidth) / 2.0
             if c.char == ' ':
                 posY = 0
             else:
-                originY = fontInfo.lineHeight - cdata.above - fontInfo.baseline - fontInfo.border
-                posY = originY - ((charHeight - cdata.height) / 2)
+                posY = baseline - (cdata.above * maxHeight) - charBottom
 
-            c.size = vec3(charWidth * correctedScale, charHeight, 1)
-            c.position = vec3(posX * correctedScale, posY, 0)
+            lowerEdge = posY + boxHeight
+            if lowerEdge > maxHeight:
+                self._baseline -= lowerEdge - maxHeight
+                self._setCharsRatio()
+                break
 
-            if c._position.x >= 1 or c._position.y >= 1:
+            c.size = vec3(boxWidth, boxHeight, 1)
+            c.position = vec3(advanceX - charLeft, posY + spacing, 0)
+            # advanceX += (cdata.advance[0] * maxHeight)  # This is the 'right way'
+            advanceX += charWidth
+
+            if c._position.x >= self._width or c._position.y >= maxHeight:
                 c.visible = False
             else:
                 c.visible = True
@@ -109,7 +132,7 @@ class Label(BaseControl):
         for c in self._chars:
             c.fontID = self._fontID
             c.fontBorder = self._fontBorder
-            c.fontBorderColor = self._fontBorderColor
+            c.outlineColor = self._outlineColor
             c.fontColor = self._fontColor
             c.fontWeight = self._fontWeight
             c.color = self.color
@@ -123,14 +146,14 @@ class Label(BaseControl):
 
     fontBorder = property(_getFontBorder, _setFontBorder)
 
-    def _getFontBorderColor(self):
-        return self._fontBorderColor
+    @property
+    def outlineColor(self):
+        return self._outlineColor
 
-    def _setFontBorderColor(self, val):
-        self._fontBorderColor = val
+    @outlineColor.setter
+    def outlineColor(self, value):
+        self._outlineColor = value
         self._dirtyProperties = True
-
-    fontBorderColor = property(_getFontBorderColor, _setFontBorderColor)
 
     def _getFontColor(self):
         return self._fontColor
@@ -163,8 +186,8 @@ class Label(BaseControl):
     def __repr__(self):
         return self._text
 
-    def _updateRealSizePosition(self):
-        super(Label, self)._updateRealSizePosition()
+    def _updateSizeProperties(self):
+        super(Label, self)._updateSizeProperties()
         self._setCharsRatio()
 
     def _setColor(self, value):
