@@ -276,6 +276,7 @@ class BaseControl(Base3DObject):
             pass
         self._scale = v2
         self._dirty = True
+        self._width, self._height, d = v2
         try:
             self._material.shaderProperties['size'] = self._scale
         except KeyError:
@@ -289,12 +290,13 @@ class BaseControl(Base3DObject):
 
     def _getAbsolutePosition(self):
         npos = vec3(self._position)
-
         return npos
 
     def _setAbsolutePosition(self, value):
+        self._dirty = True
         npos = value
         self._position = vec3(npos)
+        self._updateLastPositions()
         self._material.shaderProperties['relativePosition'] = self._position
 
     position = property(fget=_getAbsolutePosition, fset=_setAbsolutePosition)
@@ -466,6 +468,42 @@ class BaseControl(Base3DObject):
     def addMove(self, vector):
         super(BaseControl, self).addMove(vector)
         self._updateLastPositions()
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, value):
+        l, t, z = self._position
+        self.position = vec3(value, t, z)
+
+    @property
+    def top(self):
+        return self._top
+
+    @top.setter
+    def top(self, value):
+        l, t, z = self._position
+        self.position = vec3(l, value, z)
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        w, h, d = self.size
+        self.size = vec3(value, h, d)
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, value):
+        w, h, d = self.size
+        self.size = vec3(w, value, d)
 
 
 class Material2D(Material):
