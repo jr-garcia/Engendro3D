@@ -243,7 +243,7 @@ class GuiManager:
                 fontRangeInfo = GuiManager.convertFromJsoned(load(dest))
 
         fontTextureName = FONTTEXTUREIDSTRING.format(ID)
-        self.engine.textures.loadTexture(finalPath, fontTextureName, repeat=False, force=True)
+        self.engine.textures.loadTexture(finalPath, fontTextureName, mipmapsNumber=0, repeat=False, force=True)
         self.fontInfos[ID] = fontRangeInfo
         self.fontTextureNames[ID] = fontTextureName
         self.fontFilePaths[ID] = fontPath
