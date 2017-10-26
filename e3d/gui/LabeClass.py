@@ -1,5 +1,6 @@
 from .FontRendering.MSDFAtlasRenderer import AtlasInfo, CharData
 from .SingleCharClass import *
+from .TextEnums import *
 
 DEFAULTSPACING = 1.0 / 10
 
@@ -12,8 +13,9 @@ class Label(BaseControl):
     """
 
     def __init__(self, left, top, width, text, parent, fontSize=10, pinning=PinningEnum.TopLeft, fontID='default',
-                 outlineColor=vec4(0, 0, 1, 1), fontColor=vec4(0, 0, 0, 1), color=vec4(1), ID=None, imgID=None,
-                 rotation=None, borderSize=1, outlineLength=0.0, gradientType=GradientTypesEnum.noGradient):
+                 outlineColor=vec4(0, 0, 0, 1), fontColor=vec4(1), color=vec4(0), ID=None, imgID=None,
+                 rotation=None, borderSize=1, outlineLength=OutlineLenghtEnum.NoOutline,
+                 gradientType=GradientTypesEnum.noGradient):
         """
         :param borderSize:
         :type borderSize:
@@ -22,7 +24,7 @@ class Label(BaseControl):
         self._outlineLength = outlineLength
         self.fontSize = fontSize
         self._text = text
-        self._fontWeight = .5
+        self._fontWeight = FontWeightEnum.Normal
         self._fontColor = fontColor
         self._outlineColor = outlineColor
         self._fontBorder = 0
@@ -67,6 +69,7 @@ class Label(BaseControl):
                                  fontColor=self._fontColor, outlineColor=self._outlineColor,
                                  borderSize=0, color=vec4(0, 0, 0, 0))
             newChar.outlineLength = self._outlineLength
+            newChar.fontWeight = self._fontWeight
             left += height
         self._setCharsRatio()
                                  
@@ -115,7 +118,8 @@ class Label(BaseControl):
             c.size = vec3(boxWidth, boxHeight, 1)
             c.position = vec3(advanceX - charLeft, posY + spacing, 0)
             # advanceX += (cdata.advance[0] * maxHeight)  # This is the 'right way'
-            advanceX += charWidth
+            # advanceX += charWidth  # This is a safe way
+            advanceX += ((cdata.advance[0] * maxHeight) + charWidth) / 2.0  # This looks better
 
             if c._position.x >= self._width or c._position.y >= maxHeight:
                 c.visible = False
@@ -154,6 +158,15 @@ class Label(BaseControl):
     @outlineColor.setter
     def outlineColor(self, value):
         self._outlineColor = value
+        self._dirtyProperties = True
+
+    @property
+    def outlineLength(self):
+        return self._outlineLength
+
+    @outlineLength.setter
+    def outlineLength(self, value):
+        self._outlineLength = value
         self._dirtyProperties = True
 
     def _getFontColor(self):

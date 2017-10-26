@@ -1,6 +1,7 @@
 from .BaseControlClass import *
 from .GuiManagerClass import DEFAULT2DTEXTSHADERID, NAMEFORMATSTRING
 from .FontRendering.MSDFAtlasRenderer import CharData, AtlasInfo
+from .TextEnums import *
 
 
 class SingleChar(BaseControl):
@@ -18,10 +19,10 @@ class SingleChar(BaseControl):
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                          borderSize, gradientType)
         self._char = char
-        self._outlineLength = .18
+        self._outlineLength = OutlineLenghtEnum.Medium
         self._outlineColor = outlineColor
         self._fontColor = fontColor
-        self._fontWeight = .56
+        self._fontWeight = FontWeightEnum.Normal
         self._charCode = ord(char)
         self._fontID = fontID
         self._material._isText = True

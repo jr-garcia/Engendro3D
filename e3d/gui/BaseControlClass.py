@@ -102,6 +102,9 @@ class BaseControl(Base3DObject):
         self._setAbsoluteScale(size)
         self._borderSize = borderSize
         self._borderColor = vec4(0, 0, 0, 1)
+        self._gradientType = gradientType
+        self._gradientColor0 = vec4(1, 0, 0, 1)
+        self._gradientColor1 = vec4(0, 0, 1, 1)
         self._setInnerSize()
         # assert isinstance(self._guiMan, GuiManager)
 
@@ -120,12 +123,14 @@ class BaseControl(Base3DObject):
         material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._pixelSize))
         material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
         material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
+        material.shaderProperties.append(Vec3ShaderProperty('parentSize', self.parent.size))
+        material.shaderProperties.append(Vec3ShaderProperty('parentPosition', self.parent.position))
         material.shaderProperties.append(Vec3ShaderProperty('realScale', self._scale))
         # material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
-        self._gradientType = gradientType  # todo:fix this double assigning
         material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
-        self.gradientType = gradientType
+        material.shaderProperties.append(Vec4ShaderProperty('GradientColor0', self._gradientColor0))
+        material.shaderProperties.append(Vec4ShaderProperty('GradientColor1', self._gradientColor1))
 
         self._setLastDifferences()
         self._updateSizeProperties()
@@ -153,6 +158,24 @@ class BaseControl(Base3DObject):
     def gradientType(self, value):
         self._gradientType = value
         self._material.shaderProperties['GradientType'] = value
+
+    @property
+    def gradientColor0(self):
+        return self._gradientColor0
+
+    @gradientColor0.setter
+    def gradientColor0(self, value):
+        self._gradientColor0 = value
+        self._material.shaderProperties['GradientColor0'] = value
+
+    @property
+    def gradientColor1(self):
+        return self._gradientColor1
+
+    @gradientColor0.setter
+    def gradientColor1(self, value):
+        self._gradientColor1 = value
+        self._material.shaderProperties['GradientColor1'] = value
 
     @property
     def pinning(self):
@@ -351,7 +374,7 @@ class BaseControl(Base3DObject):
         scaledOffset = ewMul(self._offset, self._scale)
         position += scaledOffset
         # parentCenter -= scaledOffset
-        parentTrans = mat4.translation(parent._position)
+        parentTrans = mat4.translation(parent.position)
         pCTrans = mat4.translation(parentCenter)
         self._positionMatrix = mat4.translation(position)
         self._scaleMatrix = mat4.scaling(self._scale)
@@ -379,6 +402,12 @@ class BaseControl(Base3DObject):
         material.shaderProperties['internalSize'] = self._innerSize
         material.shaderProperties['realScale'] = self._scale
         # material.shaderProperties['inverseScale'] = self._inverseScale
+        
+    def _update(self):
+        super(BaseControl, self)._update()
+        material = self._material
+        material.shaderProperties['parentSize'] = self.parent.size
+        material.shaderProperties['parentPosition'] = self.parent.position
 
     def _setInnerSize(self):
         self._innerSize = self.size - vec3(self._borderSize * 2)

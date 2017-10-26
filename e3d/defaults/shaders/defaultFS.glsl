@@ -30,7 +30,7 @@ vec3 Material_specular = vec3(1,1,1);
 uniform light Lights[MAXLIGHTS];
 uniform bool IsLightAffected;
 
-varying vec2 f_texcoord0;
+varying vec2 uvCoord0;
 varying vec3 LightPos[MAXLIGHTS];
 varying float lDistance[MAXLIGHTS];
 varying vec3 campos;
@@ -46,7 +46,7 @@ vec3 calcBumpedNormal()
     vec3 Tangent = normalize(nmTangent);
     vec3 Bitangent = normalize(nmBiTangent);
     Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
-    vec3 BumpMapNormal = texture2D(NormalMapTexture, f_texcoord0).xyz;
+    vec3 BumpMapNormal = texture2D(NormalMapTexture, uvCoord0).xyz;
     BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0, 1.0, 1.0);
     vec3 NewNormal;
     mat3 TBN = mat3(Tangent, Bitangent, Normal);
@@ -129,7 +129,7 @@ void main()
     vec4 objectdiffuse;
     if (UseDiffuseTexture)
     {
-        objectdiffuse = vec4(texture2D(DiffuseTexture, f_texcoord0).rgb,1);
+        objectdiffuse = vec4(texture2D(DiffuseTexture, uvCoord0).rgb,1);
     }
     else
     {
@@ -166,7 +166,7 @@ void main()
     vec3 emissiveAmount = EmissiveColor.rgb;
     if (UseEmissiveTexture)
     {
-        emissiveAmount *= texture2D(EmissiveTexture, f_texcoord0).r;
+        emissiveAmount *= texture2D(EmissiveTexture, uvCoord0).r;
     }
 
     final += emissiveAmount;

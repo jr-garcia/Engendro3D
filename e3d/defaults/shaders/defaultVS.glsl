@@ -34,7 +34,7 @@ uniform light Lights[MAXLIGHTS];
 uniform bool IsLightAffected;
 uniform bool UpSideDownTextures;
 
-varying vec2 f_texcoord0;
+varying vec2 uvCoord0;
 varying vec3 nmNormal;
 varying vec3 nmTangent;
 varying vec3 nmBiTangent;
@@ -77,9 +77,9 @@ vec4 addBoneMat(vec4 pos, vec4 bind, vec4 bweights, mat4 transforms[50])
 
 void main()
 {
-    f_texcoord0 = vec2(texcoord0.x * TextureRepeat.x, texcoord0.y * TextureRepeat.y);
+    uvCoord0 = vec2(texcoord0.x * TextureRepeat.x, texcoord0.y * TextureRepeat.y);
     if (UpSideDownTextures)
-        f_texcoord0.y = 1.0 - f_texcoord0.y;
+        uvCoord0.y = 1.0 - uvCoord0.y;
 
     vec3 ppos = (ModelView * vec4(position, 1.0)).xyz;
     campos = ppos;

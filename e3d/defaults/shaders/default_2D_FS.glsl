@@ -1,5 +1,5 @@
 #version 120 //120 fails in intel 965 + windows. Suceedes under linux
-varying vec2 f_texcoord;
+varying vec2 uvCoord;
 uniform bool UseDiffuseTexture;
 uniform vec4 DiffuseColor;
 uniform sampler2D DiffuseTexture;
@@ -15,15 +15,17 @@ uniform int GradientDirection = 0;
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
+uniform vec3 parentSize;
+uniform vec3 parentPosition;
 
 // Text
 uniform bool isText=False;
 uniform vec4 fontColor = vec4(1.0);
-uniform float outlineLength = 0.2;
+uniform float outlineLength = .0;
 uniform vec4 outlineColor = vec4(0, 0 ,0 , 1.0);
 uniform float fontWeight = .6;
-uniform float f_gamma = 0.0;
-uniform float fb_gamma = 0.0;
+float f_gamma = .9;
+float fb_gamma = 0.0;
 uniform bool showSDF=false;
 
 
@@ -78,50 +80,65 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
     float rawDistance = median(sampled.r, sampled.g, sampled.b);
 
     if (showSDF)
-        return vec4(vec3(1-rawDistance), 1);
+        return vec4(vec3(rawDistance), .6);
     else
     {
         float fixedDistance = 1.0 - rawDistance;
         float distanceToBorder = fixedDistance - fontWeight;
-//        float falpha = smoothstep(fixedDistance - f_gamma, fixedDistance + f_gamma, rawDistance);
-//        float balpha = smoothstep(distanceToBorder - fb_gamma, distanceToBorder + fb_gamma, rawDistance);
-//        float fbalpha = smoothstep(fixedDistance - fb_gamma, fixedDistance + fb_gamma, rawDistance);
+        float falpha = smoothstep(fixedDistance - f_gamma, fixedDistance + f_gamma, rawDistance);
+        float balpha = smoothstep(distanceToBorder - fb_gamma, distanceToBorder + fb_gamma, rawDistance);
+        float fbalpha = smoothstep(fixedDistance - fb_gamma, fixedDistance + fb_gamma, rawDistance);
         vec4 resultColor;
+        float finalOutlineLength = outlineLength * (1.0 - fontWeight);
 
         if (fixedDistance <= fontWeight)
         {
             resultColor = fontColor;
-//            if (outlineLength == 0 && bgcolor.a == 0)
-//                resultColor.a = falpha;
-//            else
-//            {
-//                vec4 color;
-//                if (outlineLength == 0)
-//                    color = bgcolor;
-//                else
-//                    color = charOutlineColor;
-//                resultColor = mix(fontColor, color, 1-fbalpha);
-//            }
+            if (finalOutlineLength == 0 && bgcolor.a == 0)
+                  resultColor.a = falpha * clamp(pixelSize[0] / 10, 2, 10);
+            else
+            {
+                vec4 color;
+                if (finalOutlineLength == 0)
+                    color = bgcolor;
+                else
+                    color = outlineColor;
+                resultColor = mix(fontColor, color, 1-fbalpha);
+            }
             return resultColor;
        }
         else
             {
                 if (distanceToBorder <= outlineLength && outlineLength > 0)
-                    return outlineColor;
-//                    if (bgcolor.a == 0)
-//                        return vec4(charOutlineColor.rgb, balpha);
-//                    else
-//                        return mix(bgcolor, charOutlineColor, balpha);
+                    if (bgcolor.a == 0)
+                        return vec4(outlineColor.rgb, balpha);
+                    else
+                        return mix(bgcolor, outlineColor, balpha);
                 else
                     return bgcolor;
             }
     }
 }
 
+
+bool isOutBounds()
+{
+    float x, y;
+    x = gl_FragCoord.x;
+    y = gl_FragCoord.y;
+    float localx = x; 
+    float parentX = parentSize.x + parentPosition.x;
+    return localx > parentX;
+}
+
 void main()
 {
     vec4 objectdiffuse, textureColor, bgColor;
     vec2 realPos = clamp(fixedPosition, 0.0, 1.0) * pixelSize.xy;
+    if (isOutBounds())
+    {
+        discard;
+    }
 
     if (realPos.x < borderSize || realPos.y < borderSize ||
         realPos.x > (pixelSize.x - borderSize) || realPos.y > (pixelSize.y - borderSize))
@@ -137,7 +154,7 @@ void main()
 
         if (UseDiffuseTexture)
         {
-            textureColor = vec4(texture2D(DiffuseTexture, f_texcoord));
+            textureColor = vec4(texture2D(DiffuseTexture, uvCoord));
             if (isText)
                 objectdiffuse = setUpText(textureColor, bgColor);
             else

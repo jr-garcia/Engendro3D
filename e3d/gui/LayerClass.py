@@ -27,7 +27,7 @@ class Layer(Attachable):
         self._onInit = True
 
         self._rotationMatrix = mat4(1)
-        self._position = vec3(0)
+        self.position = vec3(0)
 
         self._updatePixelSize()
 
