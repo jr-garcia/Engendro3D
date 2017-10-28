@@ -8,7 +8,8 @@ import numpy as np
 from PIL import Image
 from msdf import makeSDF, multiMake
 
-from e3d.gui.FontRendering import CharRangesEnum
+from ..FontRendering import CharRangesEnum
+from ... import Logging, logLevelsEnum
 
 NAMEFORMATSTRING = '{fontName}__{rangeName}.{format}'
 bgcolor = 'black'
@@ -47,7 +48,7 @@ def render(fontPath, fontSize, atlasSize, destinationFolder, saveFormat, charRan
                         'list of characters, string, range object or 2-tuple with range start and end. '
                         'Is ' + str(type(charRangeRange)))
 
-    print('Rendering {} {}...'.format(fontName, charRangeName))
+    Logging._Logger.log('Rendering {} {}...'.format(fontName, charRangeName), logLevelsEnum.debug)
     chars = []
     for c in finalRange:
         isPrintableTest = isPrintable(c)
