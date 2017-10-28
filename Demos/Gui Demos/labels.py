@@ -70,23 +70,26 @@ class Demo(_Demo_Base):
         # load default font with japanese letters / symbols
         self.window.gui.loadFont('defaultJapanese',
                                  os.path.join(self.engine.path.defaults.fonts, 'code', 'Code200365k.ttf'),
-                                 baseSize=34, charRange=CharRangesEnum.japanese)
+                                 baseSize=34, charRange=CharRangesEnum.japanese)  # Will take some time first time
 
         self.window.gui.loadFont('auto', os.path.join(os.path.pardir, 'fonts', 'automati.ttf'))
 
         textLayer = self.window.gui.addLayer('text')
 
-        text1 = 'G{]|t!?p=#$%&^*()&*'
-        text2 = 'Y eso lo es, pero no! Puedo yo, pues?'
+        text1 = '+)(*&^%$#@!{}|":?><~`'
+        text2 = 'Lorem ipsum dolor sit amet, consectetur...'
         text3 = u'デモのみ。非ラテン文字用に最適化されていません。'
         text4 = 'Demo only. Not optimized for non latin chars.'
-        self.label1 = Label(20, 80, 900, text1, parent=textLayer, fontSize=74, fontID='default', borderSize=3,
-                            outlineColor=[1, 0, 0, 1], outlineLength=.15)
+        TLR = PinningEnum.TopLeftRight
+        self.label1 = Label(20, 80, 900, text1, parent=textLayer, fontSize=64, fontID='default', borderSize=6,
+                            outlineColor=[1, 0, 0, 1], outlineLength=outlineLengths.keys()[2],
+                            pinning=TLR)
         self.label1.color = [1, 1, 0, 1]
-        self.label1.borderColor = vec4(1)
+        self.label1.borderColor = vec4(1, .6, 0, .5)
 
         self.label2 = Label(25, self.label1.height + 100, 700, text2, parent=textLayer, fontID='auto',
-                            fontColor=[.5, .5, 0, 1], fontSize=18, borderSize=0)
+                            fontColor=[.8, 0, .8, 1], fontSize=18, borderSize=0,
+                            pinning=TLR)
         self.label2.color = [0, 1, 0, .5]
 
         self.label3 = Label(20, self.label2.top + 100, 697, text3, textLayer, fontID='defaultJapanese')
