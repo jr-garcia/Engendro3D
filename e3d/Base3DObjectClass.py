@@ -218,7 +218,7 @@ class Base3DObject(Attachable):
         """
         self._updateRotationMatrix()
         tv = self._rotationMatrix * vector
-        self._position += tv
+        self.position += tv
         self._dirty = True
 
     def moveForward(self, amount):

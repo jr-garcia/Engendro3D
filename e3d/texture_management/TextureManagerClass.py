@@ -50,7 +50,7 @@ class TexturesManager(BaseManager):
             self._defaultTexture = self._textureCache.get('default')
             self.loadTexture(dtnm, "_defaultNM", serial=True, raiseOnError=True)
             self._defaultNormalMap = self._textureCache.get('_defaultNM')
-        except:
+        except Exception:
             raise
 
     def run(self):

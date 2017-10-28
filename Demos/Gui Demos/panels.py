@@ -11,6 +11,7 @@ from os import path
 class Demo(_Demo_Base):
     def __init__(self, winSize):
         super(Demo, self).__init__(winSize)
+        self.dorot = False
         self.texturesToLoad = [['e3dlogo.png', 'logo'],
                                [path.join(path.dirname(__file__), path.pardir, 'textures/Grass.jpg'), 'grass']]
 
@@ -50,8 +51,8 @@ class Demo(_Demo_Base):
         movespeed = ft / 10.0
         self.lastspeed = movespeed
         self.scrollingPanel._material.uvOffset.x += .01
+        self.movingPanel.moveLeft(sin(ev[1] / 1000.0))
         if self.dorot:
-            self.movingPanel.moveLeft(sin(ev[1] / 1000.0))
             self.rotatingPanel.rotate2D(1)
             self.rotatingPanel2.rotate2D(-1)
             if self.triangle:
@@ -83,12 +84,13 @@ class Demo(_Demo_Base):
         pinnedPanel = Panel(280, 300, PINNEDW, PINNEDH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
                             borderSize=8)
         pinnedPanel.pinning = PinningEnum.all
+        bs = pinnedPanel.borderSize
         self.rotatingPanel2 = pinnedPanel
 
-        pinnedCorners = (Panel(0, 0, CORNERSIZE, CORNERSIZE, pinnedPanel),
-                         Panel(rightBorder, 0, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
-                         Panel(0, bottomBorder, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
-                         Panel(rightBorder, bottomBorder, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.BottomRight))
+        pinnedCorners = (Panel(bs, bs, CORNERSIZE, CORNERSIZE, pinnedPanel),
+                         Panel(rightBorder - bs, bs, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
+                         Panel(bs, bottomBorder - bs, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.all),
+                         Panel(rightBorder - bs, bottomBorder - bs, CORNERSIZE, CORNERSIZE, pinnedPanel, PinningEnum.BottomRight))
         for panel in pinnedCorners:
             panel.color = vec4(.9, .4, 0, 1)
             panel.borderSize = 2

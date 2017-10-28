@@ -64,8 +64,6 @@ class Demo(_Demo_Base):
 
         self.char = SingleChar(30, 30, 200, '?', textLayer)
         self.char.outlineColor = vec4(1, 0, 0, 1)
-        # self.char.fontBorder = 0.3
-        # self.char.fontWeight = .2
 
         SingleChar(250, 250, 200, u'癒', self.onelayer, fontID='defaultJap')
 

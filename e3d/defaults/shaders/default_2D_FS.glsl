@@ -1,11 +1,8 @@
 #version 120 //120 fails in intel 965 + windows. Suceedes under linux
-varying vec2 uvCoord;
 uniform bool UseDiffuseTexture;
 uniform vec4 DiffuseColor;
 uniform sampler2D DiffuseTexture;
 uniform float Opacity;
-
-varying vec2 fixedPosition;
 
 uniform vec4 GradientColor0 = vec4(1, 0, 0, 1);
 uniform vec4 GradientColor1 = vec4(0, 0, 1, 1);
@@ -17,6 +14,10 @@ uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
 uniform vec3 parentSize;
 uniform vec3 parentPosition;
+uniform vec3 relativePosition;
+
+varying vec2 uvCoord;
+varying vec2 fixedPosition;
 
 // Text
 uniform bool isText=False;
@@ -24,9 +25,9 @@ uniform vec4 fontColor = vec4(1.0);
 uniform float outlineLength = .0;
 uniform vec4 outlineColor = vec4(0, 0 ,0 , 1.0);
 uniform float fontWeight = .6;
+uniform bool showSDF=false;
 float f_gamma = .9;
 float fb_gamma = 0.0;
-uniform bool showSDF=false;
 
 
 float median(float r, float g, float b) {
@@ -95,7 +96,7 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
         {
             resultColor = fontColor;
             if (finalOutlineLength == 0 && bgcolor.a == 0)
-                  resultColor.a = falpha * clamp(pixelSize[0] / 10, 2, 10);
+                  resultColor.a = falpha * clamp(pixelSize[0] / 10, 2, 8);
             else
             {
                 vec4 color;
@@ -106,10 +107,10 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
                 resultColor = mix(fontColor, color, 1-fbalpha);
             }
             return resultColor;
-       }
+        }
         else
             {
-                if (distanceToBorder <= outlineLength && outlineLength > 0)
+                if (distanceToBorder <= finalOutlineLength && finalOutlineLength > 0)
                     if (bgcolor.a == 0)
                         return vec4(outlineColor.rgb, balpha);
                     else
@@ -120,24 +121,22 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
     }
 }
 
-
-bool isOutBounds()
+bool isOutBounds(vec2 pos)
 {
-    float x, y;
-    x = gl_FragCoord.x;
-    y = gl_FragCoord.y;
-    float localx = x; 
-    float parentX = parentSize.x + parentPosition.x;
-    return localx > parentX;
+    float localx = pos.x + relativePosition.x;
+    float parentX = parentSize.x;
+    float localy = pos.y + relativePosition.y;
+    float parentY = parentSize.y;
+    return (localx > parentX || localy > parentY || localx < 0 || localy < 0);
 }
 
 void main()
 {
     vec4 objectdiffuse, textureColor, bgColor;
     vec2 realPos = clamp(fixedPosition, 0.0, 1.0) * pixelSize.xy;
-    if (isOutBounds())
+    if (isOutBounds(realPos))
     {
-        discard;
+        return;
     }
 
     if (realPos.x < borderSize || realPos.y < borderSize ||

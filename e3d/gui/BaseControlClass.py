@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from cycgkit.cgtypes import vec3
 
-from e3d.commonValues import ewDiv, ewMul
+from ..commonValues import ewDiv, ewMul
 from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 from ..Base3DObjectClass import Base3DObject
 from ..model_management.MaterialClass import *
@@ -165,17 +165,17 @@ class BaseControl(Base3DObject):
 
     @gradientColor0.setter
     def gradientColor0(self, value):
-        self._gradientColor0 = value
         self._material.shaderProperties['GradientColor0'] = value
+        self._gradientColor0 = value
 
     @property
     def gradientColor1(self):
         return self._gradientColor1
 
-    @gradientColor0.setter
+    @gradientColor1.setter
     def gradientColor1(self, value):
-        self._gradientColor1 = value
         self._material.shaderProperties['GradientColor1'] = value
+        self._gradientColor1 = value
 
     @property
     def pinning(self):
@@ -317,8 +317,8 @@ class BaseControl(Base3DObject):
 
     def _setAbsolutePosition(self, value):
         self._dirty = True
-        npos = value
-        self._position = vec3(npos)
+        x, y, z = value
+        self._position = vec3(x, y, self._position.z)
         self._updateLastPositions()
         self._material.shaderProperties['relativePosition'] = self._position
 
@@ -446,9 +446,11 @@ class BaseControl(Base3DObject):
         self._bottom = nb
         self._right = nr
         self._setLastDifferences()
+        self.size = vec3(max(w - nl - nr, 0), max(h - nt - nb, 0), 1)
         self._position = vec3(nl, nt, 0)
-        self.size = vec3(max(w - nl - nr, 1), max(h - nt - nb, 1), 1)
         self._setInnerSize()
+        self._dirty = True
+        self._material.shaderProperties['relativePosition'] = self._position
 
     def _getInverseScale(self):
         return self._inverseScale
@@ -533,6 +535,17 @@ class BaseControl(Base3DObject):
     def height(self, value):
         w, h, d = self.size
         self.size = vec3(w, value, d)
+
+    def isOutBounds(self):
+        parentSize = self.parent.size
+        pos = self.position
+        size = self.size
+        localx = pos.x
+        parentX = parentSize.x
+        localy = pos.y
+        parentY = parentSize.y
+
+        return localx > parentX or localy > parentY or (localx + size.x) < 0 or (localy + size.y) < 0
 
 
 class Material2D(Material):

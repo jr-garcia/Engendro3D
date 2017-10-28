@@ -25,7 +25,7 @@ class Material(object):
         self.useEmissiveMapTexture = False
         self.useLightMapTexture = False
         self.isLightAffected = True
-        self.uvOffset = vec4(0)
+        self.uvOffset = vec4(0, 0, 1, 1)
 
         self._shaderProps = ShaderPropertiesList()
 

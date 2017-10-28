@@ -159,7 +159,7 @@ class GuiManager:
             if layer.visible:
                 layer._update()
                 for child in reversed(layer._children):
-                    if child.visible:
+                    if child.visible and not child.isOutBounds():
                         self._buildLayerDrawingData(child, newDrawingData)
 
         # GuiManager.orderInstances(newDrawingData.instances)  # todo: implement GUI z-ordering to enable this

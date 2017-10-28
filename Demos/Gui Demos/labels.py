@@ -5,14 +5,26 @@ from _set_path import setPath
 
 setPath()
 from _base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
-from e3d.gui import PinningEnum, Label, CharRangesEnum
+from e3d.gui import PinningEnum, Label, CharRangesEnum, TextEnums, GradientTypesEnum
 from math import sin
 import os
+from collections import OrderedDict
+
+weigthNames = OrderedDict()
+weigthNames[0.4] = 'light '
+weigthNames[.6] = 'normal'
+weigthNames[.9] = 'bold '
+
+outlineLengths = OrderedDict()
+outlineLengths[0] = 'NoOutline'
+outlineLengths[0.125] = 'Little'
+outlineLengths[0.25] = 'Medium'
+outlineLengths[0.5] = 'Big'
 
 
 class Demo(_Demo_Base):
-    def __init__(self):
-        super(Demo, self).__init__((950, 480))
+    def __init__(self,winsize):
+        super(Demo, self).__init__(winsize)
         self.texturesToLoad = [['e3dlogo.png', 'logo'], ['../textures/Grass.jpg', 'grass']]
 
     def loadModels(self):
@@ -41,7 +53,7 @@ class Demo(_Demo_Base):
             self.dorot = not self.dorot
         if keyName.__contains__('space'):
             self.window.setFullScreen(not self.window.isFullScreen())
-        if keyName == 'f1':  # F1
+        elif keyName == 'f1':  # F1
             np = [round(d, 3) for d in self.camera.position]
             print('Camera pos:{0}'.format(str(np)))
 
@@ -56,8 +68,9 @@ class Demo(_Demo_Base):
         super(Demo, self).buildGui()
 
         # load default font with japanese letters / symbols
-        self.window.gui.loadFont('default', os.path.join(self.engine.path.defaults.fonts, 'code', 'Code200365k.ttf'),
-                                 baseSize=34, charRange=CharRangesEnum.latin, force=True)
+        self.window.gui.loadFont('defaultJapanese',
+                                 os.path.join(self.engine.path.defaults.fonts, 'code', 'Code200365k.ttf'),
+                                 baseSize=34, charRange=CharRangesEnum.japanese)
 
         self.window.gui.loadFont('auto', os.path.join(os.path.pardir, 'fonts', 'automati.ttf'))
 
@@ -65,17 +78,20 @@ class Demo(_Demo_Base):
 
         text1 = 'G{]|t!?p=#$%&^*()&*'
         text2 = 'Y eso lo es, pero no! Puedo yo, pues?'
+        text3 = u'デモのみ。非ラテン文字用に最適化されていません。'
+        text4 = 'Demo only. Not optimized for non latin chars.'
         self.label1 = Label(20, 80, 900, text1, parent=textLayer, fontSize=74, fontID='default', borderSize=3,
                             outlineColor=[1, 0, 0, 1], outlineLength=.15)
-        self.label2 = Label(25, self.label1._height + 100, 700, text2, parent=textLayer, fontID='auto',
-                            fontColor=[.5, .5, 0, 1], fontSize=18, borderSize=0)
-
-        self.label3 = Label(20, self.label2._top + 100, 697, 'Press CTRL, SHIFT, UP or DOWN', textLayer)
-
         self.label1.color = [1, 1, 0, 1]
-        self.label2.color = [0, 1, 0, .5]
         self.label1.borderColor = vec4(1)
+
+        self.label2 = Label(25, self.label1.height + 100, 700, text2, parent=textLayer, fontID='auto',
+                            fontColor=[.5, .5, 0, 1], fontSize=18, borderSize=0)
+        self.label2.color = [0, 1, 0, .5]
+
+        self.label3 = Label(20, self.label2.top + 100, 697, text3, textLayer, fontID='defaultJapanese')
+        self.label4 = Label(20, self.label3.top + self.label3.height, 697, text4, textLayer, fontID='default')
 
 
 if __name__ == '__main__':
-    runDemo(Demo(), 'GUI Demo - Single Char')
+    runDemo(Demo((950, 680)), 'GUI Demo - Single Char')

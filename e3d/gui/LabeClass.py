@@ -89,6 +89,9 @@ class Label(BaseControl):
         for c in self._children:
             c._dirty = True
             assert isinstance(c, SingleChar)
+            hasChar = c._charCode in fontInfo.charDataDict
+            if not hasChar:
+                raise NotImplementedError('char {} not included in font atlas'.format(c.char))
             cdata = fontInfo.charDataDict[c._charCode]
             assert isinstance(cdata, CharData)
             if cdata.height > cdata.width:
@@ -121,11 +124,6 @@ class Label(BaseControl):
             # advanceX += charWidth  # This is a safe way
             advanceX += ((cdata.advance[0] * maxHeight) + charWidth) / 2.0  # This looks better
 
-            if c._position.x >= self._width or c._position.y >= maxHeight:
-                c.visible = False
-            else:
-                c.visible = True
-
     def _update(self):
         if not self._isBuilt:
             self._updateText()
@@ -140,7 +138,6 @@ class Label(BaseControl):
             c.outlineColor = self._outlineColor
             c.fontColor = self._fontColor
             c.fontWeight = self._fontWeight
-            c.color = self.color
 
     def _getFontBorder(self):
         return self._fontBorder
