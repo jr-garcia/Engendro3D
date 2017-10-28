@@ -91,7 +91,7 @@ class Label(BaseControl):
             assert isinstance(c, SingleChar)
             hasChar = c._charCode in fontInfo.charDataDict
             if not hasChar:
-                raise NotImplementedError('char {} not included in font atlas'.format(c.char))
+                raise NotImplementedError('char \'{}\' not included in font atlas.'.format(c.char))
             cdata = fontInfo.charDataDict[c._charCode]
             assert isinstance(cdata, CharData)
             if cdata.height > cdata.width:

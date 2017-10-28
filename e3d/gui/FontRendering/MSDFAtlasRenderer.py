@@ -289,8 +289,11 @@ def isPrintable(char):
 
     allowed_categories = letters + numbers + marks + punctuation + symbol + space
 
-    try:
-        cat = category(char)
-    except TypeError:
-        return False
+    if isinstance(char, str):
+        try:
+            char = unicode(char)
+        except Exception:
+            pass
+    cat = category(char)
+
     return cat in allowed_categories
