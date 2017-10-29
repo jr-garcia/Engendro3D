@@ -40,7 +40,7 @@ class Engine:
 
         self.maxContext = maxContext
         assert issubclass(backend, BaseBackend)
-        self.base_backend = backend
+        self.backend = backend
         self.path = EngineRoot((path.dirname(__file__),))
 
         self.events = EventsManager()
@@ -75,7 +75,7 @@ class Engine:
         self.log('Initializing systems...', logLevelsEnum.debug)
 
         self.log('\t Shaders...', logLevelsEnum.debug)
-        self.shaders = self.base_backend.getShadersManager()()
+        self.shaders = self.backend.getShadersManager()()
         self.shaders.initialize(self)
 
         self.log('\t Textures...', logLevelsEnum.debug)

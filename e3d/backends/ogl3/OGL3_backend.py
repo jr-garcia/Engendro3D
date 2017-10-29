@@ -1,6 +1,7 @@
 from os import path
 
 import numpy as np
+from PIL import Image
 from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
@@ -438,7 +439,7 @@ class OGL3Backend(BaseBackend):
         if tex < 1:
             raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
         glBindTexture(GL_TEXTURE_2D, tex)
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 4)
         if mipmapsNumber < 0:
             mipmapsNumber = 0
 
@@ -480,6 +481,26 @@ class OGL3Backend(BaseBackend):
                 # glBindTexture(GL_TEXTURE_2D, 0) #Raises shader compiling error on intel GMA 965 + Windows
         # glFlush()
         return tex
+
+    @staticmethod
+    def getPILpixels(path):
+        try:
+            im = Image.open(path)
+            w, h = im.size[0], im.size[1]
+
+            if im.mode != 'RGBA':
+                im = im.convert("RGBA")
+
+            mode1 = GL_RGBA8
+            mode2 = GL_BGRA
+
+            pix = np.array(im, np.uint8)
+            im.close()
+            red, green, blue, alpha = pix.T
+            pix = np.array([blue, green, red, alpha])
+            return pix.transpose().flatten(), w, h, mode1, mode2
+        except Exception:
+            raise
 
     def setRenderTarget(self, rTarget=None, attachmentTypes=None, colorIndexes=None):
         """

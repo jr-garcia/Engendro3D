@@ -85,7 +85,7 @@ class Window_Base(object):
 
         self.vsynch = vSynch
 
-        self.backend = engine.base_backend(engine, self)
+        self.backend = engine.backend(engine, self)
 
         self.backend.resize((self._size[0], self._size[1]))
 

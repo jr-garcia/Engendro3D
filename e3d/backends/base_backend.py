@@ -62,6 +62,10 @@ class BaseBackend(object):
     def culling(self, value):
         pass
 
+    @staticmethod
+    def getPILpixels(path):
+        pass
+
 
 class ShaderStruct(OrderedDict):
     def __init__(self, *args, **kwds):
