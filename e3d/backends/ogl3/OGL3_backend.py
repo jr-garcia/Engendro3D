@@ -1,7 +1,6 @@
 from os import path
 
 import numpy as np
-from PIL import Image
 from cycgkit.cgtypes import vec3
 from glaze.GL import *
 from glaze.utils import sizeofArray
@@ -430,7 +429,7 @@ class OGL3Backend(BaseBackend):
         glDisableVertexAttribArray(hand)
 
     @staticmethod
-    def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, mode1, mode2, repeat=True):
+    def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat=True):
         glGetError()
         tex = np.array([0], np.uint32)
         glGenTextures(1, tex)
@@ -466,7 +465,7 @@ class OGL3Backend(BaseBackend):
         else:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
 
-        glTexImage2D(GL_TEXTURE_2D, 0, mode1, w, h, 0, mode2, GL_UNSIGNED_BYTE, pix)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pix)
         glerr = glGetError()
         if glerr:
             raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
@@ -481,26 +480,6 @@ class OGL3Backend(BaseBackend):
                 # glBindTexture(GL_TEXTURE_2D, 0) #Raises shader compiling error on intel GMA 965 + Windows
         # glFlush()
         return tex
-
-    @staticmethod
-    def getPILpixels(path):
-        try:
-            im = Image.open(path)
-            w, h = im.size[0], im.size[1]
-
-            if im.mode != 'RGBA':
-                im = im.convert("RGBA")
-
-            mode1 = GL_RGBA8
-            mode2 = GL_BGRA
-
-            pix = np.array(im, np.uint8)
-            im.close()
-            red, green, blue, alpha = pix.T
-            pix = np.array([blue, green, red, alpha])
-            return pix.transpose().flatten(), w, h, mode1, mode2
-        except Exception:
-            raise
 
     def setRenderTarget(self, rTarget=None, attachmentTypes=None, colorIndexes=None):
         """

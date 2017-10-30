@@ -63,7 +63,7 @@ class BaseBackend(object):
         pass
 
     @staticmethod
-    def getPILpixels(path):
+    def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat):
         pass
 
 

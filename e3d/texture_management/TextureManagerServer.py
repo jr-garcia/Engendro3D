@@ -1,8 +1,26 @@
+from PIL import Image
+import numpy as np
 # from ParalellServiceClass import ParalellService
 # from CubeTextureClass import CubeTexture
 
 
 class TexturesManagerServer(object):
+    @staticmethod
+    def getPILpixels(path):
+        try:
+            im = Image.open(path)
+            w, h = im.size[0], im.size[1]
+
+            if im.mode != 'RGBA':
+                im = im.convert("RGBA")
+
+            pix = np.array(im, np.uint8)
+            im.close()
+            red, green, blue, alpha = pix.T
+            pix = np.array([blue, green, red, alpha])
+            return pix.transpose().flatten(), w, h
+        except Exception:
+            raise
 
     def loadTexture(self, filePath, ID, mipmapsNumber, repeat):
         """
@@ -14,10 +32,12 @@ class TexturesManagerServer(object):
         @rtype : None
         @param filePath:
         @param ID:
+        @param repeat:
+        @type repeat:
         """
         try:
-            pix, w, h, mode1, mode2 = self._engine.backend(filePath)
-            self.ready('loadTexture', [pix, w, h, mode1, mode2, ID, mipmapsNumber, repeat])
+            pix, w, h = TexturesManagerServer.getPILpixels(filePath)
+            self.ready('loadTexture', [pix, w, h, ID, mipmapsNumber, repeat])
         except Exception as ex:
             self.exception(ex)
             raise
@@ -40,7 +60,7 @@ class TexturesManagerServer(object):
                 self._engine.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), 1)
 
             cube = CubeTexture(self.engine, ID)
-            cube.loadFromFolder(folderPath, self._engine.backend.getPILpixels)
+            cube.loadFromFolder(folderPath, TexturesManagerServer.getPILpixels)
 
         return cube
 

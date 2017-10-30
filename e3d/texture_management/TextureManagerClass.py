@@ -81,10 +81,10 @@ class TexturesManager(BaseManager):
         self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, None, width, height, GL_RGBA8, GL_RGBA)
 
     def _fillTexture(self, args):
-        pix, w, h, mode1, mode2, ID, mipmapsNumber, repeat = args
+        pix, w, h, ID, mipmapsNumber, repeat = args
         tex = -1
         try:
-            tex = self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, pix, w, h, mode1, mode2, repeat)
+            tex = self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat)
             self._textureCache[ID] = tex
         except Exception as ex:
             self._engine.log('Error loading texture \'{0}\':\n\t{1}\n'
@@ -132,8 +132,8 @@ class TexturesManager(BaseManager):
 
             if not getdefault:
                 if serial:
-                    pix, w, h, mode1, mode2 = self._engine.backend.getPILpixels(filePath)
-                    self._fillTexture([pix, w, h, mode1, mode2, ID, mipmapsNumber, repeat])
+                    pix, w, h = TexturesManagerServer.getPILpixels(filePath)
+                    self._fillTexture([pix, w, h, ID, mipmapsNumber, repeat])
                 else:
                     self.remotequeue.put_nowait(('loadTexture', [filePath, ID, mipmapsNumber, repeat]))
             else:
@@ -160,7 +160,7 @@ class TexturesManager(BaseManager):
                 self._engine.log('Error loading cube texture {0}:\n{1}'.format(folderPath, 'Folder not found.'), logLevelsEnum.error)
 
             cube = CubeTexture(self._engine, ID)
-            cube.loadFromFolder(folderPath, self._engine.backend.getPILpixels)
+            cube.loadFromFolder(folderPath, TexturesManagerServer.getPILpixels)
 
         return cube
 

@@ -429,8 +429,8 @@ class Scene(object):
 
 class DefaultSceneParameters(object):
     def __init__(self):
-        self.zFar = 1.0
-        self.zNear = 0.0
+        self.zFar = 5000
+        self.zNear = 1
         self.defaultTexture = None
         self.ambientColor = [1, 1, 1, 1]
         self.lights = {}
