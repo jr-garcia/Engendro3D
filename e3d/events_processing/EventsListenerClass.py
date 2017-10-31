@@ -7,8 +7,8 @@ from e3d.events_processing.eventClasses import KeyEvent, MouseEvent, WindowEvent
 class EventsListener(object):
     def __init__(self):
         """
-        Inherit from this class and implement the desired on*Event methods to receive event
-        notifications. Then invoke your function callbacks accordingly.
+        Inherit from this class and implement the desired on*Event methods to respond to event
+        notifications.
         @rtype : EventsListener
         """
         pass
@@ -27,30 +27,3 @@ class EventsListener(object):
 
     def onCustomEvent(self, event):
         pass
-
-    def _announce(self, event):
-        etype = event.type
-        # myEvent = None
-        if etype in [SDL_KEYDOWN, SDL_KEYUP]:
-            myEvent = KeyEvent(event.key, etype)
-            self.onKeyEvent(myEvent)
-        elif etype in [SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP, SDL_MOUSEMOTION, SDL_MOUSEWHEEL]:
-            myEvent = MouseEvent(event)
-            self.onMouseEvent(myEvent)
-        elif etype == SDL_WINDOWEVENT:
-            myEvent = WindowEvent(event.window)
-            self.onWindowEvent(myEvent)
-        elif etype in [SDL_FINGERDOWN, SDL_FINGERUP, SDL_FINGERMOTION]:
-            myEvent = FingerEvent(event)
-        elif etype in [SDL_TEXTEDITING, SDL_TEXTINPUT]:
-            # print('text input/edit', etype, event.text.text)
-            SDL_PumpEvents()
-            return True
-        else:
-            if isinstance(event, Event):
-                self.onCustomEvent(event)
-                return event.discarded
-            else:
-                # print('Unhandled event etype: ' + str(etype))
-                return False
-        return myEvent.discarded
