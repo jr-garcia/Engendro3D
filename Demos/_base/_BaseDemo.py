@@ -39,7 +39,7 @@ class _Demo_Base(object):
         self.firstRun = False
         self.pendingTex = 0
         self.isWaitingTex = False
-        self.texturesToLoad = []
+        self.texturesToLoad = [['e3dlogo.png', 'logo']]
 
     def run(self, title):
         # Initialize the Engine

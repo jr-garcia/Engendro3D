@@ -12,8 +12,7 @@ class Demo(_Demo_Base):
     def __init__(self, winSize):
         super(Demo, self).__init__(winSize)
         self.dorot = False
-        self.texturesToLoad = [['e3dlogo.png', 'logo'],
-                               [path.join(path.dirname(__file__), path.pardir, 'textures/Grass.jpg'), 'grass']]
+        self.texturesToLoad.append([path.join(path.dirname(__file__), path.pardir, 'textures/Grass.jpg'), 'grass'])
 
     def loadModels(self):
         engine = self.engine

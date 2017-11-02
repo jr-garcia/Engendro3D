@@ -25,7 +25,6 @@ outlineLengths[0.5] = 'Big'
 class Demo(_Demo_Base):
     def __init__(self,winsize):
         super(Demo, self).__init__(winsize)
-        self.texturesToLoad = [['e3dlogo.png', 'logo'], ['../textures/Grass.jpg', 'grass']]
 
     def loadModels(self):
         engine = self.engine
