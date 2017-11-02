@@ -6,7 +6,7 @@ from warnings import warn
 
 
 from .CubeTextureClass import CubeTexture
-from ..events_processing.eventClasses import Event, EventType
+from ..events_processing.eventClasses import Event, EventTypes
 from .TextureManagerServer import serve, TexturesManagerServer
 # from ThreadedSystemClass import ThreadedSystem
 # from ParalellServiceClass import messageType
@@ -16,7 +16,7 @@ from .._baseManager import BaseManager
 
 class textureLoadedEvent(Event):
     def __init__(self, textureID):
-        super(textureLoadedEvent, self).__init__(EventType.custom)
+        super(textureLoadedEvent, self).__init__(EventTypes.Custom)
         self.name = TexturesManager.textureLoaded
         self.textureID = textureID
 

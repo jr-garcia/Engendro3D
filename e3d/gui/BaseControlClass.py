@@ -5,7 +5,10 @@ from cycgkit.cgtypes import vec3
 from ..commonValues import ewDiv, ewMul
 from .GuiManagerClass import DEFAULT2DSHADERID, GuiManager
 from ..Base3DObjectClass import Base3DObject
+from ..commonValues import ewMul
 from ..model_management.MaterialClass import *
+from .LayerClass import ResponsiveControl
+from ..events_processing.eventClasses import MouseEventNames
 
 
 class GradientTypesEnum(object):
@@ -38,7 +41,25 @@ class PinningEnum(object):
     all = (Top, Bottom, Left, Right)
 
 
-class BaseControl(Base3DObject):
+class Align2DEnum(object):
+    VCenter = 'VCenter'
+    HCenter = 'HCenter'
+    Top = 'Top'
+    Left = 'Left'
+    Right = 'Right'
+    Bottom = 'Bottom'
+
+
+class StyleHintsEnum(object):
+    Flat = 'Flat'
+    Raised = 'Raised'
+    Sunken = 'Sunken'
+    Hover = 'Hover'
+    Image = 'Image'
+    # Custom = 'Custom'
+
+
+class BaseControl(Base3DObject, ResponsiveControl):
     """
         Abstract.
         Base type for all '2D' Gui objects.
@@ -83,7 +104,8 @@ class BaseControl(Base3DObject):
 
         if ID is None:
             ID = str(id(self))
-        super(BaseControl, self).__init__(position, rotation, 1, 1, ID=ID, parent=parent)
+        Base3DObject.__init__(self, position, rotation, 1, 1, ID=ID, parent=parent)
+        ResponsiveControl.__init__(self)
 
         self._updateLastPositions()
 
@@ -204,13 +226,13 @@ class BaseControl(Base3DObject):
 
     is2D = property(_getIs2D)
 
-    def _getColor(self):
+    @property
+    def color(self):
         return self._material.diffuseColor
 
-    def _setColor(self, value):
+    @color.setter
+    def color(self, value):
         self._material.diffuseColor = value
-
-    color = property(_getColor, _setColor)
 
     def _getOpacity(self):
         return self._material.diffuseColor
@@ -546,6 +568,40 @@ class BaseControl(Base3DObject):
         parentY = parentSize.y
 
         return localx > parentX or localy > parentY or (localx + size.x) < 0 or (localy + size.y) < 0
+
+    @staticmethod
+    def getAlignedPosition(vAlign, hAlign, object2align):
+        def distribute(oV, pV, border):
+            return pushOpposite(oV, pV, border) / 2.0
+
+        def pushOpposite(oV, pV, border):
+            return pV - oV - border
+
+        def checkargs(*args):
+            for arg in args:
+                if arg not in Align2DEnum:
+                    raise TypeError('align must be in Align2DEnum')
+        checkargs(vAlign, hAlign)
+        parent = object2align.parent
+        pSize = parent.size
+        oSize = object2align.size
+        border = parent.borderSize
+
+        if vAlign == Align2DEnum.Left:
+            left = border
+        elif vAlign == Align2DEnum.Right:
+            left = pushOpposite(oSize.x, pSize.x, border)
+        else:  # vAlign == Align2DEnum.VCenter:
+            left = distribute(oSize.x, pSize.x, border)
+
+        if hAlign == Align2DEnum.Top:
+            top = border
+        elif vAlign == Align2DEnum.Bottom:
+            top = pushOpposite(oSize.y, pSize.y, border)
+        else:  # vAlign == Align2DEnum.HCenter:
+            top = distribute(oSize.y, pSize.y, border)
+
+        return vec3(left, top, object2align.position.z)
 
 
 class Material2D(Material):

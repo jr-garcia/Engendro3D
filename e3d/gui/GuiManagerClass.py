@@ -36,8 +36,10 @@ class GuiManager:
         self.defaultTexture = None
         self.fontInfos = {}
         self._window = None
-        self.resizeListener = EventsListener()
-        self.resizeListener.onWindowEvent = self._onWindowEventCallback
+        self.eventsListener = EventsListener()
+        eventsListener = self.eventsListener
+        eventsListener.onWindowEvent = self._onWindowEventCallback
+        eventsListener.onMouseEvent = self._onMouseEventCallback
 
         from .._engine import PathPiece
         self.fontsCache = PathPiece((os.path.dirname(__file__), 'cache'))
@@ -79,7 +81,7 @@ class GuiManager:
         self.loadFont('default', os.path.join(self.engine.path.defaults.fonts, 'code', 'Code200365k.ttf'))
 
         self.resizeProjection()
-        self._window.events.addListener('_winreslistgui', self.resizeListener)
+        self._window.events.addListener('_winreslistgui', self.eventsListener)
 
     def addLayer(self, ID, order=-1, visible=True):
         """
@@ -103,15 +105,18 @@ class GuiManager:
             self._layers[ID] = layer
             return layer
 
-    def moveLayer(self, ID, order=-1):
+    def moveLayerTo(self, ID, position):
         """
+        Move layer 'ID' from its place to 'position'
 
 
-
-        @type order: int
         @type ID: str
+        @type position: : int
         """
-        pass
+        layer = self._layers[ID]
+        order = self._layersOrder
+        order.remove(layer)
+        order.insert(position, layer)
 
     def deleteLayer(self, ID):
         """
@@ -252,6 +257,15 @@ class GuiManager:
         if e.eventName == 'resized':
             self.resizeProjection()
             self._resizeLayers()
+
+    def _onMouseEventCallback(self, event):
+        activeLayer = None
+        for layer in self._layersOrder:
+            if layer.visible:
+                activeLayer = layer
+                break
+        if activeLayer is not None:
+            activeLayer._handleMouseEvent(event)
 
     def resizeProjection(self):
         width, height = self._window.size

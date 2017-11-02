@@ -12,3 +12,4 @@ class Panel(BaseControl):
                  imgID=None, rotation=None, borderSize=1, gradientType=GradientTypesEnum.noGradient):
         super(Panel, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                     borderSize, gradientType)
+        self._passEventDown = True

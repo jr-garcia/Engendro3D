@@ -1,9 +1,70 @@
-from ..Base3DObjectClass import Attachable
+from ..Base3DObjectClass import Attachable, ResponsiveObject
+from ..events_processing.eventClasses import MouseEventNames, MouseEvent
 
 from cycgkit.cgtypes import *
 
 
-class Layer(Attachable):
+class ResponsiveControl(ResponsiveObject):
+    def __init__(self, watchLastControl=True):
+        super(ResponsiveControl, self).__init__(True)
+        self._watchLastControl = watchLastControl
+        self._watchedControl = None
+        self._lastControlOver = None
+
+    def _handleMouseEvent(self, event):
+        super(ResponsiveControl, self)._handleMouseEvent(event)
+        if not self._passEventDown:
+            return
+        eventX = event.x
+        eventY = event.y
+
+        activeControl = self._findForegroundControl(eventX, eventY)
+
+        if event.eventName == MouseEventNames.buttonDown:
+            if self._watchLastControl:
+                self._watchedControl = activeControl
+        elif event.eventName == MouseEventNames.motion:
+            if activeControl != self._lastControlOver:
+                if self._lastControlOver is not None:
+                    leaveEvent = event._copy()
+                    leaveEvent.eventName = MouseEventNames.leave
+                    self._lastControlOver._handleMouseEvent(leaveEvent)
+                if activeControl is not None:
+                    enterEvent = event._copy()
+                    enterEvent.eventName = MouseEventNames.enter
+                    activeControl._handleMouseEvent(enterEvent)
+                self._lastControlOver = activeControl
+        else:
+            if self._watchLastControl and self._watchedControl is not None:
+                activeControl = self._watchedControl
+
+        if activeControl is not None and event.eventName != MouseEventNames.click:
+            activeControl._handleMouseEvent(event)
+
+        if event.eventName == MouseEventNames.buttonUp:
+            activeControl = self._findForegroundControl(eventX, eventY)
+            if activeControl == self._watchedControl and self._watchedControl is not None:
+                clickEvent = event._copy()
+                clickEvent.eventName = MouseEventNames.click
+                activeControl._handleMouseEvent(clickEvent)
+            if self._watchLastControl:
+                self._watchedControl = None
+
+    def _findForegroundControl(self, eventX, eventY):
+        activeControl = None
+        for control in self._children:
+            position = control.position
+            size = control.size
+            positionX = position.x
+            positionY = position.y
+            if positionX <= eventX and positionY <= eventY and positionX + size.x >= eventX and positionY + size.y >=\
+                    eventY:
+                activeControl = control
+                break
+        return activeControl
+
+
+class Layer(Attachable, ResponsiveControl):
     """
     Virtual top level container for gui objects.
     Only objects attached to this will be drawn 'above' the scene, in 2D mode.
@@ -16,7 +77,8 @@ class Layer(Attachable):
             @rtype : Layer
             @type visible: bool
             """
-        super(Layer, self).__init__(None)
+        Attachable.__init__(self, None)
+        ResponsiveControl.__init__(self)
         self.ID = ID
         self.visible = visible
         self._pixelSize = vec3(1)

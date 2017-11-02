@@ -1,9 +1,9 @@
 from cycgkit.cgtypes import *
-from .commonValues import *
-
-from .physics_management.physicsModule import rigidObject, bodyShapesEnum
-
 from abc import ABCMeta, abstractmethod
+
+from .commonValues import *
+from .physics_management.physicsModule import rigidObject, bodyShapesEnum
+from .events_processing.eventClasses import MouseEventNames
 
 
 class Attachable(object):
@@ -35,6 +35,80 @@ class Attachable(object):
                 raise TypeError('"parent" object can\'t receive attached objects.')
         else:
             raise AttributeError('"parent" object is None.')
+
+
+class ResponsiveObject(object):
+    def __init__(self, passEventDown=False):
+        self._passEventDown = passEventDown
+
+    def _handleMouseEvent(self, event):
+        eventName = event.eventName
+        if eventName == MouseEventNames.buttonUp:
+            self._handleMouseButtonUp(event)
+        elif eventName == MouseEventNames.buttonDown:
+            self._handleMouseButtonDown(event)
+        elif eventName == MouseEventNames.motion:
+            self._handleMouseMove(event)
+        elif eventName == MouseEventNames.click:
+            self._handleMouseClick(event)
+        elif eventName == MouseEventNames.doubleClick:
+            self._handleMouseDoubleClick(event)
+        elif eventName == MouseEventNames.wheel:
+            self._handleMouseWheel(event)
+        elif eventName == MouseEventNames.enter:
+            self._handleMouseEnter(event)
+        elif eventName == MouseEventNames.leave:
+            self._handleMouseLeave(event)
+        else:
+            raise RuntimeError('Unhandled mouse event {}'.format(eventName))
+
+    def _handleMouseButtonDown(self, event):
+        self.onMouseButtonDown(event)
+
+    def _handleMouseButtonUp(self, event):
+        self.onMouseButtonUp(event)
+
+    def _handleMouseMove(self, event):
+        self.onMouseMove(event)
+
+    def _handleMouseClick(self, event):
+        self.onMouseClick(event)
+
+    def _handleMouseDoubleClick(self, event):
+        self.onMouseDoubleClick(event)
+
+    def _handleMouseWheel(self, event):
+        self.onMouseWheel(event)
+
+    def _handleMouseEnter(self, event):
+        self.onMouseEnter(event)
+
+    def _handleMouseLeave(self, event):
+        self.onMouseLeave(event)
+
+    def onMouseButtonDown(self, event):
+        pass
+
+    def onMouseButtonUp(self, event):
+        pass
+
+    def onMouseMove(self, event):
+        pass
+
+    def onMouseClick(self, event):
+        pass
+
+    def onMouseDoubleClick(self, event):
+        pass
+
+    def onMouseWheel(self, event):
+        pass
+
+    def onMouseEnter(self, event):
+        pass
+
+    def onMouseLeave(self, event):
+        pass
 
 
 class Base3DObject(Attachable):

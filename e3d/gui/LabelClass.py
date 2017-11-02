@@ -206,6 +206,6 @@ class Label(BaseControl):
 
     def _setColor(self, value):
         self._dirtyProperties = True
-        super(Label, self)._setColor(value)
+        super(Label, self).color(value)
 
-    color = property(BaseControl._getColor, _setColor)
+    color = property(BaseControl.color, _setColor)
