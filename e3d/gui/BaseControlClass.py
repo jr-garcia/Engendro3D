@@ -67,7 +67,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     """
 
     @abstractmethod
-    def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, borderSize, gradientType):
+    def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, style):
         """
 
 
@@ -99,6 +99,8 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._height = height
         # self._inverseScale = vec3(1)
         self.__offset = vec3(0.5, 0.5, 0)
+        self._checkStyleType(style)
+        self._style = style
 
         position = vec3(left, top, 0)
 
@@ -115,25 +117,22 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
         if not all((width, height)):
             raise ValueError('size of 0 not allowed: ' + str((width, height)))
-        # if not all((int(i) == i for i in size)):
-        #     raise ValueError('only integer size allowed: ' + str(size))
 
         size = vec3(width, height, 1)
-        self._pixelSize = size
-        self._previousSize = self.pixelSize
-        self._setAbsoluteScale(size)
-        self._borderSize = borderSize
-        self._borderColor = vec4(0, 0, 0, 1)
-        self._gradientType = gradientType
-        self._gradientColor0 = vec4(1, 0, 0, 1)
-        self._gradientColor1 = vec4(0, 0, 1, 1)
+        self._previousSize = self._scale
+        self.size = size
+        self._borderSize = style.borderSize
+        self._borderColor = style.borderColor
+        self._gradientType = style.gradientType
+        self._gradientColor0 = style.raisedGradientColor0
+        self._gradientColor1 = style.raisedGradientColor1
         self._setInnerSize()
         # assert isinstance(self._guiMan, GuiManager)
 
         material.shaderProperties.append(IntShaderProperty('borderSize', self._borderSize))
         material.shaderProperties.append(Vec4ShaderProperty('borderColor', self._borderColor))
-        self.borderSize = borderSize
-        self.borderColor = vec4(0, 0, 0, 1)
+        self.borderSize = style.borderSize
+        self.borderColor = style.borderColor
         if color is not None:
             material.diffuseColor = color
 
@@ -142,23 +141,26 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
         self._set2d()
 
-        material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._pixelSize))
+        material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._scale))
         material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
-        material.shaderProperties.append(Vec3ShaderProperty('size', self._scale))
         material.shaderProperties.append(Vec3ShaderProperty('parentSize', self.parent.size))
         material.shaderProperties.append(Vec3ShaderProperty('parentPosition', self.parent.position))
-        material.shaderProperties.append(Vec3ShaderProperty('realScale', self._scale))
-        # material.shaderProperties.append(Vec3ShaderProperty('inverseScale', self._inverseScale))
         material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
         material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor0', self._gradientColor0))
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor1', self._gradientColor1))
 
-        self._setLastDifferences()
+        self._fillLastDifferences()
         self._updateSizeProperties()
 
+    def _reStyle(self):
+        style = self.style
+        self.borderSize = style.borderSize
+        self.borderColor = style.borderColor
+        self.gradientType = style.gradientType
+
     def _updateLastPositions(self):
-        pw, ph = self._guiMan._window.size
+        pw, ph, _ = self.parent.size
         left = self.position.x
         top = self.position.y
         self._right = pw - (left + self._width)
@@ -169,7 +171,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     def _offset(self):
         return self.__offset
 
-    def _setLastDifferences(self):
+    def _fillLastDifferences(self):
         self._lastDifferences = (self._left, self._top, self._bottom, self._right)
 
     @property
@@ -226,13 +228,13 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     is2D = property(_getIs2D)
 
-    @property
-    def color(self):
+    def _getColor(self):
         return self._material.diffuseColor
 
-    @color.setter
-    def color(self, value):
+    def _setColor(self, value):
         self._material.diffuseColor = value
+
+    color = property(_getColor, _setColor)
 
     def _getOpacity(self):
         return self._material.diffuseColor
@@ -287,48 +289,29 @@ class BaseControl(Base3DObject, ResponsiveControl):
             except AttributeError:
                 self._is2D = False
 
-    def _getAbsoluteScale(self):
-        """
+    @property
+    def size(self):
+        return self._scale
 
-        @rtype : vec3
+    @size.setter
+    def size(self, value):
         """
-        v2 = self._scale
-        return v2
-
-    def _setAbsoluteScale(self, value):
+        Size of control in pixels.
+        :param value:
+        :type value: vec3
         """
+        if not isinstance(value, vec3):
+            raise TypeError('size must be a vec3, not \'{}\''.format(type(value)))
 
-        @type value: list
-        """
-        if isinstance(value, vec3):
-            v2 = value
-        elif hasattr(value, '__getitem__'):
-            if len(value) == 2:
-                v2 = list(value)
-                v2.append(1)
-            elif len(value) > 2:
-                v2 = (1 if v == 0 else v for v in value)[0:3]
-            else:
-                v2 = (value[0]) * 3
-        else:
-            v2 = (value, value, value)
-
-        self._previousSize = vec3(self._pixelSize)
-        self._pixelSize = v2
-        try:
-            self._material.shaderProperties['pixelSize'] = v2
-        except KeyError:
-            pass
-        self._scale = v2
+        self._previousSize = vec3(self._scale)
+        self._scale = value
         self._dirty = True
-        self._width, self._height, d = v2
+        self._width, self._height, d = value
+        self._updateLastPositions()
         try:
-            self._material.shaderProperties['size'] = self._scale
+            self._material.shaderProperties['pixelSize'] = value
         except KeyError:
             pass
-
-    size = property(fget=_getAbsoluteScale, fset=_setAbsoluteScale,
-                    doc='Size of control in percentage of parent\'s size')
 
     def getSize(self):
         return self._getAbsoluteScale()
@@ -346,29 +329,29 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     position = property(fget=_getAbsolutePosition, fset=_setAbsolutePosition)
 
-    def _convertPixelToWindow(self, vec3Val):
-        x, y = self._guiMan._window.size
-        if not all((x, y)):
-            return vec3(0)
-        sx, sy, sz = vec3Val
-        return vec3(sx / x, sy / y, sz)
-
-    def _convertWindowToPixel(self, vec3Val):
-        x, y = self._guiMan._window.size
-        sx, sy, sz = vec3Val
-        return vec3(x * sx, y * sy, sz)
-
-    def _convertPixelToParent(self, vec3Val):
-        x, y, _ = self.parent.size
-        if not all((x, y)):
-            return vec3(0)
-        sx, sy, sz = vec3Val
-        return vec3(sx / x, sy / y, sz)
-
-    def _convertParentToPixel(self, vec3Val):
-        x, y, _ = self.parent.size
-        sx, sy, sz = vec3Val
-        return vec3(x * sx, y * sy, sz)
+    # def _convertPixelToWindow(self, vec3Val):
+    #     x, y = self._guiMan._window.size
+    #     if not all((x, y)):
+    #         return vec3(0)
+    #     sx, sy, sz = vec3Val
+    #     return vec3(sx / x, sy / y, sz)
+    #
+    # def _convertWindowToPixel(self, vec3Val):
+    #     x, y = self._guiMan._window.size
+    #     sx, sy, sz = vec3Val
+    #     return vec3(x * sx, y * sy, sz)
+    #
+    # def _convertPixelToParent(self, vec3Val):
+    #     x, y, _ = self.parent.size
+    #     if not all((x, y)):
+    #         return vec3(0)
+    #     sx, sy, sz = vec3Val
+    #     return vec3(sx / x, sy / y, sz)
+    #
+    # def _convertParentToPixel(self, vec3Val):
+    #     x, y, _ = self.parent.size
+    #     sx, sy, sz = vec3Val
+    #     return vec3(x * sx, y * sy, sz)
 
     def _updateRotationMatrix(self):
         super(BaseControl, self)._updateRotationMatrix()
@@ -384,11 +367,15 @@ class BaseControl(Base3DObject, ResponsiveControl):
                 amount = (180 - angle) / 90
 
         self.rotationAmount = amount * 100
+        
+    @property
+    def windowPosition(self):
+        return self.position + self.parent.windowPosition
 
     def _updateTransformation(self):
         self._updateRotationMatrix()
         parent = self._parent
-        parentCenter = (parent.size / 2)
+        parentCenter = (parent.size / 2.0)
         parentCenter.z = 0
         position = vec3(self._position)
         rotation = self._rotationMatrix
@@ -396,35 +383,23 @@ class BaseControl(Base3DObject, ResponsiveControl):
         scaledOffset = ewMul(self._offset, self._scale)
         position += scaledOffset
         # parentCenter -= scaledOffset
-        parentTrans = mat4.translation(parent.position)
+        parentTrans = mat4.translation(parent.windowPosition)
         pCTrans = mat4.translation(parentCenter)
         self._positionMatrix = mat4.translation(position)
         self._scaleMatrix = mat4.scaling(self._scale)
-        self._transformation = parentTrans * pCTrans * parent._rotationMatrix * pCTrans.inversed() * \
-                               self._positionMatrix * rotation * self._scaleMatrix
-
-    # def _getTransformationMinusBorder(self):
-    #     npos = vec3(self._position)
-    #
-    #     npos.x += (self._scale.x - self._innerSize.x) / 2.0
-    #     npos.y -= (self._scale.y - self._innerSize.y) / 2.0
-    #     npos += ewMul(self._offset, self.scale)
-    #     alteredPositionMatrix = mat4.translation(npos)
-    #     alteredScaleMatrix = mat4.scaling(self._innerSize)
-    #     alteredTransformation = alteredPositionMatrix * alteredScaleMatrix * self._rotationMatrix
-    #     return alteredTransformation
-    #
-    # transformationMinusBorder = property(_getTransformationMinusBorder)
+        self._transformation = parentTrans * pCTrans * parent._rotationMatrix * pCTrans.inversed() * self._positionMatrix * rotation * self._scaleMatrix
 
     def _updateSizeProperties(self):
         # self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
 
         material = self._material
-        material.shaderProperties['pixelSize'] = self._pixelSize
+        material.shaderProperties['pixelSize'] = self._scale
         material.shaderProperties['internalSize'] = self._innerSize
-        material.shaderProperties['realScale'] = self._scale
-        # material.shaderProperties['inverseScale'] = self._inverseScale
-        
+        parent = self.parent
+        material.shaderProperties['parentSize'] = parent.size
+        material.shaderProperties['parentPosition'] = parent.position
+        material.shaderProperties['relativePosition'] = self._position
+
     def _update(self):
         super(BaseControl, self)._update()
         material = self._material
@@ -437,8 +412,9 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     def _setPinning(self):
         l, t, b, r = self._lastDifferences
-        w, h = self._guiMan._window.size
-        ow, oh = self._guiMan._window._previousSize
+        parent = self.parent
+        w, h, _ = parent.size
+        ow, oh, _ = parent._previousSize
 
         pinning = self._pinning
         if PinningEnum.NoPinning in pinning:
@@ -467,22 +443,22 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._left = nl
         self._bottom = nb
         self._right = nr
-        self._setLastDifferences()
-        self.size = vec3(max(w - nl - nr, 0), max(h - nt - nb, 0), 1)
+        self._fillLastDifferences()
+        self._previousSize = vec3(self._scale)
+        self._scale = vec3(max(w - nl - nr, 0), max(h - nt - nb, 0), 1)
+        try:
+            self._material.shaderProperties['pixelSize'] = self._scale
+        except KeyError:
+            pass
         self._position = vec3(nl, nt, 0)
         self._setInnerSize()
         self._dirty = True
-        self._material.shaderProperties['relativePosition'] = self._position
+        # self._material.shaderProperties['relativePosition'] = self._position
 
     def _getInverseScale(self):
         return self._inverseScale
 
     inverseScale = property(_getInverseScale, doc='Scale needed to pass from local to window scale.')
-
-    def _getpixelSize(self):
-        return self._pixelSize
-
-    pixelSize = property(_getpixelSize, doc='Size of control in pixels.')
 
     def _getRealScale(self):
         return self._scale
@@ -570,7 +546,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
         return localx > parentX or localy > parentY or (localx + size.x) < 0 or (localy + size.y) < 0
 
     @staticmethod
-    def getAlignedPosition(vAlign, hAlign, object2align):
+    def getAlignedPosition(object2align, vAlign=Align2DEnum.VCenter, hAlign=Align2DEnum.HCenter):
         def distribute(oV, pV, border):
             return pushOpposite(oV, pV, border) / 2.0
 
@@ -578,9 +554,11 @@ class BaseControl(Base3DObject, ResponsiveControl):
             return pV - oV - border
 
         def checkargs(*args):
+            Align2DEnumDir = [val for val in dir(Align2DEnum) if not val.startswith('_')]
             for arg in args:
-                if arg not in Align2DEnum:
+                if arg not in Align2DEnumDir:
                     raise TypeError('align must be in Align2DEnum')
+
         checkargs(vAlign, hAlign)
         parent = object2align.parent
         pSize = parent.size
@@ -602,6 +580,27 @@ class BaseControl(Base3DObject, ResponsiveControl):
             top = distribute(oSize.y, pSize.y, border)
 
         return vec3(left, top, object2align.position.z)
+
+    @property
+    def style(self):
+        return self._style
+
+    @style.setter
+    def style(self, value):
+        """
+
+        :rtype: Style
+        """
+        self._checkStyleType(value)
+        self._style = value
+        self._reStyle()
+
+    @staticmethod
+    def _checkStyleType(value):
+        from .Styling import DefaultStyle
+        if not isinstance(value, DefaultStyle) and not issubclass(value, DefaultStyle):
+            raise TypeError('style must be of type \'DefaultStyle\' or inherith from it.\n'
+                            'It is of type \'{}\''.format(type(value)))
 
 
 class Material2D(Material):

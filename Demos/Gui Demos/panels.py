@@ -4,6 +4,7 @@ from _set_path import setPath
 setPath()
 from _base._BaseDemo import _Demo_Base, runDemo, triangleMODEL
 from e3d.gui import Panel, GradientTypesEnum, PinningEnum
+from e3d import Colors
 from math import sin
 from os import path
 
@@ -63,16 +64,21 @@ class Demo(_Demo_Base):
 
         PANELSIZE = 100
 
-        longPanel = Panel(110, 0, PANELSIZE * 2.5, PANELSIZE, self.onelayer, color=vec4(0, 0, 1, 1), borderSize=2)
+        longPanel = Panel(110, 0, PANELSIZE * 2.5, PANELSIZE, self.onelayer, color=vec4(0, 0, 1, 1))
         longPanel.borderColor = vec4(.2, .5, 1, 1)
+        longPanel.borderSize = 2
 
         self.rotatingPanel = Panel(420, 0, PANELSIZE, PANELSIZE, self.onelayer, imgID='grass')
         self.rotatingPanel.opacity = .8
 
         for i in range(9):
-            p = Panel(110 * i, 105, PANELSIZE, PANELSIZE, self.onelayer, borderSize=1, gradientType=i)
+            p = Panel(110 * i, 105, PANELSIZE, PANELSIZE, self.onelayer)
             p.opacity = .9
             p.borderColor = vec4(1)
+            p.borderSize = 1
+            p.gradientType = i
+            p.gradientColor0 = Colors.RED
+            p.gradientColor1 = Colors.BLUE
 
         PINNEDW = PANELSIZE + 220
         PINNEDH = PANELSIZE + 100
@@ -80,10 +86,9 @@ class Demo(_Demo_Base):
         rightBorder = PINNEDW - CORNERSIZE
         bottomBorder = PINNEDH - CORNERSIZE
 
-        pinnedPanel = Panel(280, 300, PINNEDW, PINNEDH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned',
-                            borderSize=8)
+        pinnedPanel = Panel(280, 300, PINNEDW, PINNEDH, self.onelayer, color=vec4(0, 1, 0, .5), ID='pinned')
         pinnedPanel.pinning = PinningEnum.all
-        bs = pinnedPanel.borderSize
+        bs = pinnedPanel.borderSize = 8
         self.rotatingPanel2 = pinnedPanel
 
         pinnedCorners = (Panel(bs, bs, CORNERSIZE, CORNERSIZE, pinnedPanel),
@@ -95,7 +100,8 @@ class Demo(_Demo_Base):
             panel.borderSize = 2
             panel.borderColor = vec4(1, 1, 0, 1)
 
-        self.scrollingPanel = Panel(600, 0, PANELSIZE, PANELSIZE, self.onelayer, borderSize=0, imgID='grass')
+        self.scrollingPanel = Panel(600, 0, PANELSIZE, PANELSIZE, self.onelayer, imgID='grass')
+        self.scrollingPanel.borderSize = 0
 
         for i in range(4):
             p = Panel(10 + (20 * i), 220 + (20 * i), PANELSIZE, PANELSIZE, self.onelayer, color=vec4(1, 1, 0, 1))

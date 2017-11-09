@@ -80,16 +80,18 @@ class Demo(_Demo_Base):
         text3 = u'デモのみ。非ラテン文字用に最適化されていません。'
         text4 = 'Demo only. Not optimized for non latin chars.'
         TLR = PinningEnum.TopLeftRight
-        self.label1 = Label(20, 80, 900, text1, parent=textLayer, fontSize=64, fontID='default', borderSize=6,
-                            outlineColor=[1, 0, 0, 1], outlineLength=outlineLengths.keys()[2],
-                            pinning=TLR)
+        self.label1 = Label(20, 80, 900, text1, parent=textLayer, pinning=TLR, fontSize=64, fontID='default',
+                            outlineLength=outlineLengths.keys()[2])
         self.label1.color = [1, 1, 0, 1]
         self.label1.borderColor = vec4(1, .6, 0, .5)
+        self.label1.outlineColor = [1, 0, 0, 1]
+        self.label1.borderSize = 6
 
-        self.label2 = Label(25, self.label1.height + 100, 700, text2, parent=textLayer, fontID='auto',
-                            fontColor=[.8, 0, .8, 1], fontSize=18, borderSize=0,
+        self.label2 = Label(25, self.label1.height + 100, 900, text2, parent=textLayer, fontID='auto', fontSize=18,
                             pinning=TLR)
         self.label2.color = [0, 1, 0, .5]
+        self.label2.fontColor = [.8, 0, .8, .5]
+        self.label2.borderSize = 0
 
         self.label3 = Label(20, self.label2.top + 100, 697, text3, textLayer, fontID='defaultJapanese')
         self.label4 = Label(20, self.label3.top + self.label3.height, 697, text4, textLayer, fontID='default')

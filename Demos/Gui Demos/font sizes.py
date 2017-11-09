@@ -113,8 +113,9 @@ class Demo(_Demo_Base):
         textLayer = self.window.gui.addLayer('text')
         
         self.instructionsLabel = Label(300, self.window.size[1] - 50, 310, 'Press CTRL or Arrow keys',
-                                       self.onelayer, pinning=PinningEnum.BottomLeft,
-                                       gradientType=GradientTypesEnum.Vertical, borderSize=0)
+                                       self.onelayer, pinning=PinningEnum.BottomLeft)
+        self.instructionsLabel.gradientType = GradientTypesEnum.Vertical
+        self.instructionsLabel.borderSize = 0
         self.instructionsLabel.gradientColor0 = vec4(.3, .1, 0, 1)
         self.instructionsLabel.gradientColor1 = vec4(.8, .3, 0, 1)
 
@@ -124,12 +125,15 @@ class Demo(_Demo_Base):
         listRange.insert(0, 60)
         listRange.insert(1, 40)
         for i in listRange:
-            lab = Label(50, lastTop, 800, '', textLayer, i, borderSize=0, fontID='auto')
+            lab = Label(50, lastTop, 800, '', textLayer, fontID='auto')
+            lab.fontSize = i
+            lab.color = vec4(0)
             height = lab.height
             fontID = lab.fontID
             style = weigthNames[lab.fontWeight]
             lastTop += height
             lab.text = 'Size {}, {} pixels. Name {}. Style: {}'.format(i, height, fontID, style)
+            lab.borderSize = 0
             labels.append(lab)
         self.labels = labels
 

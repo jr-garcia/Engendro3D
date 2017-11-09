@@ -1,6 +1,7 @@
 from .FontRendering.MSDFAtlasRenderer import AtlasInfo, CharData
 from .SingleCharClass import *
 from .TextEnums import *
+from .Styling import DefaultStyle
 
 DEFAULTSPACING = 1.0 / 10
 
@@ -12,35 +13,47 @@ class Label(BaseControl):
        @rtype : Label
     """
 
-    def __init__(self, left, top, width, text, parent, fontSize=10, pinning=PinningEnum.TopLeft, fontID='default',
-                 outlineColor=vec4(0, 0, 0, 1), fontColor=vec4(1), color=vec4(0), ID=None, imgID=None,
-                 rotation=None, borderSize=1, outlineLength=OutlineLenghtEnum.NoOutline,
-                 gradientType=GradientTypesEnum.noGradient):
+    def __init__(self, left, top, width, text, parent, pinning=PinningEnum.TopLeft, fontSize=10, fontID='default',
+                 color=None, ID=None, imgID=None,
+                 rotation=None, outlineLength=OutlineLenghtEnum.NoOutline, style=None):
+
         """
         :param borderSize:
         :type borderSize:
 
         """
+        style = style or DefaultStyle(color)
+        if color is None:
+            color = style.backgroundColor
         self._outlineLength = outlineLength
-        self.fontSize = fontSize
+        self._fontSize = fontSize
         self._text = text
         self._fontWeight = FontWeightEnum.Normal
-        self._fontColor = fontColor
-        self._outlineColor = outlineColor
+        self._fontColor = style.fontColor
+        self._outlineColor = style.fontOutlineColor
         self._fontBorder = 0
         self._fontID = fontID
-        height = self._setHeightByFont(fontID, fontSize, parent)
+        height = self._presetHeightByFont(parent)
 
-        super(Label, self).__init__(left, top, width, height + (self._spacing * 2), parent, pinning, color, ID, imgID, rotation, borderSize,
-                                    gradientType)
+        super(Label, self).__init__(left, top, width, height + (self._spacing * 2), parent, pinning, color, ID,
+                                    imgID, rotation, style)
         self._isBuilt = False
         self._dirtyProperties = True
 
         self._updateSizeProperties()
-        self._updateText()
+        self._updateChars()
 
-    def _setHeightByFont(self, fontID, fontSize, parent):
-        height = parent._guiMan.getFontSizeInPixels(fontSize, fontID)
+    @property
+    def fontSize(self):
+        return self._fontSize
+
+    @fontSize.setter
+    def fontSize(self, value):
+        self._fontSize = value
+        self.height = self._presetHeightByFont(self.parent)
+
+    def _presetHeightByFont(self, parent):
+        height = parent._guiMan.getFontSizeInPixels(self.fontSize, self.fontID)
         self._fontMaxHeight = height
         self._spacing = DEFAULTSPACING * height
         self._baseline = height - (height / 6.0)
@@ -55,7 +68,7 @@ class Label(BaseControl):
 
     text = property(_getText, _setText)
 
-    def _updateText(self):
+    def _updateChars(self):
         self._isBuilt = True
         self._dirtyProperties = False
         try:
@@ -66,10 +79,10 @@ class Label(BaseControl):
         left = 0
         for c in self._text:
             newChar = SingleChar(left, 0, height, c, self, PinningEnum.NoPinning, fontID=self._fontID,
-                                 fontColor=self._fontColor, outlineColor=self._outlineColor,
-                                 borderSize=0, color=vec4(0, 0, 0, 0))
+                                 color=vec4(0, 0, 0, 0), borderSize=0, style=self.style)
             newChar.outlineLength = self._outlineLength
             newChar.fontWeight = self._fontWeight
+            newChar.fontColor = self._fontColor
             left += height
         self._setCharsRatio()
                                  
@@ -126,12 +139,12 @@ class Label(BaseControl):
 
     def _update(self):
         if not self._isBuilt:
-            self._updateText()
+            self._updateChars()
         if self._dirtyProperties:
-            self._updateProperties()
+            self._updateCharacterProperties()
         super(Label, self)._update()
 
-    def _updateProperties(self):
+    def _updateCharacterProperties(self):
         for c in self._children:
             c.fontID = self._fontID
             c.fontBorder = self._fontBorder
@@ -187,7 +200,7 @@ class Label(BaseControl):
     def _setFont(self, fontID):
         self._fontID = fontID
         w, h, z = self.size
-        height = self._setHeightByFont(fontID, self.fontSize, self.parent)
+        height = self._presetHeightByFont(self.parent)
         self.size = vec3(w, height + (self._spacing * 2), z)
         self._dirtyProperties = True
         self._isBuilt = False
@@ -204,8 +217,11 @@ class Label(BaseControl):
         super(Label, self)._updateSizeProperties()
         # self._setCharsRatio()
 
-    def _setColor(self, value):
-        self._dirtyProperties = True
-        super(Label, self).color(value)
+    @property
+    def color(self):
+        return super(Label, self)._getColor()
 
-    color = property(BaseControl.color, _setColor)
+    @color.setter
+    def color(self, value):
+        self._dirtyProperties = True
+        super(Label, self)._setColor(value)

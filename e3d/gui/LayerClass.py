@@ -5,8 +5,8 @@ from cycgkit.cgtypes import *
 
 
 class ResponsiveControl(ResponsiveObject):
-    def __init__(self, watchLastControl=True):
-        super(ResponsiveControl, self).__init__(True)
+    def __init__(self, watchLastControl=True, passEventDown=False):
+        super(ResponsiveControl, self).__init__(passEventDown)
         self._watchLastControl = watchLastControl
         self._watchedControl = None
         self._lastControlOver = None
@@ -53,7 +53,7 @@ class ResponsiveControl(ResponsiveObject):
     def _findForegroundControl(self, eventX, eventY):
         activeControl = None
         for control in self._children:
-            position = control.position
+            position = control.windowPosition
             size = control.size
             positionX = position.x
             positionY = position.y
@@ -78,20 +78,23 @@ class Layer(Attachable, ResponsiveControl):
             @type visible: bool
             """
         Attachable.__init__(self, None)
-        ResponsiveControl.__init__(self)
+        ResponsiveControl.__init__(self, passEventDown=True)
         self.ID = ID
         self.visible = visible
         self._pixelSize = vec3(1)
-        self._realScale = vec3(1)
-        self._inverseScale = vec3(1)
         self._guiMan = guiMan
         self._previousSize = self.pixelSize
         self._onInit = True
 
         self._rotationMatrix = mat4(1)
+        self._positionMatrix = mat4(1)
         self.position = vec3(0)
 
         self._updatePixelSize()
+
+    @property
+    def windowPosition(self):
+        return self.position
 
     def _getis2D(self):
         return True
@@ -114,7 +117,6 @@ class Layer(Attachable, ResponsiveControl):
         x, y = self._guiMan._window.size
         baseSize = vec3(x, y, 1)
         self._pixelSize = baseSize
-        self._scale = self.realScale
         if self._onInit:
             self._previousSize = self._pixelSize
             self._onInit = False
@@ -128,21 +130,7 @@ class Layer(Attachable, ResponsiveControl):
     def size(self):
         return self._pixelSize
 
-    def _getRealScale(self):
-        return self._realScale
-
-    realScale = property(_getRealScale)
-
-    def _getInverseScale(self):
-        return self._inverseScale
-
-    inverseScale = property(_getInverseScale, doc='Scale needed to pass from local to window scale.')
-
     def _resizeCallback(self):
         self._updatePixelSize()
         for c in reversed(self._children):
             c._resizeCallback()
-
-    @property
-    def _offset(self):
-        return vec3(0)

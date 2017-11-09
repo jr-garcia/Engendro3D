@@ -2,6 +2,7 @@ from .BaseControlClass import *
 from .GuiManagerClass import DEFAULT2DTEXTSHADERID, NAMEFORMATSTRING
 from .FontRendering.MSDFAtlasRenderer import CharData, AtlasInfo
 from .TextEnums import *
+from .Styling import DefaultStyle
 
 
 class SingleChar(BaseControl):
@@ -12,16 +13,16 @@ class SingleChar(BaseControl):
     """
 
     def __init__(self, left, top, height, char, parent, pinning=PinningEnum.TopLeft, color=vec4(.3, .3, .3, 1), ID=None,
-                 imgID=None, rotation=None, borderSize=1, gradientType=GradientTypesEnum.noGradient, fontID='default',
-                 fontColor=vec4(0, 0, 0, 1), outlineColor=vec4(1)):
+                 imgID=None, rotation=None, style=DefaultStyle(), fontID='default', borderSize=0):
 
         width = height
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
-                                         borderSize, gradientType)
+                                         style)
         self._char = char
+        self.borderSize = borderSize
         self._outlineLength = OutlineLenghtEnum.Medium
-        self._outlineColor = outlineColor
-        self._fontColor = fontColor
+        self._outlineColor = vec4(1)
+        self._fontColor = style.fontColor
         self._fontWeight = FontWeightEnum.Normal
         self._charCode = ord(char)
         self._fontID = fontID
@@ -30,8 +31,8 @@ class SingleChar(BaseControl):
         self.isBuilt = False
 
         self._material.shaderProperties.append(FloatShaderProperty('outlineLength', self.outlineLength))
-        self._material.shaderProperties.append(Vec4ShaderProperty('outlineColor', outlineColor))
-        self._material.shaderProperties.append(Vec4ShaderProperty('fontColor', fontColor))
+        self._material.shaderProperties.append(Vec4ShaderProperty('outlineColor', self.outlineColor))
+        self._material.shaderProperties.append(Vec4ShaderProperty('fontColor', self.fontColor))
         self._material.shaderProperties.append(FloatShaderProperty('fontWeight', self.fontWeight))
 
     def _getOutlineLength(self):

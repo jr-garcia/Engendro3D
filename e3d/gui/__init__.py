@@ -1,4 +1,3 @@
-from .DefaultValues import *
 from .BaseControlClass import GradientTypesEnum, PinningEnum, Align2DEnum, StyleHintsEnum
 from .LayerClass import Layer
 from .PanelClass import Panel
