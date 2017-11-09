@@ -153,13 +153,6 @@ class Base3DObject(Attachable):
         self._animLastPauseStartup = -1
         self._animationLastPlayedFrame = -1
         self.animState = Base3DObject.animationState.stopped
-        # Callbacks>>>>>>>>>>>>>>>>>
-        self.onUpdate_Callback = None
-        self.onClick_Callback = None
-        self.onMouseIn_Callback = None
-        self.onMouseOut_Callback = None
-        self.onKeyPress_Callback = None
-        self.onKeyRelease_Callback = None
 
         self._updateTransformation()
         self._dirty = False
