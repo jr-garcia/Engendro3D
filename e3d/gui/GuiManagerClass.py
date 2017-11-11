@@ -183,9 +183,9 @@ class GuiManager:
         meshMat = currentControl._material
         layerDrawingData.instances[meshid].append(InstanceData(meshMat, defaultObjectParams))
 
-        for c in reversed(currentControl._children):
-            if c.visible:
-                self._buildLayerDrawingData(c, layerDrawingData)
+        for child in reversed(currentControl._children):
+            if child.visible and not child.isOutBounds():
+                self._buildLayerDrawingData(child, layerDrawingData)
 
     @staticmethod
     def convertCharData(data):
