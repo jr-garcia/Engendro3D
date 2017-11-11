@@ -144,10 +144,11 @@ class _Demo_Base(object):
         rightBorder = w - LOGOSSIZE
         bottomBorder = h - LOGOSSIZE
         
-        logos.append(Panel(0, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer))
-        logos.append(Panel(rightBorder, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.TopRight))
-        logos.append(Panel(0, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomLeft))
-        logos.append(Panel(rightBorder, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomRight))
+        logos.append(Panel(0, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer, ID='TL_logo'))
+        logos.append(Panel(rightBorder, 0, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.TopRight, ID='TR_logo'))
+        logos.append(Panel(0, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomLeft, ID='BL_logo'))
+        logos.append(Panel(rightBorder, bottomBorder, LOGOSSIZE, LOGOSSIZE, self.onelayer, PinningEnum.BottomRight,
+                           ID='BR_logo'))
         for panel in logos:
             panel.color = 0
             panel.borderSize = 0
