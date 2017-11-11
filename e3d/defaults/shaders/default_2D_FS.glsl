@@ -12,9 +12,8 @@ uniform int GradientDirection = 0;
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
-uniform vec3 parentSize;
-uniform vec3 parentPosition;
-uniform vec3 relativePosition;
+uniform vec4 clippingParentSizePosition;
+uniform vec3 windowPosition;
 
 varying vec2 uvCoord;
 varying vec2 fixedPosition;
@@ -123,17 +122,21 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
 
 bool isOutBounds(vec2 pos)
 {
-    float localx = pos.x + relativePosition.x;
-    float parentX = parentSize.x;
-    float localy = pos.y + relativePosition.y;
-    float parentY = parentSize.y;
-    return (localx > parentX || localy > parentY || localx < 0 || localy < 0);
+    float posX = windowPosition.x + pos.x;
+    float posY = windowPosition.y + pos.y;
+    vec2 parentSize, parentPosition;
+    parentSize = clippingParentSizePosition.xy;
+    parentPosition = clippingParentSizePosition.zw;
+    float parentBorderX = parentPosition.x + parentSize.x;
+    float parentBorderY = parentPosition.y + parentSize.y;
+    return (posX >= parentBorderX || posY >= parentBorderY ||
+    posX <= parentPosition.x || posY <= parentPosition.y);
 }
 
 void main()
 {
     vec4 objectdiffuse, textureColor, bgColor;
-    vec2 realPos = clamp(fixedPosition, 0.0, 1.0) * pixelSize.xy;
+    vec2 realPos = fixedPosition * pixelSize.xy;
     if (isOutBounds(realPos))
     {
         return;

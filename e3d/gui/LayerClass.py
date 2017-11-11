@@ -88,13 +88,28 @@ class Layer(Attachable, ResponsiveControl):
 
         self._rotationMatrix = mat4(1)
         self._positionMatrix = mat4(1)
-        self.position = vec3(0)
 
         self._updatePixelSize()
 
     @property
+    def position(self):
+        return vec3(0)
+
+    @property
+    def left(self):
+        return 0
+
+    @property
+    def top(self):
+        return 0
+
+    @property
     def windowPosition(self):
         return self.position
+
+    @property
+    def borderSize(self):
+        return 0
 
     def _getis2D(self):
         return True
