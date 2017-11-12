@@ -16,9 +16,9 @@ class SingleChar(BaseControl):
                  imgID=None, rotation=None, style=DefaultStyle(), fontID='default', borderSize=0):
 
         width = height
+        self._char = char
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                          style)
-        self._char = char
         self.borderSize = borderSize
         self._outlineLength = OutlineLenghtEnum.Medium
         self._outlineColor = vec4(1)
