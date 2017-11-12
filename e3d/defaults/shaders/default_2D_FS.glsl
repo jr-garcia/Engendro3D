@@ -12,7 +12,7 @@ uniform int GradientDirection = 0;
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
-uniform vec4 clippingParentSizePosition;
+uniform vec4 clippingRect;
 uniform vec3 windowPosition;
 
 varying vec2 uvCoord;
@@ -124,13 +124,13 @@ bool isOutBounds(vec2 pos)
 {
     float posX = windowPosition.x + pos.x;
     float posY = windowPosition.y + pos.y;
-    vec2 parentSize, parentPosition;
-    parentSize = clippingParentSizePosition.xy;
-    parentPosition = clippingParentSizePosition.zw;
-    float parentBorderX = parentPosition.x + parentSize.x;
-    float parentBorderY = parentPosition.y + parentSize.y;
-    return (posX >= parentBorderX || posY >= parentBorderY ||
-    posX <= parentPosition.x || posY <= parentPosition.y);
+    float left, top, right, bottom;
+    left = clippingRect.x;
+    top = clippingRect.y;
+    right = clippingRect.z;
+    bottom = clippingRect.w;
+    return (posX >= right || posY >= bottom ||
+    posX <= left || posY <= top);
 }
 
 void main()

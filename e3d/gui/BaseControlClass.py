@@ -59,6 +59,61 @@ class StyleHintsEnum(object):
     # Custom = 'Custom'
 
 
+class ClippingRect(object):
+    def __init__(self, windowSize):
+        self._top = None
+        self._left = None
+        self._bottom = None
+        self._right = None
+        self._windowSize = windowSize
+
+    def __repr__(self):
+        return str(self.toVec4())
+
+    @property
+    def top(self):
+        return self._top
+
+    @top.setter
+    def top(self, value):
+        if value > self._top or self._top is None:
+            self._top = value
+
+    @property
+    def left(self):
+        return self._left
+
+    @left.setter
+    def left(self, value):
+        if value > self._left or self._left is None:
+            self._left = value
+
+    @property
+    def bottom(self):
+        return self._bottom
+
+    @bottom.setter
+    def bottom(self, value):
+        if value < self._bottom or self._bottom is None:
+            self._bottom = value
+
+    @property
+    def right(self):
+        return self._right
+
+    @right.setter
+    def right(self, value):
+        if value < self._right or self._right is None:
+            self._right = value
+
+    def isFull(self):
+        return all((v is not None for v in (self._left, self._top, self._right, self._bottom)))
+
+    def toVec4(self):
+        w, h = self._windowSize
+        return vec4(self._left or 0, self._top or 0, self._right or w, self._bottom or h)
+
+
 class BaseControl(Base3DObject, ResponsiveControl):
     """
         Abstract.
@@ -68,24 +123,9 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     @abstractmethod
     def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, style):
-        """
-
-
-
-
-
-
-        @param imgID:
-        @type color: list
-        @param color:
-        @type pos: list
-        @type sSize: list
-        @rtype : BaseControl
-        :param borderSize:
-        :type borderSize:
-        """
         self._guiMan = parent._guiMan
         self._parent = parent
+        self._clippingRect = self._mixSizePosition(parent)
         self._pinning = []
         self.pinning = pinning
         if not rotation:
@@ -97,7 +137,6 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._left = left
         self._width = width
         self._height = height
-        # self._inverseScale = vec3(1)
         self.__offset = vec3(0.5, 0.5, 0)
         self._checkStyleType(style)
         self._style = style
@@ -109,8 +148,6 @@ class BaseControl(Base3DObject, ResponsiveControl):
         Base3DObject.__init__(self, position, rotation, 1, 1, ID=ID, parent=parent)
         ResponsiveControl.__init__(self)
 
-        self._updateLastPositions()
-
         self._material = Material2D()
         material = self._material
         material._shaderID = DEFAULT2DSHADERID
@@ -118,16 +155,23 @@ class BaseControl(Base3DObject, ResponsiveControl):
         if not all((width, height)):
             raise ValueError('size of 0 not allowed: ' + str((width, height)))
 
+        self._innerSize = vec3(1)
+        material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
+        material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._scale))
+        material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
+        material.shaderProperties.append(Vec4ShaderProperty('parentSizePosition', vec4(0)))
+        material.shaderProperties.append(Vec4ShaderProperty('clippingRect', vec4(0)))
+        material.shaderProperties.append(Vec3ShaderProperty('windowPosition', self.windowPosition))
+        
+        self._borderSize = style.borderSize
         size = vec3(width, height, 1)
         self._previousSize = self._scale
         self.size = size
-        self._borderSize = style.borderSize
         self._borderColor = style.borderColor
         self._gradientType = style.gradientType
         self._gradientColor0 = style.raisedGradientColor0
         self._gradientColor1 = style.raisedGradientColor1
         self._setInnerSize()
-        # assert isinstance(self._guiMan, GuiManager)
 
         material.shaderProperties.append(IntShaderProperty('borderSize', self._borderSize))
         material.shaderProperties.append(Vec4ShaderProperty('borderColor', self._borderColor))
@@ -141,11 +185,6 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
         self._set2d()
 
-        material.shaderProperties.append(Vec3ShaderProperty('pixelSize', self._scale))
-        material.shaderProperties.append(Vec3ShaderProperty('internalSize', self._innerSize))
-        material.shaderProperties.append(Vec3ShaderProperty('parentSize', self.parent.size))
-        material.shaderProperties.append(Vec3ShaderProperty('parentPosition', self.parent.position))
-        material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
         material.shaderProperties.append(IntShaderProperty('GradientType', self._gradientType))
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor0', self._gradientColor0))
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor1', self._gradientColor1))
@@ -165,7 +204,11 @@ class BaseControl(Base3DObject, ResponsiveControl):
         top = self.position.y
         self._right = pw - (left + self._width)
         self._bottom = ph - (top + self._height)
+        self._left = left
+        self._top = top
         self._lastDifferences = left, top, self._bottom, self._right
+        self._resizeCallback()
+        self._buildClippingRect()
 
     @property
     def _offset(self):
@@ -268,6 +311,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     def _setBorder(self, val):
         self._borderSize = val
         self._material.shaderProperties['borderSize'] = val
+        self._buildClippingRect()
         self._setInnerSize()
         self._dirty = True
 
@@ -329,30 +373,6 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     position = property(fget=_getAbsolutePosition, fset=_setAbsolutePosition)
 
-    # def _convertPixelToWindow(self, vec3Val):
-    #     x, y = self._guiMan._window.size
-    #     if not all((x, y)):
-    #         return vec3(0)
-    #     sx, sy, sz = vec3Val
-    #     return vec3(sx / x, sy / y, sz)
-    #
-    # def _convertWindowToPixel(self, vec3Val):
-    #     x, y = self._guiMan._window.size
-    #     sx, sy, sz = vec3Val
-    #     return vec3(x * sx, y * sy, sz)
-    #
-    # def _convertPixelToParent(self, vec3Val):
-    #     x, y, _ = self.parent.size
-    #     if not all((x, y)):
-    #         return vec3(0)
-    #     sx, sy, sz = vec3Val
-    #     return vec3(sx / x, sy / y, sz)
-    #
-    # def _convertParentToPixel(self, vec3Val):
-    #     x, y, _ = self.parent.size
-    #     sx, sy, sz = vec3Val
-    #     return vec3(x * sx, y * sy, sz)
-
     def _updateRotationMatrix(self):
         super(BaseControl, self)._updateRotationMatrix()
         angle = self.rotation.z
@@ -370,7 +390,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
         
     @property
     def windowPosition(self):
-        return self.position + self.parent.windowPosition
+        return self.parent.windowPosition + self.position
 
     def _updateTransformation(self):
         self._updateRotationMatrix()
@@ -387,39 +407,52 @@ class BaseControl(Base3DObject, ResponsiveControl):
         pCTrans = mat4.translation(parentCenter)
         self._positionMatrix = mat4.translation(position)
         self._scaleMatrix = mat4.scaling(self._scale)
-        self._transformation = parentTrans * pCTrans * parent._rotationMatrix * pCTrans.inversed() * self._positionMatrix * rotation * self._scaleMatrix
+        self._transformation = parentTrans * pCTrans * parent._rotationMatrix * pCTrans.inversed() * \
+                               self._positionMatrix * rotation * self._scaleMatrix
 
     def _updateSizeProperties(self):
-        # self._inverseScale = ewDiv(self.parent._inverseScale, self._scale)
-
         material = self._material
         material.shaderProperties['pixelSize'] = self._scale
         material.shaderProperties['internalSize'] = self._innerSize
-        parent = self.parent
-        material.shaderProperties['parentSize'] = parent.size
-        material.shaderProperties['parentPosition'] = parent.position
         material.shaderProperties['relativePosition'] = self._position
+        material.shaderProperties['windowPosition'] = self.windowPosition
+        self._buildClippingRect()
+        self.updateParentProperties()
 
     def _update(self):
-        super(BaseControl, self)._update()
+        res = super(BaseControl, self)._update()
+        if res:
+            for child in self._children:
+                child.updateParentProperties()
+        return res
+
+    def updateParentProperties(self):
         material = self._material
-        material.shaderProperties['parentSize'] = self.parent.size
-        material.shaderProperties['parentPosition'] = self.parent.position
+        parent = self.parent
+        material.shaderProperties['parentSizePosition'] = self._mixSizePosition(parent)
+        material.shaderProperties['clippingRect'] = self._clippingRect
+
+    @staticmethod
+    def _mixSizePosition(parentObject):
+        border = parentObject.borderSize
+        offset = vec3(border, border, 0)
+        w, h, d = parentObject.size - (offset * 2)
+        t, l, z = parentObject.windowPosition + offset
+        return vec4(w, h, t, l)
 
     def _setInnerSize(self):
         self._innerSize = self.size - vec3(self._borderSize * 2)
         self._innerSize.z = 1
 
     def _setPinning(self):
-        l, t, b, r = self._lastDifferences
-        parent = self.parent
-        w, h, _ = parent.size
-        ow, oh, _ = parent._previousSize
-
         pinning = self._pinning
         if PinningEnum.NoPinning in pinning:
             return
         else:
+            l, t, b, r = self._lastDifferences
+            parent = self.parent
+            w, h, _ = parent.size
+            ow, oh, _ = parent._previousSize
             if PinningEnum.Top in pinning:
                 nt = t
             else:
@@ -446,14 +479,8 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._fillLastDifferences()
         self._previousSize = vec3(self._scale)
         self._scale = vec3(max(w - nl - nr, 0), max(h - nt - nb, 0), 1)
-        try:
-            self._material.shaderProperties['pixelSize'] = self._scale
-        except KeyError:
-            pass
-        self._position = vec3(nl, nt, 0)
         self._setInnerSize()
         self._dirty = True
-        # self._material.shaderProperties['relativePosition'] = self._position
 
     def _getInverseScale(self):
         return self._inverseScale
@@ -535,18 +562,59 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self.size = vec3(w, value, d)
 
     def isOutBounds(self):
-        parentSize = self.parent.size
-        pos = self.position
+        parent = self.parent
         size = self.size
-        localx = pos.x
-        parentX = parentSize.x
-        localy = pos.y
-        parentY = parentSize.y
+        pos = self.windowPosition
+        posX = pos.x
+        posY = pos.y
+        borderX = posX + size.x
+        borderY = posY + size.y
+        while parent is not None:
+            parentSize = parent.size
+            parentPosition = parent.windowPosition
+            parentBorderX = parentPosition.x + parentSize.x
+            parentBorderY = parentPosition.y + parentSize.y
 
-        return localx > parentX or localy > parentY or (localx + size.x) < 0 or (localy + size.y) < 0
+            res = posX >= parentBorderX or posY >= parentBorderY or \
+                  borderX <= parentPosition.x or borderY <= parentPosition.y
+            if res:
+                return True
+            parent = parent.parent
+        return False
+
+    def _buildClippingRect(self):
+        parent = self.parent
+        size = self.size
+        pos = self.windowPosition
+        left = pos.x
+        top = pos.y
+        right = left + size.x
+        bottom = top + size.y
+        rect = ClippingRect(self._guiMan._window.size)
+        while parent is not None:
+            border = parent.borderSize
+            parentSize = parent.size
+            parentPosition = parent.windowPosition
+            parentLeft = parentPosition.x
+            parentRight = parentLeft + parentSize.x
+            parentTop = parentPosition.y
+            parentBottom = parentTop + parentSize.y
+
+            if right >= parentRight:
+                rect.right = parentRight - border
+            if bottom >= parentBottom:
+                rect.bottom = parentBottom - border
+            if left <= parentLeft:
+                rect.left = parentLeft + border
+            if top <= parentTop:
+                rect.top = parentTop + border
+            if rect.isFull():
+                break
+            parent = parent.parent
+        self._clippingRect = rect.toVec4()
 
     @staticmethod
-    def getAlignedPosition(object2align, vAlign=Align2DEnum.VCenter, hAlign=Align2DEnum.HCenter):
+    def getAlignedPosition(objectSize, parentSize, parentBorderSize, vAlign=Align2DEnum.VCenter, hAlign=Align2DEnum.HCenter):
         def distribute(oV, pV, border):
             return pushOpposite(oV, pV, border) / 2.0
 
@@ -560,26 +628,22 @@ class BaseControl(Base3DObject, ResponsiveControl):
                     raise TypeError('align must be in Align2DEnum')
 
         checkargs(vAlign, hAlign)
-        parent = object2align.parent
-        pSize = parent.size
-        oSize = object2align.size
-        border = parent.borderSize
 
         if vAlign == Align2DEnum.Left:
-            left = border
+            left = parentBorderSize
         elif vAlign == Align2DEnum.Right:
-            left = pushOpposite(oSize.x, pSize.x, border)
+            left = pushOpposite(objectSize.x, parentSize.x, parentBorderSize)
         else:  # vAlign == Align2DEnum.VCenter:
-            left = distribute(oSize.x, pSize.x, border)
+            left = distribute(objectSize.x, parentSize.x, parentBorderSize)
 
         if hAlign == Align2DEnum.Top:
-            top = border
+            top = parentBorderSize
         elif vAlign == Align2DEnum.Bottom:
-            top = pushOpposite(oSize.y, pSize.y, border)
+            top = pushOpposite(objectSize.y, parentSize.y, parentBorderSize)
         else:  # vAlign == Align2DEnum.HCenter:
-            top = distribute(oSize.y, pSize.y, border)
+            top = distribute(objectSize.y, parentSize.y, parentBorderSize)
 
-        return vec3(left, top, object2align.position.z)
+        return vec3(left, top, 1)
 
     @property
     def style(self):
