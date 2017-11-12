@@ -422,6 +422,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     def _update(self):
         res = super(BaseControl, self)._update()
         if res:
+            self._buildClippingRect()
             for child in self._children:
                 child.updateParentProperties()
         return res
