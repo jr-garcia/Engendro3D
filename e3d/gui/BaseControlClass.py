@@ -357,11 +357,10 @@ class BaseControl(Base3DObject, ResponsiveControl):
             pass
 
     def getSize(self):
-        return self._getAbsoluteScale()
+        return self._scale
 
     def _getAbsolutePosition(self):
-        npos = vec3(self._position)
-        return npos
+        return self._position
 
     def _setAbsolutePosition(self, value):
         self._dirty = True
@@ -422,6 +421,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
         res = super(BaseControl, self)._update()
         if res:
             self._buildClippingRect()
+            self._updateSizeProperties()
             for child in self._children:
                 child.updateParentProperties()
         return res
