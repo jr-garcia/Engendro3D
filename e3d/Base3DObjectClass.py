@@ -27,7 +27,7 @@ class Attachable(object):
                     except Exception:
                         pass
                 if self in parent._children:
-                    return 
+                    return
                 parent._children.append(self)
                 parent._dirty = True
                 self._parent = parent
@@ -145,7 +145,7 @@ class Base3DObject(Attachable):
         self._positionMatrix = mat4(1)
         self._scaleMatrix = mat4(1)
         self.visible = True
-        self._dirty_ = True
+        self._dirtyPrivate = True
         self._dirtyP = False
         self._animationID = ''
         self._animationStartupTime = -1
@@ -226,12 +226,15 @@ class Base3DObject(Attachable):
 
     @property
     def _dirty(self):
-        return self._dirty_
+        return self._dirtyPrivate
 
     @_dirty.setter
     def _dirty(self, value):
-        self._dirty_ = value
+        self._dirtyPrivate = value
         if value:
+            parent = self.parent
+            if parent is not None:
+                parent._dirtyPrivate = True
             for c in self._children:
                 c._dirty = True
 
@@ -422,4 +425,4 @@ class DefaultObjectParameters(object):
             self.NormalMatrix = self.ModelView.getMat3().inversed().transposed()
         except RuntimeError:
             self.NormalMatrix = mat4(1)
-        # todo:convert each field into property to multiply only when needed.
+            # todo:convert each field into property to multiply only when needed.

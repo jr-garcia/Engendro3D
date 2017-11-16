@@ -207,7 +207,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._top = top
         self._lastDifferences = left, top, self._bottom, self._right
         self._updateSizeProperties()
-        self._buildClippingRect()
+        # self._buildClippingRect()
 
     @property
     def _offset(self):
