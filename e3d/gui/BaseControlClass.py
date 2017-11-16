@@ -189,7 +189,6 @@ class BaseControl(Base3DObject, ResponsiveControl):
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor0', self._gradientColor0))
         material.shaderProperties.append(Vec4ShaderProperty('GradientColor1', self._gradientColor1))
 
-        self._fillLastDifferences()
         self._updateSizeProperties()
 
     def _reStyle(self):
@@ -207,7 +206,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._left = left
         self._top = top
         self._lastDifferences = left, top, self._bottom, self._right
-        self._resizeCallback()
+        self._updateSizeProperties()
         self._buildClippingRect()
 
     @property
@@ -480,18 +479,9 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._fillLastDifferences()
         self._previousSize = vec3(self._scale)
         self._scale = vec3(max(w - nl - nr, 0), max(h - nt - nb, 0), 1)
+        self._position = vec3(nl, nt, 0)
         self._setInnerSize()
         self._dirty = True
-
-    def _getInverseScale(self):
-        return self._inverseScale
-
-    inverseScale = property(_getInverseScale, doc='Scale needed to pass from local to window scale.')
-
-    def _getRealScale(self):
-        return self._scale
-
-    realScale = property(_getRealScale, doc='Size of control in window percentage.')
 
     def _resizeCallback(self):
         self._setPinning()
