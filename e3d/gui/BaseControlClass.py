@@ -137,6 +137,8 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
         if ID is None:
             ID = str(id(self))
+
+        self._guiMan._addControl(ID)
         Base3DObject.__init__(self, position, rotation, 1, 1, ID=ID, parent=parent)
         ResponsiveControl.__init__(self)
 

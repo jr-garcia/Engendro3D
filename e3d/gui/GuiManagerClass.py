@@ -31,7 +31,7 @@ class GuiManager:
         self._currentMat = None
         self._layers = {}
         self._layersOrder = []
-        self._objects = {}
+        self._objectIDs = []
         self.view = mat4.identity()
         self.defaultTexture = None
         self.fontInfos = {}
@@ -288,3 +288,9 @@ class GuiManager:
             size = face.size.height / 64
             self.fontSizes[sizeInPoints][fontID] = size
         return size
+
+    def _addControl(self, ID):
+        if ID in self._objectIDs:
+            raise RuntimeError('the ID \'{}\' is already in use'.format(ID))
+        else:
+            self._objectIDs.append(ID)
