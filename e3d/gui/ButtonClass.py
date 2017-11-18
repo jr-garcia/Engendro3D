@@ -86,12 +86,15 @@ class Button(BaseControl):
         styleHint = self.styleHint
         if styleHint in (StyleHintsEnum.Raised, StyleHintsEnum.Sunken):
             style = self.style
+            self.gradientType = GradientTypesEnum.Horizontal
             if styleHint == StyleHintsEnum.Raised:
                 self.gradientColor0 = style.raisedGradientColor0
                 self.gradientColor1 = style.raisedGradientColor1
             else:
                 self.gradientColor0 = style.sunkenGradientColor0
                 self.gradientColor1 = style.sunkenGradientColor1
+        else:
+            self.gradientType = GradientTypesEnum.noGradient
 
     def _getText(self):
         return self._label.text
@@ -128,26 +131,19 @@ class Button(BaseControl):
     fontID = property(_getFont, _setFont)
 
     def _colorizeHover(self, isOverMe):
-        if self.gradientType == GradientTypesEnum.noGradient:
-            return
         style = self.style
         if isOverMe:
-            self.gradientColor0 = style.hoverGradientColor0
-            self.gradientColor1 = style.hoverGradientColor1
+            if self.gradientType == GradientTypesEnum.noGradient:
+                self.color = style.hoverColor
+            else:
+                self.gradientColor0 = style.hoverGradientColor0
+                self.gradientColor1 = style.hoverGradientColor1
         else:
-            self.gradientColor0 = style.raisedGradientColor0
-            self.gradientColor1 = style.raisedGradientColor1
-
-    def _colorizeUpDown(self, isDown):
-        if self.gradientType == GradientTypesEnum.noGradient:
-            return
-        style = self.style
-        if isDown:
-            self.gradientColor0 = style.pressedGradientColor0
-            self.gradientColor1 = style.pressedGradientColor1
-        else:
-            self.gradientColor0 = style.raisedGradientColor0
-            self.gradientColor1 = style.raisedGradientColor1
+            if self.gradientType == GradientTypesEnum.noGradient:
+                self.color = style.backgroundColor
+            else:
+                self.gradientColor0 = style.raisedGradientColor0
+                self.gradientColor1 = style.raisedGradientColor1
 
     def _handleMouseEnter(self, event):
         self._colorizeHover(True)
@@ -156,8 +152,12 @@ class Button(BaseControl):
         self._colorizeHover(False)
 
     def _handleMouseButtonDown(self, event):
-        self.gradientColor0 = self.style.pressedGradientColor0
-        self.gradientColor1 = self.style.pressedGradientColor1
+        style = self.style
+        if self.gradientType == GradientTypesEnum.noGradient:
+            self.color = style.pressedColor
+        else:
+            self.gradientColor0 = style.pressedGradientColor0
+            self.gradientColor1 = style.pressedGradientColor1
 
     def _handleMouseButtonUp(self, event):
         if self.parent._findForegroundControl(event.x, event.y) == self:

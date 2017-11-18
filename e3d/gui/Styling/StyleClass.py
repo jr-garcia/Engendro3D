@@ -35,7 +35,8 @@ class DefaultStyle(object):
         self.hoverGradientColor0 = WHITE
         self.hoverGradientColor1 = BLACK
         self.focusColor = ORANGE
-        self.hoverColor = (YELLOW + ORANGE) / 2.0
+        self.hoverColor = baseColor * 2.0
+        self.pressedColor = baseColor / 2.5
         self.buttonStyleHint = StyleHintsEnum.Raised
         self.controlStyleHint = StyleHintsEnum.Raised
 
