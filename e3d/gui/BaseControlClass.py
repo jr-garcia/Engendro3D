@@ -42,8 +42,7 @@ class PinningEnum(object):
 
 
 class Align2DEnum(object):
-    VCenter = 'VCenter'
-    HCenter = 'HCenter'
+    Center = 'Center'
     Top = 'Top'
     Left = 'Left'
     Right = 'Right'
@@ -123,6 +122,8 @@ class BaseControl(Base3DObject, ResponsiveControl):
 
     @abstractmethod
     def __init__(self, left, top, width, height, parent, pinning, color, ID, imgID, rotation, style):
+        self._hTextAlign = Align2DEnum.Center
+        self._vTextAlign = Align2DEnum.Left
         self._guiMan = parent._guiMan
         self._parent = parent
         self._clippingRect = self._mixSizePosition(parent)
@@ -444,6 +445,36 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._innerSize = self.size - vec3(self._borderSize * 2)
         self._innerSize.z = 1
 
+    @property
+    def vTextAlign(self):
+        return self._vTextAlignGet()
+
+    def _vTextAlignGet(self):
+        return self._vTextAlign
+
+    @vTextAlign.setter
+    def vTextAlign(self, value):
+        BaseControl._checkAlignArgs(value)
+        self._vTextAlignSet(value)
+
+    def _vTextAlignSet(self, value):
+        self._vTextAlign = value
+
+    @property
+    def hTextAlign(self):
+        return self._hTextAlignGet()
+
+    def _hTextAlignGet(self):
+        return self._hTextAlign
+
+    @hTextAlign.setter
+    def hTextAlign(self, value):
+        BaseControl._checkAlignArgs(value)
+        self._hTextAlignSet(value)
+
+    def _hTextAlignSet(self, value):
+        self._hTextAlign = value
+
     def _setPinning(self):
         pinning = self._pinning
         if PinningEnum.NoPinning in pinning:
@@ -605,34 +636,49 @@ class BaseControl(Base3DObject, ResponsiveControl):
         self._clippingRect = rect.toVec4()
 
     @staticmethod
-    def getAlignedPosition(objectSize, parentSize, parentBorderSize, vAlign=Align2DEnum.VCenter, hAlign=Align2DEnum.HCenter):
+    def _getVAlignPosition(objectSize, parentSize, parentBorderSize, align):
+        left, top, _ = BaseControl.getAlignedPosition(objectSize, parentSize, parentBorderSize, align)
+        return left
+
+    @staticmethod
+    def _getHAlignPosition(objectSize, parentSize, parentBorderSize, align):
+        left, top, _ = BaseControl.getAlignedPosition(objectSize, parentSize, parentBorderSize, align)
+        return top
+
+    @staticmethod
+    def _checkAlignArgs(align):
+        Align2DEnumDir = [val for val in dir(Align2DEnum) if not val.startswith('_')]
+        if align not in Align2DEnumDir:
+            raise TypeError('align must be in Align2DEnum')
+
+    @staticmethod
+    def getAlignedPosition(objectSize, parentSize, parentBorderSize, vAlign=Align2DEnum.Center, hAlign=Align2DEnum.Center):
         def distribute(oV, pV, border):
             return pushOpposite(oV, pV, border) / 2.0
 
         def pushOpposite(oV, pV, border):
             return pV - oV - border
 
-        def checkargs(*args):
-            Align2DEnumDir = [val for val in dir(Align2DEnum) if not val.startswith('_')]
-            for arg in args:
-                if arg not in Align2DEnumDir:
-                    raise TypeError('align must be in Align2DEnum')
-
-        checkargs(vAlign, hAlign)
+        BaseControl._checkAlignArgs(vAlign)
+        BaseControl._checkAlignArgs(hAlign)
 
         if vAlign == Align2DEnum.Left:
             left = parentBorderSize
         elif vAlign == Align2DEnum.Right:
             left = pushOpposite(objectSize.x, parentSize.x, parentBorderSize)
-        else:  # vAlign == Align2DEnum.VCenter:
+        elif vAlign == Align2DEnum.Center:
             left = distribute(objectSize.x, parentSize.x, parentBorderSize)
+        else:
+            raise ValueError('\'{}\' vAlign value not suitable'.format(vAlign))
 
         if hAlign == Align2DEnum.Top:
             top = parentBorderSize
-        elif vAlign == Align2DEnum.Bottom:
+        elif hAlign == Align2DEnum.Bottom:
             top = pushOpposite(objectSize.y, parentSize.y, parentBorderSize)
-        else:  # vAlign == Align2DEnum.HCenter:
+        elif hAlign == Align2DEnum.Center:
             top = distribute(objectSize.y, parentSize.y, parentBorderSize)
+        else:
+            raise ValueError('\'{}\' hAlign value not suitable'.format(hAlign))
 
         return vec3(left, top, 1)
 

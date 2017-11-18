@@ -1,7 +1,6 @@
-from .FontRendering.MSDFAtlasRenderer import AtlasInfo, CharData
 from .SingleCharClass import *
-from .TextEnums import *
 from .Styling import DefaultStyle
+from .TextEnums import *
 
 DEFAULTSPACING = 1.0 / 10
 
@@ -33,6 +32,7 @@ class Label(BaseControl):
         self._outlineColor = style.fontOutlineColor
         self._fontBorder = 0
         self._fontID = fontID
+        self._oldOffset = 0
         height = self._presetHeightByFont(parent)
 
         super(Label, self).__init__(left, top, width, height + (self._spacing * 2), parent, pinning, color, ID,
@@ -98,6 +98,7 @@ class Label(BaseControl):
         fontInfo = guiMan.fontInfos[self.fontID]
         assert isinstance(fontInfo, AtlasInfo)
         baseline = self._baseline
+        gotBroken = False
 
         for c in self._children:
             c._dirty = True
@@ -129,6 +130,7 @@ class Label(BaseControl):
             if lowerEdge > maxHeight:
                 self._baseline -= lowerEdge - maxHeight
                 self._setCharsRatio()
+                gotBroken = True
                 break
 
             c.size = vec3(boxWidth, boxHeight, 1)
@@ -136,6 +138,29 @@ class Label(BaseControl):
             # advanceX += (cdata.advance[0] * maxHeight)  # This is the 'right way'
             # advanceX += charWidth  # This is a safe way
             advanceX += ((cdata.advance[0] * maxHeight) + charWidth) / 2.0  # This looks better
+            self._totalLength = c.position.x + c.size.x
+
+        if not gotBroken:
+            self._alignText()
+
+    def _alignText(self):
+        size = vec3(self._totalLength, self.height - (self.borderSize * 2) + (self._spacing * 2), 1)
+        x, y, z = self.getAlignedPosition(size, self.size, self.borderSize, self._vTextAlign, self._hTextAlign)
+        oldOffset = self._oldOffset
+        for c in self._children:
+            c.left -= oldOffset
+            c.left += x
+        self._oldOffset = x
+
+    def _hTextAlignSet(self, value):
+        super(Label, self)._hTextAlignSet(value)
+        self._dirty = True
+        self._alignText()
+
+    def _vTextAlignSet(self, value):
+        super(Label, self)._vTextAlignSet(value)
+        self._dirty = True
+        self._alignText()
 
     def _update(self):
         if not self._isBuilt:
