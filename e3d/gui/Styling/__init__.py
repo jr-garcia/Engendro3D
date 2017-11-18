@@ -1,2 +1,2 @@
-from .StyleClass import DefaultStyle
+from .StyleClass import DefaultStyle, StyleHintsEnum
 from .styles import *

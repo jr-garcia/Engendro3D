@@ -1,6 +1,5 @@
 from .LabelClass import *
 from .TextEnums import FontWeightEnum
-from .BaseControlClass import StyleHintsEnum
 from ..Colors import *
 from .Styling import *
 
@@ -12,14 +11,15 @@ class Button(BaseControl):
        @rtype : Button
     """
 
-    def __init__(self, left, top, width, height, text, parent, pinning=PinningEnum.TopLeft, color=None, fontID='default',
-                 styleHint=StyleHintsEnum.Raised, ID=None, rotation=None, style=None):
+    def __init__(self, left, top, width, height, text, parent, pinning=PinningEnum.TopLeft, color=None,
+                 fontID='default', ID=None, rotation=None, style=None):
         """
         :param borderSize:
         :type borderSize:
 
         """
         style = style or RaisedStyle(color)
+        styleHint = style.buttonStyleHint
         if color is None:
             color = style.backgroundColor
         if styleHint == StyleHintsEnum.Image:
@@ -45,12 +45,24 @@ class Button(BaseControl):
         label.outlineColor = style.fontColor
         label.borderSize = 0
         label.color = vec4(0)
-        self._hTextAlign = Align2DEnum.HCenter
         x, y, z = self.getAlignedPosition(label.size, self.size, self.borderSize, hAlign=self._hTextAlign)
         label.top = y
+        label.vTextAlign = Align2DEnum.Center
 
         self._styleHint = styleHint
         self._buildColors()
+
+    def _hTextAlignGet(self):
+        return self._label.hTextAlign
+
+    def _vTextAlignGet(self):
+        return self._label.vTextAlign
+
+    def _hTextAlignSet(self, value):
+        self._label.hTextAlign = value
+
+    def _vTextAlignSet(self, value):
+        self._label.vTextAlign = value
 
     @property
     def styleHint(self):

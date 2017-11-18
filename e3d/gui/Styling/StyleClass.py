@@ -4,6 +4,15 @@ from ..BaseControlClass import GradientTypesEnum
 from json import dump, load
 
 
+class StyleHintsEnum(object):
+    Flat = 'Flat'
+    Raised = 'Raised'
+    Sunken = 'Sunken'
+    Hover = 'Hover'
+    Image = 'Image'
+    # Custom = 'Custom'
+
+
 class DefaultStyle(object):
     def __init__(self, baseColor=None):
         if baseColor is None:
@@ -27,6 +36,8 @@ class DefaultStyle(object):
         self.hoverGradientColor1 = BLACK
         self.focusColor = ORANGE
         self.hoverColor = (YELLOW + ORANGE) / 2.0
+        self.buttonStyleHint = StyleHintsEnum.Raised
+        self.controlStyleHint = StyleHintsEnum.Raised
 
         self._buildradients(baseColor)
 

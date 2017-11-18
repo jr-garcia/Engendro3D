@@ -1,4 +1,5 @@
-from .BaseControlClass import GradientTypesEnum, PinningEnum, Align2DEnum, StyleHintsEnum
+from .BaseControlClass import GradientTypesEnum, PinningEnum, Align2DEnum
+from .Styling import *
 from .LayerClass import Layer
 from .PanelClass import Panel
 from .FontRendering import CharRangesEnum

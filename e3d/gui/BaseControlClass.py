@@ -49,15 +49,6 @@ class Align2DEnum(object):
     Bottom = 'Bottom'
 
 
-class StyleHintsEnum(object):
-    Flat = 'Flat'
-    Raised = 'Raised'
-    Sunken = 'Sunken'
-    Hover = 'Hover'
-    Image = 'Image'
-    # Custom = 'Custom'
-
-
 class ClippingRect(object):
     def __init__(self, windowSize):
         self._top = None
