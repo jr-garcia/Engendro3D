@@ -95,7 +95,7 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
         {
             resultColor = fontColor;
             if (finalOutlineLength == 0 && bgcolor.a == 0)
-                  resultColor.a = falpha * clamp(pixelSize[0] / 10, 2, 8);
+                  resultColor.a = falpha * clamp(pixelSize[1] / 20, 1, 8);
             else
             {
                 vec4 color;

@@ -37,6 +37,8 @@ class Label(BaseControl):
 
         super(Label, self).__init__(left, top, width, height + (self._spacing * 2), parent, pinning, color, ID,
                                     imgID, rotation, style)
+
+        self.borderSize = 0
         self._isBuilt = False
         self._dirtyProperties = True
 
@@ -81,6 +83,7 @@ class Label(BaseControl):
             newChar = SingleChar(left, 0, height, c, self, PinningEnum.NoPinning, fontID=self._fontID,
                                  color=vec4(0, 0, 0, 0), borderSize=0, style=self.style)
             newChar.outlineLength = self._outlineLength
+            newChar.outlineColor = self._outlineColor
             newChar.fontWeight = self._fontWeight
             newChar.fontColor = self._fontColor
             left += height

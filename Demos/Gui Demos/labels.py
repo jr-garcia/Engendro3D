@@ -65,6 +65,7 @@ class Demo(_Demo_Base):
     def buildGui(self):
         self.onelayer = self.window.gui.addLayer('one')
         super(Demo, self).buildGui()
+        # return
 
         # load default font with japanese letters / symbols
         self.window.gui.loadFont('defaultJapanese',
