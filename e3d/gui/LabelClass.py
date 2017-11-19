@@ -149,11 +149,8 @@ class Label(BaseControl):
     def _alignText(self):
         size = vec3(self._totalLength, self.height - (self.borderSize * 2) + (self._spacing * 2), 1)
         x, y, z = self.getAlignedPosition(size, self.size, self.borderSize, self._vTextAlign, self._hTextAlign)
-        oldOffset = self._oldOffset
         for c in self._children:
-            c.left -= oldOffset
             c.left += x
-        self._oldOffset = x
 
     def _hTextAlignSet(self, value):
         super(Label, self)._hTextAlignSet(value)
