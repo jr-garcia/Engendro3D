@@ -23,7 +23,8 @@ class Label(BaseControl):
         """
         style = style or DefaultStyle(color)
         if color is None:
-            color = style.backgroundColor
+            color = vec4(style.backgroundColor)
+            color.w = 0
         self._outlineLength = outlineLength
         self._fontSize = fontSize
         self._text = text

@@ -20,6 +20,7 @@ class SingleChar(BaseControl):
         super(SingleChar, self).__init__(left, top, width, height, parent, pinning, color, ID, imgID, rotation,
                                          style)
         self.borderSize = borderSize
+        self.gradientType = GradientTypesEnum.noGradient
         self._outlineLength = OutlineLenghtEnum.Medium
         self._outlineColor = vec4(1)
         self._fontColor = style.fontColor

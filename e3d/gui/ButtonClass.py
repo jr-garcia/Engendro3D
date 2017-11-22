@@ -18,7 +18,7 @@ class Button(BaseControl):
         :type borderSize:
 
         """
-        style = style or RaisedStyle(color)
+        style = style or DefaultStyle(color)
         styleHint = style.buttonStyleHint
         if color is None:
             color = style.backgroundColor
@@ -36,8 +36,8 @@ class Button(BaseControl):
             self.gradientType = GradientTypesEnum.noGradient
 
         self.borderColor = style.borderColor
-
         borderSize = style.borderSize
+        self._lastBorderSize = borderSize
         self._label = Label(borderSize, borderSize, width - (borderSize * 2), text, self,
                             pinning=PinningEnum.TopLeftRight, fontID=fontID, ID=self.ID + '_label',
                             outlineLength=OutlineLenghtEnum.NoOutline)
@@ -71,6 +71,11 @@ class Button(BaseControl):
     @styleHint.setter
     def styleHint(self, value):
         self._styleHint = value
+        self._lastBorderSize = self.style.borderSize
+        if value in (StyleHintsEnum.Raised, StyleHintsEnum.Sunken):
+            self.gradientType = GradientTypesEnum.Horizontal
+        else:
+            self.gradientType = GradientTypesEnum.noGradient
         self._buildColors()
 
     @property
@@ -80,21 +85,9 @@ class Button(BaseControl):
     @color.setter
     def color(self, val):
         super(Button, self)._setColor(val)
-        self._buildColors()
 
     def _buildColors(self):
-        styleHint = self.styleHint
-        if styleHint in (StyleHintsEnum.Raised, StyleHintsEnum.Sunken):
-            style = self.style
-            self.gradientType = GradientTypesEnum.Horizontal
-            if styleHint == StyleHintsEnum.Raised:
-                self.gradientColor0 = style.raisedGradientColor0
-                self.gradientColor1 = style.raisedGradientColor1
-            else:
-                self.gradientColor0 = style.sunkenGradientColor0
-                self.gradientColor1 = style.sunkenGradientColor1
-        else:
-            self.gradientType = GradientTypesEnum.noGradient
+        self._colorizeHover(False)
 
     def _getText(self):
         return self._label.text
@@ -133,12 +126,21 @@ class Button(BaseControl):
     def _colorizeHover(self, isOverMe):
         style = self.style
         if isOverMe:
-            if self.gradientType == GradientTypesEnum.noGradient:
-                self.color = style.hoverColor
+            if self.styleHint == StyleHintsEnum.Hover:
+                self.borderSize = style.borderSize
+                self.gradientType = GradientTypesEnum.Horizontal
+                self.gradientColor0 = style.autoRaiseGradientColor0
+                self.gradientColor1 = style.autoRaiseGradientColor1
             else:
-                self.gradientColor0 = style.hoverGradientColor0
-                self.gradientColor1 = style.hoverGradientColor1
+                if self.gradientType == GradientTypesEnum.noGradient:
+                    self.color = style.hoverColor
+                else:
+                    self.gradientColor0 = style.hoverGradientColor0
+                    self.gradientColor1 = style.hoverGradientColor1
         else:
+            if self.styleHint == StyleHintsEnum.Hover:
+                self.borderSize = self._lastBorderSize
+                self.gradientType = GradientTypesEnum.noGradient
             if self.gradientType == GradientTypesEnum.noGradient:
                 self.color = style.backgroundColor
             else:
@@ -146,6 +148,7 @@ class Button(BaseControl):
                 self.gradientColor1 = style.raisedGradientColor1
 
     def _handleMouseEnter(self, event):
+        self._lastBorderSize = self._borderSize
         self._colorizeHover(True)
 
     def _handleMouseLeave(self, event):
@@ -153,6 +156,8 @@ class Button(BaseControl):
 
     def _handleMouseButtonDown(self, event):
         style = self.style
+        if self.styleHint == StyleHintsEnum.Hover:
+            self.borderSize = style.borderSize
         if self.gradientType == GradientTypesEnum.noGradient:
             self.color = style.pressedColor
         else:
@@ -167,4 +172,5 @@ class Button(BaseControl):
 
     def _reStyle(self):
         super(Button, self)._reStyle()
+        self._lastBorderSize = self.style.borderSize
         self._buildColors()
