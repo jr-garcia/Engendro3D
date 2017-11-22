@@ -1,10 +1,10 @@
-# ![e3d_Logo](./e3d/defaults/textures/e3dlogo.png) Engendro3D™
+# ![e3d_Logo](./e3d/defaults/textures/e3dlogo.png) Engendro 3D™
 
 OpenGL 3D Game Engine for Python. **_Version 0.7_**
 
 MIT license.
 
-<h5>Work in Progress.</h5>
+#### Work in Progress.
 
 RENDER EXAMPLE             | VIDEO  
 :-------------------------:|:-------------------------:
@@ -13,7 +13,7 @@ RENDER EXAMPLE             | VIDEO
 ## Requires:
 
 * **[Python](https://www.python.org/)** 
-    > 2 or 3
+    > 2.7 or 3.4+
 
 * **[PySDL2](http://pysdl2.readthedocs.org/)** 
     > `pip install pysdl2`
@@ -40,7 +40,7 @@ Please refer to each project's documentation for specific instructions on how to
 
 ### Usage
 
-No docs for the moment. Check the 'demos' folder for examples and screenshots.
+No docs for the moment. Check the 'Demos' folder for examples and screenshots.
  
 <hr>
  
