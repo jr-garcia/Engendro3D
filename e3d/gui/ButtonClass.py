@@ -127,9 +127,10 @@ class Button(BaseControl):
         style = self.style
         if isOverMe:
             if self.styleHint == StyleHintsEnum.Hover:
-                self.borderSize = self._lastBorderSize
                 if self._lastBorderSize == 0:
-                    self._lastBorderSize = style.borderSize
+                    super(Button, self)._setBorder(style.borderSize)
+                else:
+                    super(Button, self)._setBorder(self._lastBorderSize)
                 self.gradientType = GradientTypesEnum.Horizontal
                 self.gradientColor0 = style.autoRaiseGradientColor0
                 self.gradientColor1 = style.autoRaiseGradientColor1
@@ -159,9 +160,10 @@ class Button(BaseControl):
     def _handleMouseButtonDown(self, event):
         style = self.style
         if self.styleHint == StyleHintsEnum.Hover:
-            self.borderSize = self._lastBorderSize
             if self._lastBorderSize == 0:
-                self._lastBorderSize = style.borderSize
+                super(Button, self)._setBorder(style.borderSize)
+            else:
+                super(Button, self)._setBorder(self._lastBorderSize)
         if self.gradientType == GradientTypesEnum.noGradient:
             self.color = style.pressedColor
         else:
@@ -187,5 +189,3 @@ class Button(BaseControl):
     def borderSize(self, value):
         super(Button, self)._setBorder(value)
         self._lastBorderSize = value
-        if self._lastBorderSize == 0:
-            self._lastBorderSize = self.style.borderSize
