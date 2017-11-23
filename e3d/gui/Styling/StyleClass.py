@@ -57,9 +57,9 @@ class DefaultStyle(object):
         color4.w = 1
         color5 = baseColor / 8.0
         color5.w = 1
-        color6 = (baseColor + WHITE / 1.9) / 2.0
+        color6 = (baseColor + WHITE / 1.8) / 2.0
         color6.w = 1
-        color7 = baseColor / 1.5
+        color7 = baseColor / 1.4
         color7.w = 1
 
         self.raisedGradientColor0 = color2
