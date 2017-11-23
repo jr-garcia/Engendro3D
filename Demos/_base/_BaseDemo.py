@@ -15,7 +15,7 @@ from e3d.cameras.SimpleCameraClass import SimpleCamera
 from e3d.events_processing.EventsManagerClass import EventsListener
 from e3d.gui import Panel, PinningEnum
 
-GLOBAL_NAME = 'Engendro3D OpenGL {}'.format(__version__)
+GLOBAL_NAME = 'Engendro 3D OpenGL {}'.format(__version__)
 LOGOSSIZE = 60
 
 
@@ -57,7 +57,8 @@ class _Demo_Base(object):
         self.loadTextures()
         self.scene0 = self.engine.scenes.addScene('scene0')
         self.scene0.beforeUpdateCallback = self.defUpdate
-        self.scene0.ambientColor = vec3(.2, .0, .05)
+        self.scene0.ambientColor = vec3(0)
+        self.scene0.bgColor = vec3(0)
         self.engine.scenes.currentSceneID = 'scene0'
         self.engine.updateLoop()
 
@@ -68,8 +69,11 @@ class _Demo_Base(object):
 
     def defUpdate(self, e):
         if self.pendingTex == 0:
-            self.engine.log('All Textures Loaded.')
+            engine = self.engine
+            engine.log('All Textures Loaded.')
             self.prepareScene()
+            engine.log('Switch scene 0 >> 1', logLevelsEnum.debug)
+            engine.scenes.setCurrentSceneID('scene1')
             self.loadModels()
             self.addLights()
             self.buildGui()
@@ -101,7 +105,7 @@ class _Demo_Base(object):
             print('<< Loading texture: ' + args[1])
             # self.pendingTex += 1
             # self.isWaitingTex = True
-            self.engine.textures.loadTexture(args[0], args[1], args[2])
+            self.engine.textures.loadTexture(args[0], args[1], serial=args[2])
 
         texCount = len(self.texturesToLoad)
         if texCount > 0:
@@ -121,9 +125,6 @@ class _Demo_Base(object):
             raise
 
         self.camera.position = [0, 10, 230]
-
-        self.engine.log('Switch scene 0 >> 1', logLevelsEnum.debug)
-        engine.scenes.setCurrentSceneID('scene1')
 
     def loadModels(self):
         pass

@@ -234,7 +234,7 @@ def _setMaterialShaderProperties(shader, props):
     paramsList = []
     for p in props:
         assert isinstance(p, ShaderProperty)
-        paramsList.append((p.shaderName, p.getVal()))
+        paramsList.append((p.nameInShader, p.getVal()))
 
     shader.setUniformsList(paramsList)
 

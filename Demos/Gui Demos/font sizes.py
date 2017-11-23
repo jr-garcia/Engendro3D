@@ -30,6 +30,10 @@ class Demo(_Demo_Base):
         self.camera.position = vec3(0, 100, 290)
         self.camera.rotateX(20)
 
+    def prepareScene(self):
+        super(Demo, self).prepareScene()
+        self.scene1.bgColor = vec3(0)
+
     def keydown(self, e):
         if e.eventName == 'keyUp':
             return
@@ -111,7 +115,7 @@ class Demo(_Demo_Base):
         self.window.gui.loadFont('auto', os.path.join(os.path.pardir, 'fonts', 'automati.ttf'))
 
         textLayer = self.window.gui.addLayer('text')
-        
+
         self.instructionsLabel = Label(300, self.window.size[1] - 50, 310, 'Press CTRL or Arrow keys',
                                        self.onelayer, pinning=PinningEnum.BottomLeft)
         self.instructionsLabel.gradientType = GradientTypesEnum.Vertical
@@ -121,13 +125,13 @@ class Demo(_Demo_Base):
 
         lastTop = 0
         labels = []
-        listRange = list(range(20, 4, -1))
+        listRange = list(range(26, 5, -2))
         listRange.insert(0, 60)
         listRange.insert(1, 40)
         for i in listRange:
             lab = Label(50, lastTop, 800, '', textLayer, fontID='auto')
             lab.fontSize = i
-            lab.color = vec4(0)
+            lab.outlineColor = vec4(1, 0, 1, 1)
             height = lab.height
             fontID = lab.fontID
             style = weigthNames[lab.fontWeight]

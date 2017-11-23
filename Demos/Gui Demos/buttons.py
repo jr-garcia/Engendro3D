@@ -94,7 +94,7 @@ class Demo(_Demo_Base):
         colorfullBtn = Button(20, 170, 200, 40, 'Colorfull Hover', colorfullContainer, ID='ColorfullButton')
         colorfullBtn.style = cfStyle
         colorfullBtn.styleHint = StyleHintsEnum.Hover
-        colorfullBtn.borderSize = 10
+        colorfullBtn.borderSize = 1
 
     def buttonClick(self, eventData):
         print(eventData)  # for debuggin

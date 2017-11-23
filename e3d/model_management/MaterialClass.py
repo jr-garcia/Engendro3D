@@ -121,8 +121,8 @@ class Material(object):
 
 
 class ShaderProperty:
-    def __init__(self, shaderName, val):
-        self.shaderName = shaderName
+    def __init__(self, nameInShader, val):
+        self.nameInShader = nameInShader
         self._val = val
 
     def getVal(self):
@@ -165,7 +165,7 @@ class ShaderPropertiesList:
     def append(self, val):
         if not isinstance(val, ShaderProperty) and not issubclass(ShaderProperty, val):
             raise TypeError('ShaderPropertiesList accepts only ShaderProperty types, got ' + type(val))
-        self.pdict[val.shaderName] = val
+        self.pdict[val.nameInShader] = val
 
     def __setitem__(self, key, value):
         if not isinstance(key, str):

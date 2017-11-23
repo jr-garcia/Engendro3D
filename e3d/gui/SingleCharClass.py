@@ -22,7 +22,7 @@ class SingleChar(BaseControl):
         self.borderSize = borderSize
         self.gradientType = GradientTypesEnum.noGradient
         self._outlineLength = OutlineLenghtEnum.Medium
-        self._outlineColor = vec4(1)
+        self._outlineColor = vec4(0, 0, 0, 1)
         self._fontColor = style.fontColor
         self._fontWeight = FontWeightEnum.Normal
         self._charCode = ord(char)
@@ -31,6 +31,7 @@ class SingleChar(BaseControl):
         self._material.useDiffuseTexture = True
         self.isBuilt = False
 
+        self._material.shaderProperties.append(FloatShaderProperty('fontHeightInPixels', self.height))
         self._material.shaderProperties.append(FloatShaderProperty('outlineLength', self.outlineLength))
         self._material.shaderProperties.append(Vec4ShaderProperty('outlineColor', self.outlineColor))
         self._material.shaderProperties.append(Vec4ShaderProperty('fontColor', self.fontColor))

@@ -82,7 +82,6 @@ class TexturesManager(BaseManager):
 
     def _fillTexture(self, args):
         pix, w, h, ID, mipmapsNumber, repeat = args
-        tex = -1
         try:
             tex = self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat)
             self._textureCache[ID] = tex
@@ -110,6 +109,7 @@ class TexturesManager(BaseManager):
         @param ID:
         """
         warn('forcing serial texture load')
+        serial = True
         filePath = os.path.abspath(filePath)
         tex = self._textureCache.get(ID)
         getdefault = False

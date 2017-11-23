@@ -53,7 +53,8 @@ class Label(BaseControl):
     @fontSize.setter
     def fontSize(self, value):
         self._fontSize = value
-        self.height = self._presetHeightByFont(self.parent)
+        height = self._presetHeightByFont(self.parent)
+        self.height = height
 
     def _presetHeightByFont(self, parent):
         height = parent._guiMan.getFontSizeInPixels(self.fontSize, self.fontID)
@@ -142,6 +143,7 @@ class Label(BaseControl):
             # advanceX += (cdata.advance[0] * maxHeight)  # This is the 'right way'
             # advanceX += charWidth  # This is a safe way
             advanceX += ((cdata.advance[0] * maxHeight) + charWidth) / 2.0  # This looks better
+            c._material.shaderProperties['fontHeightInPixels'] = self.height
             self._totalLength = c.position.x + c.size.x
 
         if not gotBroken:

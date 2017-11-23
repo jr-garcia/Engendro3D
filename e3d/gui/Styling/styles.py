@@ -19,6 +19,8 @@ class ColorfullStyle(DefaultStyle):
         self.hoverGradientColor1 = RED
         self.pressedGradientColor0 = BLACK
         self.pressedGradientColor1 = WHITE
+        self.autoRaiseGradientColor0 = RGB1(.5, 0, .9)
+        self.autoRaiseGradientColor1 = RGB1(0, 1, .5)
 
         self.pressedColor = RGB1(1, .5, .5)
 

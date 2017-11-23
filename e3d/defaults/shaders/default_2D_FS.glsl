@@ -12,6 +12,7 @@ uniform int GradientDirection = 0;
 uniform int borderSize = 2;
 uniform vec4 borderColor = vec4(1);
 uniform vec3 pixelSize;
+uniform float fontHeightInPixels;
 uniform vec4 clippingRect;
 uniform vec3 windowPosition;
 
@@ -95,7 +96,7 @@ vec4 setUpText(vec4 sampled, vec4 bgcolor)
         {
             resultColor = fontColor;
             if (finalOutlineLength == 0 && bgcolor.a == 0)
-                  resultColor.a = falpha * clamp(pixelSize[1] / 20, 1, 8);
+                  resultColor.a = falpha * clamp(fontHeightInPixels / 20.0, 1, 8);
             else
             {
                 vec4 color;
