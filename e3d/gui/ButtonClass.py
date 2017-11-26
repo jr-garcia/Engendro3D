@@ -12,28 +12,32 @@ class Button(BaseControl):
     """
 
     def __init__(self, left, top, width, height, text, parent, pinning=PinningEnum.TopLeft, color=None,
-                 fontID='default', ID=None, rotation=None, style=None):
+                 fontID='default', ID=None, rotation=None, style=None, imageIDs=None):
         """
         :param borderSize:
         :type borderSize:
 
         """
+        if imageIDs is None:
+            imageIDs = [None] * 3
+        if len(imageIDs) != 3:
+            raise RuntimeError('imageIDs must have 3 elements, None or String ([Normal, Hover, Down])')
+        self._buttonImageIDs = imageIDs
         style = style or DefaultStyle(color)
         styleHint = style.buttonStyleHint
         if color is None:
             color = style.backgroundColor
-        if styleHint == StyleHintsEnum.Image:
-            image = bgImgID
-        else:
-            image = None
 
         super(Button, self).__init__(left, top, width, height, parent, pinning, color, ID,
-                                     image, rotation, style)
+                                     None, rotation, style)
 
         if styleHint in (StyleHintsEnum.Raised, StyleHintsEnum.Sunken):
             self.gradientType = GradientTypesEnum.Horizontal
         else:
             self.gradientType = GradientTypesEnum.noGradient
+
+        if styleHint == StyleHintsEnum.Image:
+            self.backgroundImageID = imageIDs[0]
 
         self.borderColor = style.borderColor
         borderSize = style.borderSize
@@ -51,6 +55,30 @@ class Button(BaseControl):
 
         self._styleHint = styleHint
         self._buildColors()
+        
+    @property
+    def normalImageID(self):
+        return self._buttonImageIDs[0]
+    
+    @normalImageID.setter
+    def normalImageID(self, value):
+        self._buttonImageIDs[0] = value
+
+    @property
+    def hoverImageID(self):
+        return self._buttonImageIDs[1]
+
+    @hoverImageID.setter
+    def hoverImageID(self, value):
+        self._buttonImageIDs[1] = value
+
+    @property
+    def downImageID(self):
+        return self._buttonImageIDs[2]
+
+    @downImageID.setter
+    def downImageID(self, value):
+        self._buttonImageIDs[2] = value
 
     def _hTextAlignGet(self):
         return self._label.hTextAlign
@@ -76,6 +104,10 @@ class Button(BaseControl):
             self.gradientType = GradientTypesEnum.Horizontal
         else:
             self.gradientType = GradientTypesEnum.noGradient
+        self._material.useDiffuseTexture = value == StyleHintsEnum.Image
+        if value == StyleHintsEnum.Image:
+            normalImageID = self._buttonImageIDs[0]
+            self.backgroundImageID = normalImageID
         self._buildColors()
 
     @property
@@ -125,8 +157,9 @@ class Button(BaseControl):
 
     def _colorizeHover(self, isOverMe):
         style = self.style
+        hint = self.styleHint
         if isOverMe:
-            if self.styleHint == StyleHintsEnum.Hover:
+            if hint == StyleHintsEnum.Hover:
                 if self._lastBorderSize == 0:
                     super(Button, self)._setBorder(style.borderSize)
                 else:
@@ -135,15 +168,19 @@ class Button(BaseControl):
                 self.gradientColor0 = style.autoRaiseGradientColor0
                 self.gradientColor1 = style.autoRaiseGradientColor1
             else:
+                if hint == StyleHintsEnum.Image:
+                    self.backgroundImageID = self.hoverImageID
                 if self.gradientType == GradientTypesEnum.noGradient:
                     self.color = style.hoverColor
                 else:
                     self.gradientColor0 = style.hoverGradientColor0
                     self.gradientColor1 = style.hoverGradientColor1
         else:
-            if self.styleHint == StyleHintsEnum.Hover:
+            if hint == StyleHintsEnum.Hover:
                 self.borderSize = self._lastBorderSize
                 self.gradientType = GradientTypesEnum.noGradient
+            elif hint == StyleHintsEnum.Image:
+                self.backgroundImageID = self.normalImageID
             if self.gradientType == GradientTypesEnum.noGradient:
                 self.color = style.backgroundColor
             else:
@@ -159,11 +196,14 @@ class Button(BaseControl):
 
     def _handleMouseButtonDown(self, event):
         style = self.style
-        if self.styleHint == StyleHintsEnum.Hover:
+        hint = self.styleHint
+        if hint == StyleHintsEnum.Hover:
             if self._lastBorderSize == 0:
                 super(Button, self)._setBorder(style.borderSize)
             else:
                 super(Button, self)._setBorder(self._lastBorderSize)
+        elif hint == StyleHintsEnum.Image:
+            self.backgroundImageID = self.downImageID
         if self.gradientType == GradientTypesEnum.noGradient:
             self.color = style.pressedColor
         else:
