@@ -37,30 +37,30 @@ class DefaultStyle(object):
         self.hoverGradientColor1 = BLACK
         self.autoRaiseGradientColor0 = WHITE
         self.autoRaiseGradientColor1 = BLACK
-        self.hoverColor = fromRGB1_A((baseColor + (WHITE / 10.0)), 1)
-        self.pressedColor = fromRGB1_A(baseColor / 1.5, 1)
+        self.hoverColor = fromRGB1_A((baseColor + (WHITE / 10.0)), baseColor.w)
+        self.pressedColor = fromRGB1_A(baseColor / 1.5, baseColor.w)
         self.buttonStyleHint = StyleHintsEnum.Raised
         self.controlStyleHint = StyleHintsEnum.Raised
 
-        self._buildradients(baseColor)
+        self._buildGradients(baseColor)
 
-    def _buildradients(self, baseColor):
+    def _buildGradients(self, baseColor):
         color0 = (baseColor + WHITE / 2.0) / 2.0
-        color0.w = 1
+        color0.w = baseColor.w
         color1 = baseColor / 4.0
-        color1.w = 1
+        color1.w = baseColor.w
         color2 = (baseColor + WHITE / 3.0) / 2.0
-        color2.w = 1
+        color2.w = baseColor.w
         color3 = baseColor / 6.0
-        color3.w = 1
+        color3.w = baseColor.w
         color4 = (baseColor + WHITE / 4.0) / 2.0
-        color4.w = 1
+        color4.w = baseColor.w
         color5 = baseColor / 8.0
-        color5.w = 1
+        color5.w = baseColor.w
         color6 = (baseColor + WHITE / 1.8) / 2.0
-        color6.w = 1
+        color6.w = baseColor.w
         color7 = baseColor / 1.4
-        color7.w = 1
+        color7.w = baseColor.w
 
         self.raisedGradientColor0 = color2
         self.raisedGradientColor1 = color3
