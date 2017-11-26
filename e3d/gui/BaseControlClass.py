@@ -286,7 +286,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     def _setImg(self, value):
         material = self._material
         material.diffuseTextureID = value
-        material.useDiffuseTexture = (value != '')
+        material.useDiffuseTexture = value not in ('', None)
 
     backgroundImageID = property(_getImg, _setImg)
 
