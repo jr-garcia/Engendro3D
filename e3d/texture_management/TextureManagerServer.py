@@ -9,15 +9,15 @@ class TexturesManagerServer(object):
     def getPILpixels(path):
         try:
             im = Image.open(path)
-            w, h = im.size[0], im.size[1]
+            w, h = im.size[:2]
 
             if im.mode != 'RGBA':
                 im = im.convert("RGBA")
 
-            pix = np.array(im, np.uint8)
+            pix = np.asarray(im)
             im.close()
             red, green, blue, alpha = pix.T
-            pix = np.array([blue, green, red, alpha])
+            pix = np.array((blue, green, red, alpha), np.uint8)
             return pix.transpose().flatten(), w, h
         except Exception:
             raise
