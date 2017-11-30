@@ -63,6 +63,7 @@ class Button(BaseControl):
     @normalImageID.setter
     def normalImageID(self, value):
         self._buttonImageIDs[0] = value
+        self.backgroundImageID = value
 
     @property
     def hoverImageID(self):
