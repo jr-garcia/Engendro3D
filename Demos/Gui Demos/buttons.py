@@ -65,7 +65,7 @@ class Demo(_Demo_Base):
         self.containers.append(flatContainer)
         Label(0, 0, 200, 'Flat stylehint', flatContainer, fontID='auto')
         Button(20, 30, 150, 40, 'Button 1', flatContainer).styleHint = StyleHintsEnum.Flat
-        secondFlat = Button(20, 80, 200, 30, 'RGB ', flatContainer, color=RGB1(.1, .5, 0))
+        secondFlat = Button(20, 80, 200, 30, 'RGBA ', flatContainer, color=RGB1(.1, .5, 0))
         secondFlat.styleHint = StyleHintsEnum.Flat
         secondFlat.text += str(secondFlat.color)
 
@@ -76,7 +76,7 @@ class Demo(_Demo_Base):
         self.containers.append(HoverContainer)
         Label(0, 0, 200, 'Hover stylehint', HoverContainer, fontID='auto').fontColor = BLACK
         Button(20, 30, 150, 40, 'Default border', HoverContainer, color=darkOrange).styleHint = StyleHintsEnum.Hover
-        secondHover = Button(20, 80, 200, 30, 'RGB ', HoverContainer, color=darkOrange)
+        secondHover = Button(20, 80, 200, 30, 'RGBA ', HoverContainer, color=darkOrange)
         secondHover.styleHint = StyleHintsEnum.Hover
         secondHover.borderSize = 0
         secondHover.text += str(secondHover.color)
@@ -107,7 +107,7 @@ class Demo(_Demo_Base):
         transparentBtn.styleHint = StyleHintsEnum.Image
         transparentBtn.borderSize = 0
         transparentBtn.fontColor = BLACK
-        secondImage = Button(20, 80, 200, 30, 'RGB ', ImageContainer, color=GREEN)
+        secondImage = Button(20, 80, 200, 30, 'RGBA ', ImageContainer, color=GREEN)
         secondImage.styleHint = StyleHintsEnum.Image
         secondImage.borderSize = 0
         secondImage.text += str(secondImage.color)
@@ -123,4 +123,4 @@ class Demo(_Demo_Base):
 
 
 if __name__ == '__main__':
-    runDemo(Demo((950, 680)), 'GUI Demo - Single Char')
+    runDemo(Demo((950, 680)), 'GUI Demo - Buttons')
