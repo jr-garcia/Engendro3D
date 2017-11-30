@@ -85,7 +85,6 @@ class Demo(_Demo_Base):
         colorfullContainer = Panel(HoverContainer.windowPosition.x + HoverContainer.width + 10, HoverContainer.top,
                                    250, 250, self.onelayer, style=cfStyle)
         Label(10, 10, 200, 'Colorfull style', colorfullContainer, fontID='auto', style=cfStyle)
-        colorfullContainer.visible = False
         self.containers.append(colorfullContainer)
         Button(20, 50, 150, 60, 'Default (raised)', colorfullContainer, color=darkOrange, style=cfStyle).fontColor=BLACK
         colorfullFlatBtn = Button(20, 120, 180, 40, 'Colorfull Flat', colorfullContainer, ID='ColorfullFlatButton')
@@ -95,6 +94,27 @@ class Demo(_Demo_Base):
         colorfullBtn.style = cfStyle
         colorfullBtn.styleHint = StyleHintsEnum.Hover
         colorfullBtn.borderSize = 1
+
+        self.engine.textures.loadTexture('../textures/button_hover.png', 'hover')
+        self.engine.textures.loadTexture('../textures/button_down.png', 'down')
+        self.engine.textures.loadTexture('../textures/button_normal.png', 'normal')
+        ImageContainer = Panel(container.width * 2 + 100, 10, 250, 150, self.onelayer)
+        ImageContainer.color = TRANSPARENT
+        self.containers.append(ImageContainer)
+        Label(0, 0, 200, 'Image stylehint', ImageContainer, fontID='auto')
+        buttonIDs = ('normal', 'hover', 'down')
+        transparentBtn = Button(20, 30, 150, 40, 'No color', ImageContainer, color=TRANSPARENT, imageIDs=buttonIDs)
+        transparentBtn.styleHint = StyleHintsEnum.Image
+        transparentBtn.borderSize = 0
+        transparentBtn.fontColor = BLACK
+        secondImage = Button(20, 80, 200, 30, 'RGB ', ImageContainer, color=GREEN)
+        secondImage.styleHint = StyleHintsEnum.Image
+        secondImage.borderSize = 0
+        secondImage.text += str(secondImage.color)
+        secondImage.fontColor = BLACK
+        secondImage.normalImageID = 'normal'
+        secondImage.hoverImageID = 'hover'
+        secondImage.downImageID = 'down'
 
     def buttonClick(self, eventData):
         print(eventData)  # for debuggin
