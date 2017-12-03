@@ -7,7 +7,7 @@ def RGB255(r, g, b):
 
 def RGBA255(r, g, b, a):
     val = RGB255(r, g, b)
-    val.w = a
+    val.w = a / 255.0
     return val
 
 
