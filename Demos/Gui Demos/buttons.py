@@ -17,15 +17,8 @@ class Demo(_Demo_Base):
         self.texturesToLoad = [['e3dlogo.png', 'logo'], ['../textures/Grass.jpg', 'grass']]
 
     def loadModels(self):
-        # engine = self.engine
-
         self.camera.position = vec3(0, 100, 290)
         self.camera.rotateX(20)
-
-        # engine.models.loadModel(triangleMODEL, "trianglemodel", forceStatic=True)
-        # self.triangle = self.scene1.addModel('trianglemodel', 'triangle1', vec3(0, 0, 0), vec3(0), 1.5)
-        # mat = self.triangle.getMaterialByIndex(0)
-        # mat.useDiffuseTexture = True
 
     def keydown(self, e):
         if e.eventName == 'keyUp':
@@ -117,7 +110,7 @@ class Demo(_Demo_Base):
         secondImage.downImageID = 'down'
 
     def buttonClick(self, eventData):
-        print(eventData)  # for debuggin
+        print(eventData)
         for container in self.containers:
             container.visible = not container.visible
 

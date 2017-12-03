@@ -118,8 +118,10 @@ class Button(BaseControl):
     @color.setter
     def color(self, val):
         super(Button, self)._setColor(val)
+        self._buildColors()
 
     def _buildColors(self):
+        self.borderColor = self.style.borderColor
         self._colorizeHover(False)
 
     def _getText(self):
@@ -172,7 +174,7 @@ class Button(BaseControl):
                 if hint == StyleHintsEnum.Image:
                     self.backgroundImageID = self.hoverImageID
                 if self.gradientType == GradientTypesEnum.noGradient:
-                    self.color = style.hoverColor
+                    super(Button, self)._setColor(style.hoverColor)
                 else:
                     self.gradientColor0 = style.hoverGradientColor0
                     self.gradientColor1 = style.hoverGradientColor1
@@ -183,7 +185,7 @@ class Button(BaseControl):
             elif hint == StyleHintsEnum.Image:
                 self.backgroundImageID = self.normalImageID
             if self.gradientType == GradientTypesEnum.noGradient:
-                self.color = style.backgroundColor
+                super(Button, self)._setColor(style.backgroundColor)
             else:
                 self.gradientColor0 = style.raisedGradientColor0
                 self.gradientColor1 = style.raisedGradientColor1
@@ -206,7 +208,7 @@ class Button(BaseControl):
         elif hint == StyleHintsEnum.Image:
             self.backgroundImageID = self.downImageID
         if self.gradientType == GradientTypesEnum.noGradient:
-            self.color = style.pressedColor
+            super(Button, self)._setColor(style.pressedColor)
         else:
             self.gradientColor0 = style.pressedGradientColor0
             self.gradientColor1 = style.pressedGradientColor1
