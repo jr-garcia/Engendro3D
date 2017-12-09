@@ -146,8 +146,8 @@ class BaseControl(Base3DObject, ResponsiveControl):
         material = self._material
         material._shaderID = DEFAULT2DSHADERID
 
-        if not all((width, height)):
-            raise ValueError('size of 0 not allowed: ' + str((width, height)))
+        # if not all((width, height)):
+        #     raise ValueError('size of 0 not allowed: ' + str((width, height)))
 
         self._innerSize = vec3(1)
         material.shaderProperties.append(Vec3ShaderProperty('relativePosition', self._position))
@@ -286,7 +286,7 @@ class BaseControl(Base3DObject, ResponsiveControl):
     def _setImg(self, value):
         material = self._material
         material.diffuseTextureID = value
-        material.useDiffuseTexture = value not in ('', None)
+        material.useDiffuseTexture = value is not None
 
     backgroundImageID = property(_getImg, _setImg)
 
