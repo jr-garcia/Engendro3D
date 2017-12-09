@@ -1,5 +1,6 @@
 from ...Colors import *
 from ..BaseControlClass import GradientTypesEnum
+from copy import copy
 
 from json import dump, load
 
@@ -16,17 +17,11 @@ class StyleHintsEnum(object):
 class DefaultStyle(object):
     def __init__(self, baseColor=None):
         if baseColor is None:
-            baseColor = RGBA255(28, 30, 33, 255)
+            baseColor = RGBA255(30, 30, 30, 255)
+
+        self._baseColor = vec4(0)
+        self.activeColor = RGB1(.8, .4, 0)
         self.name = 'Default'
-        self.backgroundColor = vec4(baseColor)
-        self.fontColor = WHITE
-        self.fontOutlineColor = BLUE
-        self.fontSize = 10
-        self.borderSize = 1
-        self.borderColor = fromRGB1_A(baseColor / 4.0, 1)
-        self.focusBorderColor = ORANGE
-        self.hoverBorderColor = GREEN
-        self.gradientType = GradientTypesEnum.noGradient
         self.raisedGradientColor0 = WHITE
         self.raisedGradientColor1 = BLACK
         self.sunkenGradientColor0 = BLACK
@@ -37,14 +32,10 @@ class DefaultStyle(object):
         self.hoverGradientColor1 = BLACK
         self.autoRaiseGradientColor0 = WHITE
         self.autoRaiseGradientColor1 = BLACK
-        self.hoverColor = fromRGB1_A((baseColor + (WHITE / 10.0)), baseColor.w)
-        self.pressedColor = fromRGB1_A(baseColor / 1.5, baseColor.w)
-        self.buttonStyleHint = StyleHintsEnum.Raised
-        self.controlStyleHint = StyleHintsEnum.Raised
+        self.baseColor = baseColor
 
-        self._buildGradients(baseColor)
-
-    def _buildGradients(self, baseColor):
+    def _buildGradients(self):
+        baseColor = self._baseColor
         color0 = (baseColor + WHITE / 2.0) / 2.0
         color0.w = baseColor.w
         color1 = baseColor / 4.0
@@ -94,3 +85,30 @@ class DefaultStyle(object):
                 setattr(style, att, vals[att])
 
         return style
+
+    @property
+    def baseColor(self):
+        return self._baseColor
+
+    @baseColor.setter
+    def baseColor(self, value):
+        baseColor = vec4(value)
+        self._baseColor = value
+        self.backgroundColor = vec4(baseColor)
+        self.fontColor = WHITE
+        self.fontOutlineColor = BLUE
+        self.fontSize = 10
+        self.borderSize = 1
+        self.borderColor = fromRGB1_A(baseColor / 4.0, 1)
+        self.focusBorderColor = ORANGE
+        self.hoverBorderColor = GREEN
+        self.gradientType = GradientTypesEnum.noGradient
+        self.hoverColor = fromRGB1_A((baseColor + (WHITE / 10.0)), baseColor.w)
+        self.pressedColor = fromRGB1_A(baseColor / 1.5, baseColor.w)
+        self.buttonStyleHint = StyleHintsEnum.Raised
+        self.controlStyleHint = StyleHintsEnum.Raised
+
+        self._buildGradients()
+
+    def _copy(self):
+        return copy(self)
