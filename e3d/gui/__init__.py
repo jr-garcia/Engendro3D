@@ -6,3 +6,4 @@ from .FontRendering import CharRangesEnum
 from .SingleCharClass import SingleChar
 from .LabelClass import Label
 from .ButtonClass import Button
+from .ProgressbarClass import ProgressBar
