@@ -100,6 +100,7 @@ class Button(BaseControl):
     @styleHint.setter
     def styleHint(self, value):
         self._styleHint = value
+        self.style.buttonStyleHint = value
         self._lastBorderSize = self.style.borderSize
         if value in (StyleHintsEnum.Raised, StyleHintsEnum.Sunken):
             self.gradientType = GradientTypesEnum.Horizontal
