@@ -66,7 +66,7 @@ class ClippingRect(object):
 
     @top.setter
     def top(self, value):
-        if value > self._top or self._top is None:
+        if self._top is None or value > self._top:
             self._top = value
 
     @property
@@ -75,7 +75,7 @@ class ClippingRect(object):
 
     @left.setter
     def left(self, value):
-        if value > self._left or self._left is None:
+        if self._left is None or value > self._left:
             self._left = value
 
     @property
@@ -84,7 +84,7 @@ class ClippingRect(object):
 
     @bottom.setter
     def bottom(self, value):
-        if value < self._bottom or self._bottom is None:
+        if self._bottom is None or value < self._bottom:
             self._bottom = value
 
     @property
@@ -93,7 +93,7 @@ class ClippingRect(object):
 
     @right.setter
     def right(self, value):
-        if value < self._right or self._right is None:
+        if self._right is None or value < self._right:
             self._right = value
 
     def isFull(self):
