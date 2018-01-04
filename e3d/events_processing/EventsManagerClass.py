@@ -1,5 +1,6 @@
 from sdl2 import SDL_GetKeyboardState, SDL_PumpEvents, SDL_GetKeyFromName, SDL_GetScancodeFromKey
 from collections import OrderedDict
+from ctypes import ArgumentError
 
 from .EventsListenerClass import EventsListener
 from .eventClasses import *
@@ -81,5 +82,8 @@ class EventsManager(object):
             key = SDL_GetKeyFromName(keyName)
         except TypeError:
             key = SDL_GetKeyFromName(keyName.encode())
+        except ArgumentError as ar:
+            if 'TypeError' in str(ar):
+                key = SDL_GetKeyFromName(keyName.encode())
         scan = SDL_GetScancodeFromKey(key)
         return self._keysState[scan]
