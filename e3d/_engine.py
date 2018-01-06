@@ -14,6 +14,7 @@ from .texture_management.TextureManagerClass import TexturesManager
 from .windowing.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
 from .plugin_management.PluginsManagerClass import PluginsManager
+# from .video import VideoManager
 
 
 class globalsStruct:
@@ -46,6 +47,7 @@ class Engine:
         self.events = EventsManager()
         self.textures = TexturesManager()
         self.scenes = ScenesManager()
+        # self.videos = VideoManager()
         self.threading = ThreadingManager()
         self.plugins = PluginsManager()
         self.globals = globalsStruct()
@@ -63,9 +65,10 @@ class Engine:
             self.__setAttribs(multiSampleLevel, maxContext)
 
     def initialize(self, maxThreads=2):
-        self.__createDummyWindowAndContext()
+        self._createDummyWindowAndContext()
         loadGL()
         self._fillGLInfo()
+        self.backend = self.backend(self)
         self._initializeManagers(maxThreads)
         self._isInitialized = True
 
@@ -75,11 +78,10 @@ class Engine:
         self.log('Initializing systems...', logLevelsEnum.debug)
 
         self.log('\t Shaders...', logLevelsEnum.debug)
-        self.shaders = self.backend.getShadersManager()()
-        self.shaders.initialize(self)
+        self.shaders = self.backend.getShadersManager()
 
         self.log('\t Textures...', logLevelsEnum.debug)
-        self.textures.initialize(self, (None, None))
+        self.textures.initialize(self)
 
         self.log('\t Models...', logLevelsEnum.debug)
         from .model_management.ModelsManagerClass import ModelsManager
@@ -102,6 +104,9 @@ class Engine:
 
         self.log('\t Plugins...', logLevelsEnum.debug)
         self.plugins.initialize(self)
+
+        # self.log('\t Videos...', logLevelsEnum.debug)
+        # self.videos.initialize(self)
 
     def __setAttribs(self, multiSampleLevel, restrictContextTo):
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8)
@@ -175,6 +180,7 @@ class Engine:
             self.scenes.terminate()
             self.threading.terminate()
             self.plugins.terminate()
+            # self.videos.terminate()
 
             # self.localqueue.close()
 
@@ -246,7 +252,7 @@ class Engine:
         for e in range(num):
             self.log(glGetStringi(GL_EXTENSIONS, e), logLevelsEnum.info)
 
-    def __createDummyWindowAndContext(self):
+    def _createDummyWindowAndContext(self):
         if not self._useQT:
             self._dummySDL()
         else:

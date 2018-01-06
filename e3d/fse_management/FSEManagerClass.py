@@ -27,9 +27,9 @@ class FSEManager(object):
         self._e3dShaders = {}
         self._builtRenderTargets = {}
         self._engine = engine
-        self._maxColorAtachments = engine.backend._getMaxColorAttachments()
+        self._maxColorAtachments = backend._getMaxColorAttachments()
         self._sceneRT = None
-        self.renderTarget = engine.backend.getRenderTarget()
+        self.renderTarget = backend.getRenderTarget()
         self._backend = backend
 
     def _initializeSceneRT(self):

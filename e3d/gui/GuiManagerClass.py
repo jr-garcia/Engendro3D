@@ -72,7 +72,7 @@ class GuiManager:
         p = os.path.join(shadersDefaultPath, 'default_2D_')
         vsp = p + 'VS.glsl'
         fsp = p + 'FS.glsl'
-        backend.shaders.loadShader(vsp, fsp, DEFAULT2DSHADERID)
+        backend._shaders.loadShader(vsp, fsp, DEFAULT2DSHADERID)
 
         # store ref to default texture
         self.defaultTexture = defaultTexture

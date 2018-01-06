@@ -14,7 +14,7 @@ from ...fse_management.FSEManagerClass import FSEManager, FullScreenEffect
 
 
 class OGL3Backend(BaseBackend):
-    def __init__(self, engine, window):
+    def __init__(self, engine):
         super(OGL3Backend, self).__init__()
         self._engine = engine
         self._currentRenderTarget = None
@@ -24,57 +24,62 @@ class OGL3Backend(BaseBackend):
         self._defaultClearColor = vec3(0.50, 0.50, 0.50)
         self._lastClearColor = None
         self._setClearColor(self._defaultClearColor)
-        self.shaders = engine.shaders
-        self.textures = self._engine.textures
+        self._shaders = ShadersManager()
+        self._shaders.initialize(engine)
+        self._textures = self._engine.textures
         self._poliCount = 0
-        self.drawingData = None
-        self._window = window
+        self._drawingData = None
         self._shaderOverride = None
         self._currentFSE = None
         self._lastShader = None
 
-        self.vertexBuffers = {}
-        self.indexBuffers = {}
+        self._vertexBuffers = {}
+        self._indexBuffers = {}
 
-        self.cube_array = np.array([[-1, 1, 1, 0], [-1, 1, -1, 1], [1, 1, -1, 2],
+        self._cube_array = np.array([[-1, 1, 1, 0], [-1, 1, -1, 1], [1, 1, -1, 2],
 
-                                    [-1, 1, 1, 3], [1, 1, -1, 4], [1, 1, 1, 5],
+                                     [-1, 1, 1, 3], [1, 1, -1, 4], [1, 1, 1, 5],
 
-                                    [-1, -1, 1, 0], [-1, 1, 1, 1], [1, 1, 1, 2],
+                                     [-1, -1, 1, 0], [-1, 1, 1, 1], [1, 1, 1, 2],
 
-                                    [-1, -1, 1, 3], [1, 1, 1, 4], [1, -1, 1, 5],
+                                     [-1, -1, 1, 3], [1, 1, 1, 4], [1, -1, 1, 5],
 
-                                    [1, -1, 1, 0], [1, 1, 1, 1], [1, 1, -1, 2],
+                                     [1, -1, 1, 0], [1, 1, 1, 1], [1, 1, -1, 2],
 
-                                    [1, -1, 1, 3], [1, 1, -1, 4], [1, -1, -1, 5],
+                                     [1, -1, 1, 3], [1, 1, -1, 4], [1, -1, -1, 5],
 
-                                    [1, -1, -1, 0], [1, 1, -1, 1], [-1, 1, -1, 2],
+                                     [1, -1, -1, 0], [1, 1, -1, 1], [-1, 1, -1, 2],
 
-                                    [1, -1, -1, 3], [-1, 1, -1, 4], [-1, -1, -1, 5],
+                                     [1, -1, -1, 3], [-1, 1, -1, 4], [-1, -1, -1, 5],
 
-                                    [-1, -1, -1, 0], [-1, 1, -1, 1], [-1, 1, 1, 2],
+                                     [-1, -1, -1, 0], [-1, 1, -1, 1], [-1, 1, 1, 2],
 
-                                    [-1, -1, -1, 3], [-1, 1, 1, 4], [-1, -1, 1, 5],
+                                     [-1, -1, -1, 3], [-1, 1, 1, 4], [-1, -1, 1, 5],
 
-                                    [-1, -1, 1, 0], [1, -1, 1, 1], [1, -1, -1, 2],
+                                     [-1, -1, 1, 0], [1, -1, 1, 1], [1, -1, -1, 2],
 
-                                    [-1, -1, 1, 3], [1, -1, -1, 4], [-1, -1, -1, 5]], dtype=np.float32).flatten()
+                                     [-1, -1, 1, 3], [1, -1, -1, 4], [-1, -1, -1, 5]], dtype=np.float32).flatten()
 
         self._cubeVBO = None
 
-        self.screenQuad_array = np.array([[-1, -1, -0.1], [1, -1, -0.1], [-1, 1, -0.1],
+        self._screenQuad_array = np.array([[-1, -1, -0.1], [1, -1, -0.1], [-1, 1, -0.1],
 
-                                          [1, -1, -0.1], [1, 1, -0.1], [-1, 1, -0.1]], dtype=np.float32).flatten()
+                                           [1, -1, -0.1], [1, 1, -0.1], [-1, 1, -0.1]], dtype=np.float32).flatten()
 
         self._screenQuadVBO = None
 
-        self.screenQuadShader = None
+        self._screenQuadShader = None
 
         # debug>>>>>>>>>>>>>>>
         self.__isDebugEnabled = False
-        self.wireShader = None
+        self._wireShader = None
         # <<<<<<<<<<<<<<<<<<<<
 
+        self._culling = True
+
+        self.setContextState()
+
+    def setContextState(self):
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_DEPTH_TEST)
@@ -82,17 +87,12 @@ class OGL3Backend(BaseBackend):
         # glDepthMask(GL_FALSE)
         glDepthFunc(GL_LEQUAL)
         # glDepthFunc(GL_LESS)
-
         glDepthRange(0, 1.0)
-
-        self.culling = True
         glCullFace(GL_BACK)
         glFrontFace(GL_CCW)
-
         glEnable(GL_BLEND)
         glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
         glClearDepth(1.0)
 
     @property
@@ -107,9 +107,8 @@ class OGL3Backend(BaseBackend):
             glDisable(GL_CULL_FACE)
         self._culling = value
 
-    @staticmethod
-    def getShadersManager():
-        return ShadersManager
+    def getShadersManager(self):
+        return self._shaders
 
     @staticmethod
     def getRenderTarget():
@@ -126,7 +125,7 @@ class OGL3Backend(BaseBackend):
             self._lastClearColor = color
 
     def drawAll(self, drawingData):
-        self.drawingData = drawingData
+        self._drawingData = drawingData
         self._poliCount = 0
         # postUsed = False
         sceneNeeded = False
@@ -207,11 +206,11 @@ class OGL3Backend(BaseBackend):
                     self._shaderOverride = None
                 shader.set()
                 for txID in effect.textures2d:
-                    tex = self.textures.getTexture(effect.ID + '_' + txID)
+                    tex = self._textures.getTexture(effect.ID + '_' + txID)
                     if tex:
                         shader.setTexture(txID, tex)
                 for txID in effect.texturesCube:
-                    tex = self.textures.getTextureCube(effect.ID + '_' + txID)
+                    tex = self._textures.getTextureCube(effect.ID + '_' + txID)
                     if tex:
                         shader.setTexture(txID, tex)
 
@@ -235,7 +234,7 @@ class OGL3Backend(BaseBackend):
                     if txID not in ['_raw'] and txID not in targetsIDs:
                         realID = effect.ID + '_' + txID if txID not in ['_scene', '_depth'] else txID
                         if effect.textureType == renderTextureTypeEnum.t2D:
-                            value = self.textures.getTexture(realID)
+                            value = self._textures.getTexture(realID)
                             shader.setTexture(txID, value)
                         else:
                             pass
@@ -245,7 +244,7 @@ class OGL3Backend(BaseBackend):
                     if txID not in ['_scene', '_raw', '_depth', '_stencil'] and txID not in targetsIDs:
                         realID = effect.ID + '_' + txID if txID != '_scene' else txID
                         if effect.textureType == renderTextureTypeEnum.t2D:
-                            value = self.textures.getTexture(realID)
+                            value = self._textures.getTexture(realID)
                             shader.setTexture(txID, value)
                         else:
                             pass
@@ -255,7 +254,7 @@ class OGL3Backend(BaseBackend):
                     self.fullScreenEffects._sceneRT._deActivate()
 
                 if '_raw' in passOb.members['in']:
-                    self.drawingData.clearColor = passOb.members.get('clear', self.drawingData.clearColor)
+                    self._drawingData.clearColor = passOb.members.get('clear', self._drawingData.clearColor)
                     self.drawScene(passOb.name)
                     if rt:
                         rt._deActivate()
@@ -267,10 +266,10 @@ class OGL3Backend(BaseBackend):
                     self._drawScreenQuad(shader)
 
     def drawScene(self, passN):
-        self._setClearColor(self.drawingData.clearColor)
+        self._setClearColor(self._drawingData.clearColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         # todo: reimplement passN callback
-        self.renderMeshes(self.drawingData)
+        self.renderMeshes(self._drawingData)
 
     def drawSkybox(self, sky):
         # self.shader.reset()
@@ -327,14 +326,14 @@ class OGL3Backend(BaseBackend):
         glDisableVertexAttribArray(res)
 
     def __createCubeVBO(self):
-        self._cubeVBO = VBO(data=self.cube_array, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
+        self._cubeVBO = VBO(data=self._cube_array, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
 
     def __createScreenQuadStuff(self):
-        self._screenQuadVBO = VBO(data=self.screenQuad_array, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
+        self._screenQuadVBO = VBO(data=self._screenQuad_array, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
         shadersPath = self._engine.path.defaults.shaders
         vs = path.join(shadersPath, 'default_sq_VS.vs')
         fs = path.join(shadersPath, 'default_sq_FS.fs')
-        self.screenQuadShader = self.shaders.loadShader(vs, fs, 'default_sqShader')
+        self._screenQuadShader = self._shaders.loadShader(vs, fs, 'default_sqShader')
 
     def renderMeshes(self, drawingData):
         for mesh in drawingData.meshes:
@@ -344,15 +343,15 @@ class OGL3Backend(BaseBackend):
             renderDataPerInstance = drawingData.instances.get(meshid)
             if renderDataPerInstance is None or len(renderDataPerInstance) < 1:
                 continue
-            vertexBuffer = self.vertexBuffers.get(meshid)
+            vertexBuffer = self._vertexBuffers.get(meshid)
             if vertexBuffer is None:
                 vertexBuffer = VBO(data=mesh._vertexBufferArray, target=GL_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
-                self.vertexBuffers[meshid] = vertexBuffer
+                self._vertexBuffers[meshid] = vertexBuffer
 
-            indexBuffer = self.indexBuffers.get(meshid)
+            indexBuffer = self._indexBuffers.get(meshid)
             if indexBuffer is None:
                 indexBuffer = VBO(data=mesh._indexBufferArray, target=GL_ELEMENT_ARRAY_BUFFER, usage=GL_STATIC_DRAW)
-            self.indexBuffers[meshid] = indexBuffer
+            self._indexBuffers[meshid] = indexBuffer
 
             vertexBuffer.bind()
             indexBuffer.bind()
@@ -381,7 +380,7 @@ class OGL3Backend(BaseBackend):
                 _setObjectUniforms(currentShader, defaultObjectParams)
                 if transformations:
                     _setBoneTransformationsForMesh(currentShader, transformations, drawingData.modelBoneDirs[modelID])
-                setMaterialValues(self.textures, currentShader, currentMat)
+                setMaterialValues(self._textures, currentShader, currentMat)
                 self.renderMesh(mesh)
 
             OGL3Backend.disableAttributes(attribs)
@@ -465,7 +464,11 @@ class OGL3Backend(BaseBackend):
         else:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pix)
+        if pix is None:
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h)
+        else:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pix)
+            
         glerr = glGetError()
         if glerr:
             raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
@@ -480,6 +483,20 @@ class OGL3Backend(BaseBackend):
                 # glBindTexture(GL_TEXTURE_2D, 0) #Raises shader compiling error on intel GMA 965 + Windows
         # glFlush()
         return tex
+
+    def updateOGL2DTexture(self, ID, data, fromTuple, toTuple):
+        # GLenum target,  GLint level,  GLint xoffset,  GLint yoffset,  GLsizei width,  GLsizei height,  GLenum format,
+        #  GLenum type,  const GLvoid * data
+
+        xoffset, yoffset = fromTuple
+        width, height = toTuple
+
+        value = self._textures._textureCache[ID]
+        if value is None:
+            raise RuntimeError('ID \'\' does not exist in cache.'.format(ID))
+        glBindTexture(GL_TEXTURE_2D, value)
+        glTexSubImage2D(GL_TEXTURE_2D, 1, xoffset, yoffset, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data)
+        glBindTexture(GL_TEXTURE_2D, 0)
 
     def setRenderTarget(self, rTarget=None, attachmentTypes=None, colorIndexes=None):
         """
@@ -545,8 +562,8 @@ class OGL3Backend(BaseBackend):
         vbos = []
         vaos = []
 
-        acum(self.indexBuffers.values())
-        acum(self.vertexBuffers.values())
+        acum(self._indexBuffers.values())
+        acum(self._vertexBuffers.values())
         vboarr = np.asarray(vbos, np.uint32)
         vaoarr = np.asarray(vaos, np.uint32)
 

@@ -14,8 +14,8 @@ class BaseBackend(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        self.shaders = None
-        self.textures = None
+        self._shaders = None
+        self._textures = None
         self._poliCount = 0
         self._culling = False
 
@@ -37,8 +37,7 @@ class BaseBackend(object):
     def terminate(self):
         pass
 
-    @staticmethod
-    def getShadersManager():
+    def getShadersManager(self):
         pass
 
     @staticmethod
@@ -54,6 +53,9 @@ class BaseBackend(object):
     def _getMaxColorAttachments():
         pass
 
+    def setContextState(self):
+        pass
+
     @property
     def culling(self):
         return self._culling
@@ -64,6 +66,9 @@ class BaseBackend(object):
 
     @staticmethod
     def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat):
+        pass
+
+    def updateOGL2DTexture(self, ID, data, fromTuple, toTuple):
         pass
 
 

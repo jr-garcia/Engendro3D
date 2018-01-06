@@ -85,9 +85,11 @@ class Window_Base(object):
 
         self.vsynch = vSynch
 
-        self.backend = engine.backend(engine, self)
+        self.backend = engine.backend
 
         self.backend.resize((self._size[0], self._size[1]))
+
+        self.backend.setContextState()
 
         if iconPath:
             self.setIcon(iconPath)
