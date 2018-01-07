@@ -435,7 +435,7 @@ class OGL3Backend(BaseBackend):
         glerr = glGetError()
         tex = tex[0]
         if tex < 1:
-            raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
+            raise RuntimeError('GL error {} when creating texture.'.format(glerr))
         glBindTexture(GL_TEXTURE_2D, tex)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4)
         if mipmapsNumber < 0:
@@ -465,13 +465,14 @@ class OGL3Backend(BaseBackend):
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
 
         if pix is None:
-            glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h)
-        else:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pix)
+            pix = np.zeros((w*h*4,), np.uint8)
+            # glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h)
+        # else:
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pix)
             
         glerr = glGetError()
         if glerr:
-            raise RuntimeError('Unknown error {} when creating GL texture.'.format(glerr))
+            raise RuntimeError('GL error {} when creating texture.'.format(glerr))
 
         if mipmapsNumber > 0 and repeat:
             try:
@@ -485,17 +486,17 @@ class OGL3Backend(BaseBackend):
         return tex
 
     def updateOGL2DTexture(self, ID, data, fromTuple, toTuple):
-        # GLenum target,  GLint level,  GLint xoffset,  GLint yoffset,  GLsizei width,  GLsizei height,  GLenum format,
-        #  GLenum type,  const GLvoid * data
-
         xoffset, yoffset = fromTuple
         width, height = toTuple
-
         value = self._textures._textureCache[ID]
         if value is None:
             raise RuntimeError('ID \'\' does not exist in cache.'.format(ID))
         glBindTexture(GL_TEXTURE_2D, value)
-        glTexSubImage2D(GL_TEXTURE_2D, 1, xoffset, yoffset, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data)
+        glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data)
+        glerr = glGetError()
+        if glerr:
+            raise RuntimeError('GL error {} when updating GL texture.'.format(glerr))
+        glFlush()
         glBindTexture(GL_TEXTURE_2D, 0)
 
     def setRenderTarget(self, rTarget=None, attachmentTypes=None, colorIndexes=None):

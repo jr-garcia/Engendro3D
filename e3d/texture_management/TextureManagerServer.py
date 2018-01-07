@@ -1,6 +1,6 @@
 from PIL import Image
 import numpy as np
-# from ParalellServiceClass import ParalellService
+# from ParallelServiceClass import ParallelService
 # from CubeTextureClass import CubeTexture
 
 

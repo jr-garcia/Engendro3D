@@ -14,7 +14,7 @@ from .texture_management.TextureManagerClass import TexturesManager
 from .windowing.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
 from .plugin_management.PluginsManagerClass import PluginsManager
-# from .video import VideoManager
+from .video import VideoManager
 
 
 class globalsStruct:
@@ -47,7 +47,7 @@ class Engine:
         self.events = EventsManager()
         self.textures = TexturesManager()
         self.scenes = ScenesManager()
-        # self.videos = VideoManager()
+        self.videos = VideoManager()
         self.threading = ThreadingManager()
         self.plugins = PluginsManager()
         self.globals = globalsStruct()
@@ -105,8 +105,8 @@ class Engine:
         self.log('\t Plugins...', logLevelsEnum.debug)
         self.plugins.initialize(self)
 
-        # self.log('\t Videos...', logLevelsEnum.debug)
-        # self.videos.initialize(self)
+        self.log('\t Videos...', logLevelsEnum.debug)
+        self.videos.initialize(self)
 
     def __setAttribs(self, multiSampleLevel, restrictContextTo):
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8)
@@ -180,7 +180,7 @@ class Engine:
             self.scenes.terminate()
             self.threading.terminate()
             self.plugins.terminate()
-            # self.videos.terminate()
+            self.videos.terminate()
 
             # self.localqueue.close()
 

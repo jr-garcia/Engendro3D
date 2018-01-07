@@ -8,7 +8,7 @@ def updateAll(window, netElapsedTime):
 
     # engine.textures.checkQueue()
 
-    # engine.videos.update()
+    engine.videos.update()
 
     sceneDrawingData = engine.scenes.update(netElapsedTime, winSize)
 
