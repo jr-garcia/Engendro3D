@@ -30,11 +30,10 @@ class Demo(_Demo_Base):
         mt.setDefaultNormalMap()
         mt.textureRepeat = 80
 
-        engine.models.loadBox("boxmodel", [28, 20, 20], 2)
-        self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 11, 0], [0, 0, 0], 2)
+        engine.models.loadBox("boxmodel", [20, 10, 20], 2)
+        self.box1 = self.scene1.addModel('boxmodel', 'box1', [0, 10, 0], [0, 0, 0], 2)
         mt = self.box1._materials[0]
         mt.specularPower = 40
-        mt.textureRepeat = 2
         mt.useDiffuseTexture = True
 
     def mouseMove(self, ev):
@@ -131,7 +130,7 @@ class Demo(_Demo_Base):
         longPanel.backgroundImageID = videoTexID  # apply the video texture to the panel
         mat.diffuseTextureID = videoTexID  # and the models
 
-        print('Press P to switch video playing.')
+        print('Press P to start video playing.')
 
 
 if __name__ == '__main__':

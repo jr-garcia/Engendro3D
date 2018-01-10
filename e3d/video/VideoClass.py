@@ -51,12 +51,17 @@ class VideoFiller(ParallelServer):
         task = self._readTask()
 
         if task:
+            taskName = task.name
+            taskData = task.data
             if task.taskType == taskTypesEnum.Finish:
                 self.running = False
                 return False
-            elif task.name == 'state':
-                self.state = task.data
-
+            elif taskName == 'state':
+                self.state = taskData
+            elif taskName == 'startTime':
+                self.startTime = taskData
+            else:
+                print('unknown task name:' + taskName)
         return True
 
     def _removeTask(self):
@@ -82,18 +87,19 @@ class VideoFiller(ParallelServer):
                     break
                 if self.state == VideoStatesEnum.Playing:
                     if not self.isInit:
-                        startTime = time()
+                        startTime = self.startTime
                         self.isInit = True
                     if vr.pos < vr.nframes:
                         currentTime = time() - startTime
-                        neededFrameN = int(round(currentTime / frameDuration)) + 1
-                        if neededFrameN > vr.pos + 1:
-                            toSkip = (neededFrameN - vr.pos)
+                        neededFrameN = int(round(currentTime / frameDuration)) 
+                        toSkip = (neededFrameN - vr.pos) 
+                        if toSkip > 0:
                             vr.skip_frames(toSkip)
 
-                        frame = vr.read_frame()  # .flatten()
-                        self._removeTask()
-                        self._sendTask(Task(taskTypesEnum.TaskResult, frame, 'frame'))
+                        if neededFrameN >= vr.pos:
+                            frame = vr.read_frame()  # .flatten()
+                            self._removeTask()
+                            self._sendTask(Task(taskTypesEnum.TaskResult, frame, 'frame'))
             except Exception:
                 raise
 
@@ -114,7 +120,8 @@ class Video(ParallelClient):
         super(Video, self).__init__()
         self._engine = engine
         self._state = VideoStatesEnum.Stopped
-        self._lastFrame = None
+        # self._lastFrame = None
+        self._isStarted = False
 
         infos = ffmpeg_parse_infos(filePath)
         if resizeTo is None:
@@ -147,14 +154,15 @@ class Video(ParallelClient):
     @state.setter
     def state(self, value):
         if self._state == value:
-            return 
+            return
+        if value == VideoStatesEnum.Playing and not self._isStarted:
+            self._sendTask(Task(taskTypesEnum.RawData, time(), 'startTime'))
         self._sound.state = value
         self._sendTask(Task(taskTypesEnum.NewTask, value, 'state'))
         self._state = value
 
     def play(self):
         self.state = VideoStatesEnum.Playing
-        # self._sound.play()
 
     def stop(self):
         self.state = VideoStatesEnum.Stopped
@@ -174,12 +182,10 @@ class Video(ParallelClient):
         task = self._readTask()
         if task:
             if task.name == 'frame':
-                data = task.data
-                self._lastFrame = data
-                self._engine.textures.update2DTexture(self._textureID, data, (0, 0), self._size)
+                self._engine.textures.update2DTexture(self._textureID, task.data, (0, 0), self._size)
 
     def terminate(self):
         self._sendTask(Task(taskTypesEnum.Finish, ''), True)
         super(Video, self).terminate()
-        self._filler.join()
+        self._filler.join(1)
         # self._filler.terminate()
