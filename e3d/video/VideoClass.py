@@ -5,6 +5,7 @@ from os import path
 from .._baseManager import BaseManager
 from ..ParallelCommunicators import ParallelServer, ParallelClient, taskTypesEnum, Task
 from ..ParallelCommunicators import Empty
+from ..sound_management import SoundStatesEnum
 from .ffmpeg_reader import FFMPEG_VideoReader, ffmpeg_parse_infos
 
 
@@ -86,10 +87,9 @@ class VideoFiller(ParallelServer):
                     if vr.pos < vr.nframes:
                         currentTime = time() - startTime
                         neededFrameN = int(round(currentTime / frameDuration)) + 1
-                        if neededFrameN > vr.pos:
-                            toSkip = (neededFrameN - vr.pos) - 1
-                            if toSkip > 0:
-                                vr.skip_frames(toSkip)
+                        if neededFrameN > vr.pos + 1:
+                            toSkip = (neededFrameN - vr.pos)
+                            vr.skip_frames(toSkip)
 
                         frame = vr.read_frame()  # .flatten()
                         self._removeTask()
@@ -110,7 +110,7 @@ class VideoFiller(ParallelServer):
 
 
 class Video(ParallelClient):
-    def __init__(self, engine, filePath, resizeTo):
+    def __init__(self, engine, filePath, resizeTo, streamSound=True):
         super(Video, self).__init__()
         self._engine = engine
         self._state = VideoStatesEnum.Stopped
@@ -132,6 +132,11 @@ class Video(ParallelClient):
         self._textureID = ID + '_texture'
         self._engine.textures.createEmpty2DTexture(self._textureID, h, w)
 
+        soundID = ID + '_sound'
+        sound = engine.sounds.load(soundID, filePath, isStream=streamSound)
+        self._soundID = soundID
+        self._sound = sound
+
         self._filler = VideoFiller(self._inQueue, self._outQueue, filePath, infos, (w, h))
         self._filler.start()
 
@@ -141,23 +146,29 @@ class Video(ParallelClient):
 
     @state.setter
     def state(self, value):
+        if self._state == value:
+            return 
+        self._sound.state = value
         self._sendTask(Task(taskTypesEnum.NewTask, value, 'state'))
         self._state = value
 
     def play(self):
         self.state = VideoStatesEnum.Playing
+        # self._sound.play()
 
     def stop(self):
         self.state = VideoStatesEnum.Stopped
+        self._sound.stop()
 
     def pause(self):
         self.state = VideoStatesEnum.Paused
+        self._sound.pause()
 
     def getTextureID(self):
         return self._textureID
 
     def getSound(self):
-        pass
+        return self._sound
 
     def update(self):
         task = self._readTask()
