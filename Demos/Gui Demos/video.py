@@ -36,6 +36,14 @@ class Demo(_Demo_Base):
         mt.specularPower = 40
         mt.useDiffuseTexture = True
 
+        engine.models.loadSphere("spheremodel", segmentsU=32)
+        self.sphere1 = self.scene1.addModel('spheremodel', 'sphere1', [40, 18, 60], [0, 0, 0], 4)
+        mats = self.sphere1.getMaterialByIndex(0)
+        mats.specularPower = 50
+        mats.useDiffuseTexture = True
+        mats.setDefaultNormalMap()
+        mats.textureRepeat = 8
+
     def mouseMove(self, ev):
         if ev.eventName == 'motion':
             if self.window.hasFocus():
@@ -80,6 +88,10 @@ class Demo(_Demo_Base):
     def scene1Update(self, ev):
         ft = ev[0] + .01
         movespeed = ft / 10.0
+
+        if self.dorot:
+            if self.sphere1:
+                self.sphere1.rotateY(-.05 * ft)
 
         if self.window.events.isKeyPressed('w'):
             self.camera.moveForward(movespeed)
@@ -129,6 +141,7 @@ class Demo(_Demo_Base):
 
         longPanel.backgroundImageID = videoTexID  # apply the video texture to the panel
         mat.diffuseTextureID = videoTexID  # and the models
+        self.sphere1.getMaterialByIndex(0).diffuseTextureID = videoTexID
 
         print('Press P to start video playing.')
 
