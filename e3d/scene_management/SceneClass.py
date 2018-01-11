@@ -42,8 +42,13 @@ class Scene(object):
         self.bottom = -500
 
         self._material = Material()
-        self.ambientColor = [v / 3.0 for v in [0.23, 0.34, 0.65]]
         self._material.diffuseColor = vec3(0.23, 0.34, 0.65)
+        self.ambientColor = [v / 3.0 for v in self._material.diffuseColor]
+
+        self._fogType = 0
+        self._fogColor = self._material.diffuseColor
+        self._fogStart = 300.0
+        self._fogEnd = 500.0
 
         self.physics = ScenePhysics(gravity, resolution)
         self._currentTransformations = None
@@ -54,6 +59,7 @@ class Scene(object):
 
     def _setBGColor(self, val):
         self._material.diffuseColor = val
+        self._fogColor = self._material.diffuseColor
 
     bgColor = property(_getBGColor, _setBGColor)
 
@@ -283,6 +289,14 @@ class Scene(object):
 
     sky = property(_getSky, _setSky)
 
+    @property
+    def fogType(self):
+        return self._fogType
+
+    @fogType.setter
+    def fogType(self, value):
+        self._fogType = value
+
     def update(self, netTime, windowSize):
         if self._lastUpdate == 0:
             frameTime = 0
@@ -323,6 +337,10 @@ class Scene(object):
         defaultSceneParams.zNear = current_zNear
         defaultSceneParams.zFar = current_zFar
         defaultSceneParams.ambientColor = self.ambientColor
+        defaultSceneParams.fogType = self._fogType
+        defaultSceneParams.fogColor = self._fogColor
+        defaultSceneParams.fogStart = self._fogStart
+        defaultSceneParams.fogEnd = self._fogEnd
         defaultSceneParams.lights = self._lights
         defaultSceneParams.cameraPosition = self.currentCamera._position
         defaultSceneParams.view = current_view
@@ -431,6 +449,10 @@ class DefaultSceneParameters(object):
     def __init__(self):
         self.zFar = 5000
         self.zNear = 1
+        self.fogType = 0
+        self.fogColor = vec3(0.23, 0.34, 0.65)
+        self.fogStart = 300.0
+        self.fogEnd = 500.0
         self.defaultTexture = None
         self.ambientColor = [1, 1, 1, 1]
         self.lights = {}

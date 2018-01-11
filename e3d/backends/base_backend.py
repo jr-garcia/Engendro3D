@@ -195,6 +195,10 @@ def _setSceneUniforms(shader, params):
     paramsList.append(('zFar', float(params.zFar)))
     paramsList.append(('CamPos', params.cameraPosition))
     paramsList.append(('WindowSize', params.windowSize))
+    paramsList.append(('fogType', params.fogType))
+    paramsList.append(('fogColor', params.fogColor))
+    paramsList.append(('fogStart', params.fogStart))
+    paramsList.append(('fogEnd', params.fogEnd))
     LightCount = 0
 
     activeLights = [False] * MAXLIGHTS

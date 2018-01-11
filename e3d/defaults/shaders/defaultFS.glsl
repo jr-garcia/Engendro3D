@@ -39,6 +39,13 @@ varying vec3 nmTangent;
 varying vec3 nmBiTangent;
 uniform bool activeLights[MAXLIGHTS];
 
+// Fog
+uniform int fogType = 3;
+uniform vec3 fogColor = vec3(0.23, 0.34, 0.65);
+uniform float fogStart = 300.0;
+uniform float fogEnd = 500;
+varying vec3 finalDistance;
+
 vec3 calcBumpedNormal()
 {
 //  http://ogldev.atspace.co.uk/www/tutorial26/tutorial26.html
@@ -124,6 +131,31 @@ void phong_weightCalc(int i,
 
 }
 
+vec4 calculateFog(vec4 oFragColor)
+{
+    // http://in2gpu.com/2014/07/22/create-fog-shader/
+    float fogFactor;
+    const float fogDensity = 0.003;
+    // fog range
+    float fragmentZ = length(finalDistance);
+    if (fogType == 0) // no fog
+        return oFragColor;
+    else if (fogType == 1)
+    {
+        // linear
+        fogFactor = (fogEnd - fragmentZ) / (fogEnd - fogStart);
+    }
+    else
+    {
+        float a = fragmentZ * fogDensity;
+        // exponential
+        if (fogType == 3) // cuadratic
+            a *= a;
+        fogFactor = 1.0 / exp(a);
+    }
+    return vec4(mix(fogColor, oFragColor.rgb, clamp(fogFactor, 0, 1)), oFragColor.a);
+}
+
 void main()
 {
     vec4 objectdiffuse;
@@ -172,5 +204,8 @@ void main()
     final += emissiveAmount;
 
     vec4 fdifColor = vec4(clamp(final, 0.0, 1.0) , Opacity);
+
+    fdifColor = calculateFog(fdifColor);
+
     gl_FragColor = fdifColor;
  }

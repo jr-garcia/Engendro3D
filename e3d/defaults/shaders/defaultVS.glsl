@@ -44,6 +44,8 @@ varying float lDistance[MAXLIGHTS];
 varying vec3 campos;
 uniform bool activeLights[MAXLIGHTS];
 
+varying vec3 finalDistance;
+
 void phong_preCalc(
             in vec3 vertex_position,
             in light clight,
@@ -97,6 +99,8 @@ void main()
        nmBiTangent = NormalMatrix * bitangent;
        gl_Position = ModelViewProjection * vec4(position, 1.0);
     }
+
+    finalDistance = (ModelView * vec4(position, 1.0)).xyz;
 
    if (IsLightAffected)
    {
