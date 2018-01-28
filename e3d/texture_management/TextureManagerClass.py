@@ -79,16 +79,16 @@ class TexturesManager(BaseManager):
         self._engine.log('Using untested createEmpty2DTexture', logLevelsEnum.warning)
         if self.exists(ID):
             raise RuntimeError('the ID is already in use.')
-        tex = self._engine.backend.createOGL2DTexture(ID, -1, None, width, height)
+        tex = self._engine.backend.create2DTexture(ID, -1, None, width, height)
         self._textureCache[ID] = tex
 
     def update2DTexture(self, ID, data, fromTuple, toTuple):
-        self._engine.backend.updateOGL2DTexture(ID, data, fromTuple, toTuple)
+        self._engine.backend.update2DTexture(ID, data, fromTuple, toTuple)
 
     def _fillTexture(self, args):   # todo: move to base backend
         pix, w, h, ID, mipmapsNumber, repeat = args
         try:
-            tex = self._engine.backend.createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat)
+            tex = self._engine.backend.create2DTexture(ID, mipmapsNumber, pix, w, h, repeat)
             self._textureCache[ID] = tex
         except Exception as ex:
             self._engine.log('Error loading texture \'{0}\':\n\t{1}\n'

@@ -428,7 +428,7 @@ class OGL3Backend(BaseBackend):
         glDisableVertexAttribArray(hand)
 
     @staticmethod
-    def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat=True):
+    def create2DTexture(ID, mipmapsNumber, pix, w, h, repeat=True):
         glGetError()
         tex = np.array([0], np.uint32)
         glGenTextures(1, tex)
@@ -485,7 +485,7 @@ class OGL3Backend(BaseBackend):
         # glFlush()
         return tex
 
-    def updateOGL2DTexture(self, ID, data, fromTuple, toTuple):
+    def update2DTexture(self, ID, data, fromTuple, toTuple):
         xoffset, yoffset = fromTuple
         width, height = toTuple
         value = self._textures._textureCache[ID]

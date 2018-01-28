@@ -65,10 +65,10 @@ class BaseBackend(object):
         pass
 
     @staticmethod
-    def createOGL2DTexture(ID, mipmapsNumber, pix, w, h, repeat):
+    def create2DTexture(ID, mipmapsNumber, pix, w, h, repeat):
         pass
 
-    def updateOGL2DTexture(self, ID, data, fromTuple, toTuple):
+    def update2DTexture(self, ID, data, fromTuple, toTuple):
         pass
 
 
