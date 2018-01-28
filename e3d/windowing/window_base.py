@@ -268,6 +268,9 @@ class Window_Base(object):
         """
         pass
 
+    def saveScreenShot(self, filename=''):
+        pass
+
 
 class winEvents(EventsListener):
     def onMouseEvent(self, event):

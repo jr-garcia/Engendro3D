@@ -499,6 +499,10 @@ class OGL3Backend(BaseBackend):
         glFlush()
         glBindTexture(GL_TEXTURE_2D, 0)
 
+    def getBackBufferContent(self, w, h, destBuffer):
+        glPixelStorei(GL_PACK_ALIGNMENT, 1)
+        glReadPixels(0, 0, w, h, GL_BGR, GL_UNSIGNED_BYTE, destBuffer)
+
     def setRenderTarget(self, rTarget=None, attachmentTypes=None, colorIndexes=None):
         """
 

@@ -197,3 +197,72 @@ class Window(Window_Base):
         d = ct.pointer(ct.c_float(0))
         SDL_GetDisplayDPI(0, d, h, v)  # fixme: should consider real monitor index
         return int(h.contents.value), int(v.contents.value)
+
+    def saveScreenShot(self, filePath=''):
+        def slugify(value):
+            """
+            Based on https://github.com/django/django/blob/master/django/utils/text.py#L413
+
+            Copyright (c) Django Software Foundation and individual contributors.
+            All rights reserved.
+
+            Redistribution and use in source and binary forms, with or without modification,
+            are permitted provided that the following conditions are met:
+
+                1. Redistributions of source code must retain the above copyright notice,
+                   this list of conditions and the following disclaimer.
+
+                2. Redistributions in binary form must reproduce the above copyright
+                   notice, this list of conditions and the following disclaimer in the
+                   documentation and/or other materials provided with the distribution.
+
+                3. Neither the name of Django nor the names of its contributors may be used
+                   to endorse or promote products derived from this software without
+                   specific prior written permission.
+
+            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+            ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+            WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+            ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+            (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+            ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+            (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+            SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+            """
+            import unicodedata, re
+            value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+            value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+
+            return value
+
+        w, h = self.size
+
+        import numpy as np
+        dest = np.empty(w * h * 3, np.uint8)
+        self.backend.getBackBufferContent(w, h, dest)
+        # Now the file creation
+        if filePath == '':
+            from datetime import datetime
+            ind = 0
+            basePath = os.path.abspath(os.curdir)
+            now = datetime.now()
+            date = str(datetime.date(now))
+            timeNow = datetime.time(now)
+            time = '{}-{}-{}'.format(timeNow.hour, timeNow.minute, timeNow.second)
+            baseName = slugify(self.gameName) + '_' + date + '_' + time
+            filePath = os.path.join(basePath, baseName)
+            filePath = filePath + '.png'
+            while os.path.exists(filePath):
+                filePath = os.path.join(basePath, baseName + str(ind))
+                filePath = filePath + '.png'
+                ind += 1
+
+        from PIL.Image import fromarray, merge
+        from PIL.ImageOps import flip
+        image = fromarray(dest.reshape(h, w, 3))
+        image = flip(image)
+        b, g, r = image.split()
+        image = merge("RGB", (r, g, b))
+        image.save(filePath)

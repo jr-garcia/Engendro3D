@@ -71,6 +71,9 @@ class BaseBackend(object):
     def update2DTexture(self, ID, data, fromTuple, toTuple):
         pass
 
+    def getBackBufferContent(self, w, h, destBuffer):
+        pass
+
 
 class ShaderStruct(OrderedDict):
     def __init__(self, *args, **kwds):
