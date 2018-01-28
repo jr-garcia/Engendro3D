@@ -2,7 +2,7 @@ from math import sin
 
 from cycgkit.cgtypes import vec3
 
-from _base._BaseDemo import _Demo_Base, runDemo
+from _base._BaseDemo import _Demo_Base, runDemo, logLevelsEnum
 
 
 class Demo(_Demo_Base):
@@ -88,6 +88,8 @@ class Demo(_Demo_Base):
             self.window.backend.debugModeActive = not self.window.backend.debugModeActive
         if keyName == 'f4':
             self.window.backend.showAsWireframe = not self.window.backend.showAsWireframe
+        if keyName == 'f12':
+            self.window.saveScreenShot()
         if keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
         if 'ctrl' in keyName:

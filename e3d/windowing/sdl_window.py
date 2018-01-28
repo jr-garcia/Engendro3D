@@ -1,3 +1,4 @@
+from __future__ import print_function
 import ctypes as ct
 import os
 from sdl2 import *
@@ -28,7 +29,12 @@ class Window(Window_Base):
             self._engine.log(msg, log)
             raise Exception(msg)
         _, self._context = engine._getNewContext(self._SDL_Window)
+
         SDL_GL_MakeCurrent(self._SDL_Window, self._context)
+
+    @property
+    def windowID(self):
+        return SDL_GetWindowID(self._SDL_Window)
 
     def setFullScreen(self, setfull):
         if setfull:
@@ -166,10 +172,12 @@ class Window(Window_Base):
                 self.close()
             elif event.type == SDL_WINDOWEVENT:
                 winev = event.window.event
-                if winev == SDL_WINDOWEVENT_RESIZED:
-                    self._sizeChanged(event.window.data1, event.window.data2)
-                elif winev == SDL_WINDOWEVENT_CLOSE:
-                    self.close()
+                evWinId = event.window.windowID
+                if evWinId == self.windowID:
+                    if winev == SDL_WINDOWEVENT_RESIZED:
+                        self._sizeChanged(event.window.data1, event.window.data2)
+                    if winev == SDL_WINDOWEVENT_CLOSE:
+                        self.close()
             self.events._announce(event)
 
     def _makeContextCurrent(self):

@@ -54,7 +54,7 @@ class Window_Base(object):
         self.events.addListener('default', self._defaultWindowEventListener)
         self._isFull = fullscreen
         self.is1stRun = True
-        self.backend = None
+        self.backend = engine.backend
 
         self._framesThisSecond = 0
         self._lastTime = 0
@@ -84,8 +84,6 @@ class Window_Base(object):
         self._createInternalWindow(title, engine, fullscreen)
 
         self.vsynch = vSynch
-
-        self.backend = engine.backend
 
         self.backend.resize((self._size[0], self._size[1]))
 

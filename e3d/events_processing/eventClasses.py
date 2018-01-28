@@ -69,6 +69,7 @@ class WindowEvent(Event):
         """
         super(WindowEvent, self).__init__(EventTypes.Window)
         self._code = event.event
+        self.windowID = event.windowID
         code = self._code
         if code == SDL_WINDOWEVENT_CLOSE:
             self.eventName = windowEventNames.close
