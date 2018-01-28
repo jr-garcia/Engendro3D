@@ -88,8 +88,8 @@ class SimpleCamera(Base3DObject):
             self.lookAtFixed = self._rotationMatrix * self.lookAtConstant
             self.lookAt = self._position + self.lookAtFixed
             self._vm = self.lookAtRH(self._position, self.lookAt, self._rotationMatrix * self.upConstant)
-            self.__lastpos = copy(self._position)
-            self.__lastrot = copy(self._rotation)
+            self.__lastpos = vec3(self._position)
+            self.__lastrot = vec3(self._rotation)
 
         return self._vm
 

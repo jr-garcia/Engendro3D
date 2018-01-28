@@ -321,7 +321,7 @@ class Engine:
                 self.log(error, logLevelsEnum.error)
                 raise RuntimeError(error)
         else:
-            newContext = self.globals.dummyWindow.context()
+            newContext = self.globals.dummyWindow.context()  # todo: check correction with qt
 
         return window, newContext
 
