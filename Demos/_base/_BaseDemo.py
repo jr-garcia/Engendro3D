@@ -34,7 +34,7 @@ class _Demo_Base(object):
         self.plane = None
         self.dlight = None
         self.lastspeed = 0
-        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1])
+        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], useDebug=True)
         self.window = None
         self.firstRun = False
         self.pendingTex = 0

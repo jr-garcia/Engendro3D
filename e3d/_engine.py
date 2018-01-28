@@ -30,7 +30,7 @@ class globalsStruct:
 
 
 class Engine:
-    def __init__(self, backend, multiSampleLevel=0, maxContext=(2, 1), useQT=False):
+    def __init__(self, backend, multiSampleLevel=0, maxContext=(2, 1), useQT=False, useDebug=False):
         self._logger = _Logger()
         if not useQT:
             # Init SDL>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -62,7 +62,7 @@ class Engine:
         self._isInitialized = False
 
         if not useQT:
-            self.__setAttribs(multiSampleLevel, maxContext)
+            self._setAttribs(multiSampleLevel, maxContext, useDebug)
 
     def initialize(self, maxThreads=2):
         self._createDummyWindowAndContext()
@@ -108,7 +108,7 @@ class Engine:
         self.log('\t Videos...', logLevelsEnum.debug)
         self.videos.initialize(self)
 
-    def __setAttribs(self, multiSampleLevel, restrictContextTo):
+    def _setAttribs(self, multiSampleLevel, restrictContextTo, useDebug):
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8)
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8)
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8)
@@ -131,6 +131,13 @@ class Engine:
 
         # SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+
+        if useDebug:
+            res = SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG)
+            if res != 0:
+                error = 'Error setting SDL debug context flag: ' + self.getSDLError()
+                self.log(error)
+                raise RuntimeError(error)
 
         if SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1) != 0:
             error = 'Error setting SDL shared context flag: ' + self.getSDLError()
