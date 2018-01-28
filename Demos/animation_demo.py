@@ -64,8 +64,8 @@ class Demo(_Demo_Base):
             self.dorot = not self.dorot
         if keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            self._engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
-            self._engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
+            self.engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
+            self.engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
                        logLevelsEnum.info)
         if keyName == 'g':
             val = self.window.gamma
