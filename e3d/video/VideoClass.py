@@ -111,7 +111,7 @@ class VideoFiller(ParallelServer):
 
 
 class Video(ParallelClient):
-    def __init__(self, engine, filePath, resizeTo, streamSound=True):
+    def __init__(self, engine, filePath, resizeTo, streamSound=False):
         super(Video, self).__init__()
         self._engine = engine
         self._state = VideoStatesEnum.Stopped

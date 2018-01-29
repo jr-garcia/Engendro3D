@@ -97,9 +97,8 @@ class FFMPEG_VideoReader:
     def skip_frames(self, n=1):
         """Reads and throws away n frames """
         w, h = self.size
-        # for i in range(n):
         self.proc.stdout.read(self.depth * w * h * n)
-        # self.proc.stdout.flush()
+        self.proc.stdout.flush()
         self.pos += n
 
     def read_frame(self):

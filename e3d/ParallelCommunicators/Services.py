@@ -1,4 +1,11 @@
-from multiprocessing import Process, Queue
+from sys import platform
+if platform == 'win32':
+    from multiprocessing.dummy import Process, Queue
+else:
+    # fixme: This raises
+    # TypeError: can't pickle _thread.lock objects
+    # on Windows
+    from multiprocessing import Process, Queue
 
 try:
     from queue import Full, Empty
@@ -62,8 +69,11 @@ class ParallelClient(BaseManager, Communicator):
         Communicator.__init__(self)
 
     def terminate(self):
-        self._outQueue.close()
-        self._inQueue.close()
+        try:
+            self._outQueue.close()
+            self._inQueue.close()
+        except AttributeError:
+            pass
 
 
 class ParallelServer(Communicator, Process):
