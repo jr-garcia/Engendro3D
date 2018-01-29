@@ -46,6 +46,7 @@ class VideoFiller(ParallelServer):
         self.running = True
         self.state = VideoStatesEnum.Stopped
         self.isInit = False
+        self.startTime = 0
 
     def checkQueue(self):
         task = self._readTask()
@@ -66,19 +67,13 @@ class VideoFiller(ParallelServer):
 
     def _removeTask(self):
         try:
-            task = self._outQueue.get_nowait()
+            self._outQueue.get_nowait()
         except Empty:
             return
-
-        if not isinstance(task, Task):
-            self._engine.log('server sent data with wrong type. Ignored.', logLevelsEnum.warning)
-        else:
-            return task
 
     def run(self):
         vr = self.vr
         startTime = 0
-        currentTime = 0
         frameDuration = 1.0 / vr.fps
         while self.running:
             try:
