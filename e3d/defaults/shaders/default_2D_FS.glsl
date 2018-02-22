@@ -20,7 +20,7 @@ varying vec2 uvCoord;
 varying vec2 fixedPosition;
 
 // Text
-uniform bool isText=False;
+uniform bool isText=false;
 uniform vec4 fontColor = vec4(1.0);
 uniform float outlineLength = .0;
 uniform vec4 outlineColor = vec4(0, 0 ,0 , 1.0);
