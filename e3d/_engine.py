@@ -150,7 +150,9 @@ class Engine:
             self.log('Error setting SDL double buffer flag: ' + self.getSDLError(), logLevelsEnum.info)
 
         if multiSampleLevel is not None and multiSampleLevel > 0:
-            self._multisampleFallback(multiSampleLevel, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN)
+            from warnings import warn
+            warn('Multisample is not implemented')
+            # self._multisampleSetup(multiSampleLevel, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN)
 
         # Next causes multisample to fail.
         # if SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) != 0:
@@ -332,11 +334,11 @@ class Engine:
 
         return window, newContext
 
-    def _multisampleFallback(self, multisampleLevel, flags):
+    def _multisampleSetup(self, multisampleLevel, flags):
         window = None
         ms = SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1)
         if ms < 0:
-            self.log('Error setting multisample: ' + self.getSDLError(), logLevelsEnum.warning)
+            self.log('Error enabling multisample: ' + self.getSDLError(), logLevelsEnum.warning)
             self.globals.multisample = False
         else:
             self.globals.multisample = True
@@ -354,13 +356,17 @@ class Engine:
 
             level -= 1
             if level > 0:
+                if window is not None:
+                    SDL_DestroyWindow(window)
+                    window = None
                 self.log('Error setting multisample level {}. Trying {}'.format(level + 1, level), logLevelsEnum.info)
 
         if level == 0:
             self.log('Multisample disabled: ' + self.getSDLError() + ".")
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0)
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0)
 
-        if window:
+        if window is not None:
             SDL_DestroyWindow(window)
 
     @staticmethod
