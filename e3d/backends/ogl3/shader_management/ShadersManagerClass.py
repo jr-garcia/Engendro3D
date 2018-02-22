@@ -363,8 +363,8 @@ def _dissectShaderCompilingErrorsMesa(mess):
     lastline = ''
 
     for ind in range(len(errorlist)):
-        i = errorlist[ind]
-        if i == '':
+        i = errorlist[ind].strip()
+        if i == '' or i == '\0':
             errorlist.remove(i)
         else:
             i = i.replace('"', "'")
@@ -372,6 +372,8 @@ def _dissectShaderCompilingErrorsMesa(mess):
             errorlist[ind] = i
 
     for i in errorlist:
+        if i == '':
+            continue
         if i.lower().__contains__("shader compile failure"):
             i = i[i.find(': ', 10) + 2: len(i)]
             i = i.replace('\\', '')
