@@ -34,8 +34,7 @@ RENDER EXAMPLE             | VIDEO
 * **[PyAl](http://pythonhosted.org/PyAL/)** 
     > `pip install https://bitbucket.org/marcusva/py-al/downloads/PyAL-0.1.0.zip`                
 * **[CyBullet](https://github.com/jr-garcia/CyBullet)** 
-    > `pip install git+https://github.com/jr-garcia/CyBullet.git@modified'`
-    
+    > `pip install git+https://github.com/jr-garcia/CyBullet.git@modified'`    
 * **[Hissing Python](https://github.com/jr-garcia/Hissing-Python)**
     > `pip install git+https://github.com/jr-garcia/Hissing-Python.git`
         
