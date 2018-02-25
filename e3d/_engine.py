@@ -144,9 +144,9 @@ class Engine:
             self.log(error)
             raise RuntimeError(error)
 
-        isDOubleBuffered = not SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+        isDoubleBuffered = not SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-        if not isDOubleBuffered:
+        if not isDoubleBuffered:
             self.log('Error setting SDL double buffer flag: ' + self.getSDLError(), logLevelsEnum.info)
 
         if multiSampleLevel is not None and multiSampleLevel > 0:
@@ -177,7 +177,7 @@ class Engine:
         for win in self._windows.values():
             try:
                 win.close()
-            except:
+            except Exception:
                 pass
 
     def _terminateManagers(self):
@@ -238,7 +238,7 @@ class Engine:
 
         try:
             self._fillSuportedGLSLVersions()
-        except:
+        except Exception:
             pass
         self.log('OpenGL version: ' + str(self.globals.oglversionraw), logLevelsEnum.info)
         self.log('GLSL version: {}.{}'.format(self.globals.glslmajor, self.globals.glslminor), logLevelsEnum.info)
@@ -292,7 +292,7 @@ class Engine:
 
         try:
             _, self.globals.dummyContext = self._getNewContext()
-        except:
+        except Exception:
             raise
         self.globals.dummyWindow.makeCurrent()
 
@@ -311,7 +311,7 @@ class Engine:
 
         try:
             _, self.globals.dummyContext = self._getNewContext()
-        except:
+        except Exception:
             raise
         SDL_GL_MakeCurrent(self.globals.dummyWindow, self.globals.dummyContext)
 
@@ -374,7 +374,7 @@ class Engine:
         sderr = SDL_GetError()
         try:
             sderr = sderr.decode()
-        except:
+        except Exception:
             pass
         return sderr
 
@@ -422,5 +422,3 @@ class DefaultPath(PathPiece):
         self.primitives = PathPiece((self.base, 'primitives'))
         self.fonts = PathPiece((self.base, 'fonts'))
         # self.sounds = PathPiece((self.base, 'sounds'))
-
-
