@@ -85,4 +85,3 @@ class SDLTester(unittest.TestCase):
             error = 'Error creating context: ' + sdlerr
             self.fail(error)
 
-        SDL_GL_MakeCurrent(self._SDL_Window, self._context)

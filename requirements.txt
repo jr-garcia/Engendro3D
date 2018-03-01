@@ -1,0 +1,11 @@
+AssimpCy==1.1.1
+bullet==0.0.0
+cycgkit==0.0.0
+freetype-py==1.2
+glaze==0.1.0
+Hissing-Python==0.6
+MSDF-ext==0.1
+numpy==1.14.1
+Pillow==5.0.0
+PyAL==0.1.0
+PySDL2==0.9.6
