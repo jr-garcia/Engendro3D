@@ -311,10 +311,10 @@ class OGL3Backend(BaseBackend):
             elif attribName.__contains__('boneweights'):
                 glVertexAttribPointer(res, 4, GL_FLOAT, False, stride, vBuffer)
             elif attribName.__contains__('boneindexes'):
-                if glVertexAttribIPointer:
-                    glVertexAttribIPointer(res, 4, GL_INT, stride, vBuffer)
-                else:
-                    glVertexAttribPointer(res, 4, GL_FLOAT, False, stride, vBuffer)
+                # if glVertexAttribIPointer:
+                #     glVertexAttribIPointer(res, 4, GL_INT, stride, vBuffer)
+                # else: # todo: add proper check
+                glVertexAttribPointer(res, 4, GL_FLOAT, False, stride, vBuffer)
             else:
                 glVertexAttribPointer(res, 3, GL_FLOAT, False, stride, vBuffer)
 
