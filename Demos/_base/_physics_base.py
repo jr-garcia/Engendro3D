@@ -3,9 +3,9 @@ from cycgkit.cgtypes import vec3
 from _base._BaseDemo import _Demo_Base, runDemo, tubeMODEL
 
 
-class Demo(_Demo_Base):
+class Physics_Demo_Base(_Demo_Base):
     def __init__(self):
-        super(Demo, self).__init__()
+        super(Physics_Demo_Base, self).__init__()
         self.texturesToLoad = [
             ['e3dlogo.png', 'logo'],
             ['./textures/n_deep.png', 'defND', True],
@@ -143,4 +143,4 @@ class Demo(_Demo_Base):
 
 
 if __name__ == '__main__':
-    runDemo(Demo(), 'Physics Demo 1')
+    runDemo(Physics_Demo_Base(), 'Physics Physics_Demo_Base 1')

@@ -1,15 +1,15 @@
 from cycgkit.cgtypes import vec3
 
-from _base._physics_base import _Demo_Base, game, runDemo
+from _base._physics_base import Physics_Demo_Base, runDemo
 
 
-class Demo(_Demo_Base):
+class Demo(Physics_Demo_Base):
     def __init__(self):
-        game.__init__(self)
+        Physics_Demo_Base.__init__(self)
 
     def loadModels(self):
         engine = self.engine
-        game.loadModels(self)
+        Physics_Demo_Base.loadModels(self)
         self.camera.position = vec3(0, 10, 250)
 
         self.bigSphere = self.scene1.addModel('bigspheremodel', 'bigSphere', [0, 100, 0], [0, 0, 0], 20, mass=8)
