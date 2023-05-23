@@ -19,8 +19,8 @@ class OGL3Backend(BaseBackend):
         self._engine = engine
         self._currentRenderTarget = None
         self.fullScreenEffects = FSEManager(engine,
-                                            self)  # todo: move FSEManager to engine?, so all fseffects are shared
-        # among windows
+                                            self)
+        # todo: move FSEManager to engine, so all fseffects are shared among windows?
         self._defaultClearColor = vec3(0.50, 0.50, 0.50)
         self._lastClearColor = None
         self._setClearColor(self._defaultClearColor)
@@ -76,6 +76,7 @@ class OGL3Backend(BaseBackend):
         # <<<<<<<<<<<<<<<<<<<<
 
         self._culling = True
+        self._size = None
 
         self.setContextState()
 
@@ -287,6 +288,7 @@ class OGL3Backend(BaseBackend):
         glDisableVertexAttribArray(hand)
 
     def resize(self, size):
+        self._size = size
         glViewport(0, 0, size[0], size[1])
 
     @staticmethod

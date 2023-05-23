@@ -85,3 +85,6 @@ class SDLTester(unittest.TestCase):
             error = 'Error creating context: ' + sdlerr
             self.fail(error)
 
+
+if __name__ == '__main__':
+    unittest.main()

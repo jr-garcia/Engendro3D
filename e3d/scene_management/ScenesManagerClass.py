@@ -74,5 +74,6 @@ class ScenesManager(object):
             return DrawingData()
             
     def terminate(self):
-        print('scenes man terminate not implemented.')
-        # for scene in self._scenes ... terminate?
+        for sceneName in self._scenes:
+            scene = self.getScene(sceneName)
+            scene.terminate()

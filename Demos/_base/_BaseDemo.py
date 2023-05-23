@@ -34,7 +34,8 @@ class _Demo_Base(object):
         self.plane = None
         self.dlight = None
         self.lastspeed = 0
-        self.engine = Engine(OGL3Backend, multiSampleLevel=16, maxContext=[2, 1], useDebug=True)
+        self.engine = Engine(OGL3Backend, multiSampleLevel=0, maxContext=[2, 1], useDebug=True)
+        # todo: implement multisample
         self.window = None
         self.firstRun = False
         self.pendingTex = 0
@@ -66,6 +67,7 @@ class _Demo_Base(object):
         listener = EventsListener()
         listener.onCustomEvent = self.customEvent
         self.window.events.addListener('main', listener)
+        self.window.mouseLock = True
 
     def defUpdate(self, e):
         if self.pendingTex == 0:
@@ -82,7 +84,11 @@ class _Demo_Base(object):
             self.scene0.beforeUpdateCallback = None
 
     def keydown(self, e):
-        pass
+        if e.eventName == 'keyUp':
+            return
+        keyName = e.keyName
+        if 'shift' in keyName:
+            self.window.mouseLock = not self.window.mouseLock
 
     def mouseMove(self, ev):
         pass

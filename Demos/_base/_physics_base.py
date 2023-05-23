@@ -1,6 +1,7 @@
 from cycgkit.cgtypes import vec3
 
 from _base._BaseDemo import _Demo_Base, runDemo, tubeMODEL
+from e3d import logLevelsEnum
 
 
 class Physics_Demo_Base(_Demo_Base):
@@ -83,9 +84,9 @@ class Physics_Demo_Base(_Demo_Base):
             self.window.mouseLock = not self.window.mouseLock
         if keyName == 'escape':  # ESC
             self.close()
-        if keyName == 'f8':
+        if keyName == 'f2':
             self.window.backend.debugModeActive = not self.window.backend.debugModeActive
-        if keyName == 'f4':
+        if keyName == 'f3':
             self.window.backend.showAsWireframe = not self.window.backend.showAsWireframe
         if keyName == 'space':
             self.window.setFullScreen(not self.window.isFullScreen())
@@ -93,7 +94,7 @@ class Physics_Demo_Base(_Demo_Base):
             self.dorot = not self.dorot
         if keyName == 'f1':
             np = [round(d, 3) for d in self.camera.position]
-            engine = self._engine
+            engine = self.engine
             engine.log('Camera pos:{0}'.format(str(np)), logLevelsEnum.info)
             engine.log('Poligons drawn:{}'.format(self.window.backend.poligonsDrawnThisUpdate),
                        logLevelsEnum.info)
@@ -101,12 +102,12 @@ class Physics_Demo_Base(_Demo_Base):
             engine.log('Balls: ' + str(self.ballcount), logLevelsEnum.debug)
         if keyName == 'g':
             val = self.window.gamma
-            print ('old gamma:' + str(val))
+            print('old gamma:' + str(val))
             if val <= 1.8:
                 self.window.gamma = 2.5
             else:
                 self.window.gamma = 1.7
-            print ('new gamma:' + str(self.window.gamma))
+            print('new gamma:' + str(self.window.gamma))
         if keyName == 'right':
             self.scene1.physics.step(50)
         if keyName == 'left':

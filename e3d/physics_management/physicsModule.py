@@ -3,6 +3,37 @@ from ..commonValues import *
 from bullet.bullet import *
 
 
+class PhysicsStatesEnum(object):
+    Playing = 'Playing'
+    Paused = 'Paused'
+
+
+class PhysicsUpdater(object):
+    def __init__(self, world, resolution):
+        super(PhysicsUpdater, self).__init__()
+        self.dynamicsWorld = world
+        self.isRunning = False
+        self._requiredSteppedTimelapse = 0
+        self.resolution = resolution
+        self.state = PhysicsStatesEnum.Playing
+
+    def update(self, elapsedTime):
+        if self._requiredSteppedTimelapse != 0:
+            elapsedTime = self._requiredSteppedTimelapse
+            self._requiredSteppedTimelapse = 0
+        elif self.state == PhysicsStatesEnum.Paused:
+            return
+        if elapsedTime > 0:
+            fixedStep = (1.0 / float(self.resolution))
+            originalFixedStep = fixedStep
+            steps = int(elapsedTime / fixedStep) + 1
+            if steps >= 20:
+                fixedStep = 1 / 60.0
+            stepsNeeded = self.dynamicsWorld.stepSimulation(elapsedTime, steps, fixedStep)
+            if steps > stepsNeeded and originalFixedStep != fixedStep:
+                self.dynamicsWorld.stepSimulation(0.05, steps, 1.0 / float(
+                    self.resolution))  # print ('max', steps, 'needed', stepsNeeded)
+
 
 class ScenePhysics(object):
     def __init__(self, gravity, resolution):
@@ -18,6 +49,7 @@ class ScenePhysics(object):
         # http://stackoverflow.com/questions/2474939/bullet-physics-when-to-choose-which-dynamicsworld?rq=1
         self.dynamicsWorld = DiscreteDynamicsWorld()
         self.dynamicsWorld.setGravity(Vector3(0, gravity * 100, 0))
+        self._updater = PhysicsUpdater(self.dynamicsWorld, resolution)
 
     def _setPaused(self, value):
         self.__paused = value
@@ -59,30 +91,16 @@ class ScenePhysics(object):
         self.dynamicsWorld.removeRigidBody(physicsBody.body)
 
     def update(self, elapsedTime):
-        if self._requiredSteppedTimelapse != 0:
-            elapsedTime = self._requiredSteppedTimelapse
-            self._requiredSteppedTimelapse = 0
-        elif self.__paused:
-            return
-        if elapsedTime > 0:
-            fixedStep = (1.0 / float(self._resolution))
-            originalFixedStep = fixedStep
-            steps = int(elapsedTime / fixedStep) + 1
-            if steps >= 20:
-                fixedStep = 1 / 60.0
-            stepsNeeded = self.dynamicsWorld.stepSimulation(elapsedTime, steps, fixedStep)
-            if steps > stepsNeeded and originalFixedStep != fixedStep:
-                self.dynamicsWorld.stepSimulation(0.05, steps, 1.0 / float(self._resolution))
-                # print ('max', steps, 'needed', stepsNeeded)
+        self._updater.update(elapsedTime)
 
     def castRay(self, fromPos, toPos):
         """
 
-        @rtype : rayResult
+        @rtype : CastRayResult
         """
         try:
             rayResult = self.dynamicsWorld.rayTestClosest(Vector3(fromPos[0], fromPos[1], fromPos[2]),
-                                                   Vector3(toPos[0], toPos[1], toPos[2]))
+                                                          Vector3(toPos[0], toPos[1], toPos[2]))
 
             if rayResult:
                 return CastRayResult(rayResult, self)
@@ -90,6 +108,10 @@ class ScenePhysics(object):
                 return None
         except Exception as ex:
             print(ex.message)
+
+    def terminate(self):
+        while len(self._bodies) > 0:
+            self.removeRigidObject(self._bodies[list(self._bodies.keys())[-1]])
 
 
 class CastRayResult(object):
@@ -288,5 +310,6 @@ class e3dMotionState(overridableMotionState):
 
         @rtype : e3dMotionState
         """
+        super(e3dMotionState, self).__init__()
         self.worldTrans = transform
         self.bObject = None

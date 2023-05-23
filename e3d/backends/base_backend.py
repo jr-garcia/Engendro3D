@@ -18,6 +18,7 @@ class BaseBackend(object):
         self._textures = None
         self._poliCount = 0
         self._culling = False
+        self._size = None
 
     def renderMeshes(self, drawingData):
         pass

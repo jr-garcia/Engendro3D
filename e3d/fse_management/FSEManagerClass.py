@@ -38,7 +38,7 @@ class FSEManager(object):
 
     def __buildSceneRT(self):
         rt = self.renderTarget(self._engine, self._backend, '2d', True)
-        size = self._backend._window.size
+        size = self._backend._size
         rt.createDepthAttachment(size)
         rt.createColorAttachments(['_scene'], [size])
         return rt
@@ -185,7 +185,7 @@ class FSEManager(object):
             ttexs.extend([t for t in alls if t not in excludes])
 
         try:
-            winsize = self._backend._window.size
+            winsize = self._backend._size
             ttype = effect.textureType
             if ttype not in ['2d', 'cube']:
                 raise AttributeError('Unknown render texture type: \'{}\''.format(ttype))

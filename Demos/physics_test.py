@@ -42,7 +42,7 @@ class Demo(Physics_Demo_Base):
         self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [200, 6, 0], [0, 0, 0], 4, mass=50)
         self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-200, 6, 0], [0, 0, 0], 4, mass=50)
 
-        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1000, mass=50)
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1000, mass=0)
         mt = self.floor._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
