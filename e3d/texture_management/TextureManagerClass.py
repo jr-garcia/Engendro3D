@@ -118,6 +118,7 @@ class TexturesManager(BaseManager):
         filePath = os.path.abspath(filePath)
         tex = self._textureCache.get(ID)
         getdefault = False
+        # todo: remove default texture loading
         if tex is None or force:
             if not os.path.exists(filePath):
                 defaultTexturesDir = os.path.join(self._engine.path, 'defaults', 'textures')

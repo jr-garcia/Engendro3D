@@ -15,6 +15,10 @@ from .windowing.sdl_window import Window
 from .ThreadingManagerClass import ThreadingManager
 from .plugin_management.PluginsManagerClass import PluginsManager
 from .video import VideoManager
+try:
+    from .windowing.qt_window import e3DGLWidget
+except ImportError:
+    pass
 
 
 class globalsStruct:
@@ -115,14 +119,11 @@ class Engine:
         SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8)
         SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 24)
 
-        for depth in [24, 16]:
-            if SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depth) == 0:
-                break
-            else:
-                if depth == 16:
-                    error = 'Error setting depth size: ' + self.getSDLError()
-                    self.log(error)
-                    raise RuntimeError(error)
+        if SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0:
+            if SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16) != 0:
+                error = 'Error setting depth size: ' + self.getSDLError()
+                self.log(error)
+                raise RuntimeError(error)
 
         if restrictContextTo:
             # Todo: add context fallback
@@ -383,7 +384,7 @@ class Engine:
         try:
             self._terminateManagers()
         except Exception as ex:
-            self.log('Error in \'Engine.terminate\': ' + str(ex), logLevelsEnum.error)
+            self.log('Error in \'Engine.terminate\': {} {}'.format(str(type(ex)), str(ex)), logLevelsEnum.error)
         if not self._useQT:
             if self._isInitialized:
                 SDL_GL_DeleteContext(self.globals.dummyContext)

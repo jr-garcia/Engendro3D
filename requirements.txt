@@ -1,11 +1,11 @@
-AssimpCy==1.1.1
+AssimpCy>=1.1.1
 bullet==0.0.0
 cycgkit==0.0.0
-freetype-py==1.2
+freetype-py>=2.4
 glaze==0.1.0
 Hissing-Python==0.6
 MSDF-ext==0.1
-numpy==1.14.1
-Pillow==5.0.0
-PyAL==0.1.0
-PySDL2==0.9.6
+numpy>=1.21.4
+Pillow>=8.4.0
+python-openal>=0.4.1
+PySDL2==0.9.9

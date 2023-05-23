@@ -274,7 +274,7 @@ def nativeCompile(vertexSource, fragmentSource):
         glDetachShader(ProgramObject, vertexShaderObject)
         glDeleteShader(fragmentShaderObject)
         glDeleteShader(vertexShaderObject)  # todo: move to shader terminate?
-    except:
+    except Exception:
         pass
 
     return ProgramObject
@@ -285,13 +285,16 @@ def _dissectShaderCompilingErrors(mess, driverName):
 
     @type driverName: str
     """
-    lname = driverName.lower()
-    if 'nvidia' in lname:
-        return _dissectShaderCompilingErrorsNvidia(mess)
-    elif 'mesa' in lname or 'intel' in lname:
-        return _dissectShaderCompilingErrorsMesa(mess)
-    else:
-        raise NotImplementedError('Shader compile error dissection not implemented for {}'.format(driverName))
+    try:
+        lname = driverName.lower()
+        if 'nvidia' in lname:
+            return _dissectShaderCompilingErrorsNvidia(mess)
+        elif 'mesa' in lname or 'intel' in lname:
+            return _dissectShaderCompilingErrorsMesa(mess)
+        else:
+            raise NotImplementedError('Shader compile error dissection not implemented for {}'.format(driverName))
+    except Exception as ex:
+        return 'error while parsing shader failure: {}\nOriginal shader error: {}'.format(str(ex), mess)
 
 
 def _dissectShaderCompilingErrorsNvidia(mess):
@@ -374,11 +377,11 @@ def _dissectShaderCompilingErrorsMesa(mess):
     for i in errorlist:
         if i == '':
             continue
-        if i.lower().__contains__("shader compile failure"):
+        if i.lower().__contains__("shader compile failure") or i.lower().__contains__("shader link failure"):
             i = i[i.find(': ', 10) + 2: len(i)]
             i = i.replace('\\', '')
         ct = i.split(': ')
-        currline = ct[1] if ct[0].__contains__('ERROR') or ct[0].__contains__('error') else ct[0]
+        currline = ct[1] if ct[0].lower().__contains__('error') else ct[0]
         lc = currline.strip().strip(')').split(':')
         if len(lc) > 1:
             if lc[1].__contains__('('):

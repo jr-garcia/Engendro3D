@@ -96,7 +96,7 @@ class ScenePhysics(object):
     def castRay(self, fromPos, toPos):
         """
 
-        @rtype : rayResult
+        @rtype : CastRayResult
         """
         try:
             rayResult = self.dynamicsWorld.rayTestClosest(Vector3(fromPos[0], fromPos[1], fromPos[2]),
@@ -108,6 +108,10 @@ class ScenePhysics(object):
                 return None
         except Exception as ex:
             print(ex.message)
+
+    def terminate(self):
+        while len(self._bodies) > 0:
+            self.removeRigidObject(self._bodies[list(self._bodies.keys())[-1]])
 
 
 class CastRayResult(object):

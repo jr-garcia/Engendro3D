@@ -33,13 +33,10 @@ class OGL3Tester(unittest.TestCase):
         SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 24)
 
     # set_attribs_depth
-        for depth in [24, 16]:
-            if SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depth) == 0:
-                break
-            else:
-                if depth == 16:
-                    error = 'Error setting depth size: ' + getSDLError()
-                    self.fail(error)
+        # todo: check if 24 works on Windows. Switch to 16 if not
+        if SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0:
+            error = 'Error setting depth size: ' + getSDLError()
+            self.fail(error)
 
     # set_attribs_restrict_Context
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
@@ -156,6 +153,15 @@ class OGL3Tester(unittest.TestCase):
         glDisableVertexAttribArray(0)
         # end the current frame (internally swaps the front and back buffers)
         glDeleteBuffers(1, vertexbuffer)
+        
+    def getSimilarity(self, img1, img2):
+        # https://stackoverflow.com/a/1927689
+        s = 0
+        for band_index, band in enumerate(img1.getbands()):
+            m1 = np.array([p[band_index] for p in img1.getdata()]).reshape(*img1.size)
+            m2 = np.array([p[band_index] for p in img2.getdata()]).reshape(*img2.size)
+            s += np.sum(np.abs(m1-m2))
+        return s
 
     def compareScreenShot(self, testName):
         w, h = self.size
@@ -175,8 +181,12 @@ class OGL3Tester(unittest.TestCase):
             capture.save(filePath)
         else:
             stored = open(filePath)
-            isEqual = np.all(np.asarray(capture) == np.asarray(stored))
-            self.assertTrue(isEqual)
+            s = self.getSimilarity(capture, stored)
+            isEqual = not bool(s)
+            if not isEqual:
+                print('similarity', s)
+                capture.save(os.path.join(BASEPATH, testName + '_failed.png'))
+            self.assertTrue(isEqual)                
 
     def getBackBufferContent(self, w, h, destBuffer):
         glPixelStorei(GL_PACK_ALIGNMENT, 1)
@@ -270,3 +280,7 @@ def arrayToString(array):
     for i in range(len(array)):
         strList[i] = chr(array[i])
     return ''.join(strList)
+
+
+if __name__ == '__main__':
+    unittest.main()

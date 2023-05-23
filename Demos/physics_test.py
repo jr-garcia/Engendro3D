@@ -1,15 +1,15 @@
 from cycgkit.cgtypes import vec3
 
-from _base._physics_base import Demo as game, runDemo, tubeMODEL
+from _base._physics_base import Physics_Demo_Base, runDemo, tubeMODEL
 
 
-class Demo(game):
+class Demo(Physics_Demo_Base):
     def __init__(self):
-        game.__init__(self)
+        Physics_Demo_Base.__init__(self)
 
     def loadModels(self):
         engine = self.engine
-        game.loadModels(self)
+        Physics_Demo_Base.loadModels(self)
         engine.models.loadSphere("spheremodel", 12)
         engine.models.loadBox("boxmodel", [6], 1)
         engine.models.loadBox("pushboxmodel", [50, 10, 10], 1)
@@ -42,7 +42,7 @@ class Demo(game):
         self.pushbox1 = self.scene1.addModel('pushboxmodel', 'pushbox1', [200, 6, 0], [0, 0, 0], 4, mass=50)
         self.pushbox2 = self.scene1.addModel('pushboxmodel', 'pushbox2', [-200, 6, 0], [0, 0, 0], 4, mass=50)
 
-        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1000, mass=50)
+        self.floor = self.scene1.addModel('floorplane', 'floor', [0, 0, 0], [0, 0, 0], 1000, mass=0)
         mt = self.floor._materials[0]
         mt.specularPower = 50
         mt.useDiffuseTexture = True
@@ -81,7 +81,7 @@ class Demo(game):
             if self.pushbox1:
                 self.pushbox1.rotateY(-.07 * ft)
                 self.pushbox2.rotateY(-.07 * ft)
-        game.scene1Update(self, ev)
+        Physics_Demo_Base.scene1Update(self, ev)
 
 
 if __name__ == '__main__':

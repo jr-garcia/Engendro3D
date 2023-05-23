@@ -75,15 +75,17 @@ class Scene(object):
 
 
 
-        @param animationQuality: The quality for the steps of the animations. The higer,
+        @param animationQuality: The quality for the steps of the animations. The higher,
           more frames will be fetched from the animations. If animations are incomplete or
           show jumps, raise this value. Must be equal or higher than 0. Default 1.
         @param modelID: The ID of a model previously loaded with engine.models.loadModel.
         @param IDInScene: The ID that this instance will have in the scene.
+        @param shape: One of bodyShapesEnum
         @type animationQuality: int
         @rtype : ModelInstance
         @type IDInScene: str
         @type modelID: str
+        @type shape: bodyShapesEnum
         """
         if self.hasModel(IDInScene):
             raise NameError("An object with the same ID already exists in the scene:\n" + IDInScene)
@@ -153,7 +155,7 @@ class Scene(object):
     def _modelsUpdate(self):
         # Todo: implement per model calbacks
         for m in self._models.values():
-            if m.physicsBody.isDynamic:
+            if m.physicsBody.isDynamic and not m.physicsBody._beyondBoundary:
                 transform = m.physicsBody._motion.getWorldTransform()
                 pos = vec3(bulletVectorToList(transform.getOrigin() - Vector3(m._pOffset[0], m._pOffset[1], m._pOffset[2])))
                 rot = vec3(bulletQuatToRotList(transform.getRotation()))
@@ -167,6 +169,7 @@ class Scene(object):
                 self.physics.removeRigidObject(m.physicsBody)
                 m.physicsBody._phyUpdWait = 0
                 m.visible = False
+                m.physicsBody._beyondBoundary = True
             else:
                 for Sn in m._attachedSounds.values():
                     Sn.soundSource.position = list(m._position)
